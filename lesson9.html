@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Computing Services Guide</title>
+    <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M62.5,20 a25,25 0 1,0 0,50 h-25 a20,20 0 1,0 -15,-35 a25,25 0 0,0 40,-15" fill="%233B82F6" /></svg>'>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FDFBF8; color: #383838; padding-bottom: 60px; }
+        .nav-link { transition: color 0.3s, border-bottom-color 0.3s; border-bottom: 2px solid transparent; cursor: pointer; }
+        .nav-link.active, .nav-link:hover { color: #3B82F6; border-bottom-color: #3B82F6; }
+        .page-content { display: none; animation: fadeIn 0.8s ease-in-out forwards; }
+        .page-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .social-link svg { transition: transform 0.3s ease; }
+        .social-link:hover svg { transform: scale(1.2); }
+        .quiz-option-label { transition: all 0.2s ease-in-out; }
+        .quiz-option-label.selected { background-color: #93C5FD; border-color: #3B82F6; }
+        .quiz-option-label.correct { background-color: #10B981; color: white; border-color: #059669; }
+        .quiz-option-label.incorrect { background-color: #EF4444; color: white; border-color: #DC2626; }
+        .comparison-layer { position: relative; transition: all 0.3s ease; }
+        .comparison-layer:hover { transform: scale(1.02); box-shadow: 0 0 10px rgba(59, 130, 246, 0.3); }
+        .comparison-layer .tooltip {
+            visibility: hidden; width: 220px; background-color: #1e293b; color: #fff; text-align: center;
+            border-radius: 6px; padding: 8px; position: absolute; z-index: 1; bottom: 105%;
+            left: 50%; margin-left: -110px; opacity: 0; transition: opacity 0.3s; pointer-events: none;
+        }
+        .comparison-layer:hover .tooltip { visibility: visible; opacity: 1; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex-shrink-0">
+                    <h1 class="text-xl font-bold text-gray-800">Cloud Computing Services</h1>
+                </div>
+                <div class="hidden md:flex items-center">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a data-target="home" class="nav-link active px-3 py-2 rounded-md text-sm font-medium">Home</a>
+                        <a data-target="models" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Service Models</a>
+                        <a data-target="comparison" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Comparison</a>
+                        <a data-target="scenarios" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Scenarios</a>
+                        <a data-target="quiz" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Quiz</a>
+                        <a data-target="resources" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Resources</a>
+                    </div>
+                    <div class="ml-4 pl-4 border-l border-gray-300">
+                        <a href="index.html" class="inline-flex items-center bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-semibold hover:bg-blue-200 transition-colors">
+                            Back to Curriculum
+                        </a>
+                    </div>
+                </div>
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
+                        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                    </button>
+                </div>
+            </div>
+            <div id="mobile-menu" class="md:hidden hidden">
+                <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                    <a data-target="home" class="nav-link mobile-link active block px-3 py-2 rounded-md text-base font-medium">Home</a>
+                    <a data-target="models" class="nav-link mobile-link block px-3 py-2 rounded-md text-base font-medium">Service Models</a>
+                    <a data-target="comparison" class="nav-link mobile-link block px-3 py-2 rounded-md text-base font-medium">Comparison</a>
+                    <a data-target="scenarios" class="nav-link mobile-link block px-3 py-2 rounded-md text-base font-medium">Scenarios</a>
+                    <a data-target="quiz" class="nav-link mobile-link block px-3 py-2 rounded-md text-base font-medium">Quiz</a>
+                    <a data-target="resources" class="nav-link mobile-link block px-3 py-2 rounded-md text-base font-medium">Resources</a>
+                    <div class="mt-2 pt-2 border-t border-zinc-200">
+                        <a href="index.html" class="block text-center py-2 px-3 rounded-lg bg-blue-100 text-blue-800 font-semibold">Back to Curriculum</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section id="home" class="page-content active py-12 sm:py-16 lg:py-24">
+             <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h2 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 tracking-tight">Understanding Cloud Computing</h2>
+                <p class="mt-4 max-w-3xl mx-auto text-base sm:text-lg text-gray-600"><strong>Cloud computing</strong> is the delivery of on-demand computing resources—everything from applications to data centers—over the internet on a pay-for-what-you-use basis. Instead of owning and maintaining your own computing infrastructure, you can access these services from a cloud provider like Amazon Web Services (AWS) or Microsoft Azure.</p>
+                
+                <div class="mt-10 max-w-4xl mx-auto bg-gray-50 p-6 rounded-lg shadow-inner border border-gray-200 text-left">
+                    <h3 class="text-xl font-bold text-gray-800 text-center mb-4">Syllabus Focus: A1.1.9</h3>
+                    <p class="font-semibold text-gray-700">This guide comprehensively covers the syllabus requirement to "Describe the different types of services in cloud computing." By exploring all the tabs, you will master:</p>
+                    <ul class="list-disc list-inside mt-4 space-y-2 text-gray-600">
+                        <li>The services: <strong>Software as a Service (SaaS)</strong>, <strong>Platform as a Service (PaaS)</strong>, and <strong>Infrastructure as a Service (IaaS)</strong>.</li>
+                        <li>The differences between these approaches in various real-world scenarios, recognizing how control and flexibility influence resource management and availability.</li>
+                    </ul>
+                </div>
+                 <div class="mt-12">
+                     
+                </div>
+            </div>
+        </section>
+
+        <section id="models" class="page-content hidden py-12 sm:py-16 lg:py-24 bg-white">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900">The Three Cloud Service Models</h2>
+                    <p class="mt-4 max-w-3xl mx-auto text-base sm:text-lg text-gray-600">Cloud services are delivered in three main models, each offering a different level of abstraction, control, and management. Think of it as the difference between ordering a pizza, making one at home with a kit, or building your own oven to cook one from scratch.</p>
+                </div>
+                <div class="mt-12 grid md:grid-cols-3 gap-8 max-w-7xl mx-auto">
+                    <div class="bg-gray-50 p-8 rounded-xl shadow-md">
+                        <h3 class="text-2xl font-bold text-blue-800">Software as a Service (SaaS)</h3>
+                        <p class="mt-2 text-gray-600">Delivers ready-to-use software applications over the internet, typically on a subscription basis. The provider manages everything—the application, the data, and the underlying infrastructure. This is the simplest model for the end-user.</p>
+                        <p class="mt-4"><strong>Analogy:</strong> Ordering a pizza. You don't manage the ingredients, the oven, or the kitchen; you just enjoy the final product.</p>
+                        <p class="mt-2"><strong>Examples:</strong> Google Workspace, Canva, Microsoft Office 365, Zoom.</p>
+                        <p class="mt-2"><strong>Best for:</strong> End-users who need access to software without any technical management.</p>
+                    </div>
+                    <div class="bg-gray-50 p-8 rounded-xl shadow-md">
+                        <h3 class="text-2xl font-bold text-blue-800">Platform as a Service (PaaS)</h3>
+                        <p class="mt-2 text-gray-600">Provides a platform for developers to build, test, and deploy applications without worrying about the underlying infrastructure. The provider manages the servers, storage, networking, and operating system, while the developer manages their application and data.</p>
+                        <p class="mt-4"><strong>Analogy:</strong> A make-at-home pizza kit. The provider gives you the dough, sauce, and toppings (the platform), but you assemble and cook the pizza (your application).</p>
+                        <p class="mt-2"><strong>Examples:</strong> Heroku, Google App Engine, Microsoft Azure App Service.</p>
+                        <p class="mt-2"><strong>Best for:</strong> Developers who want to focus on coding without managing infrastructure.</p>
+                    </div>
+                    <div class="bg-gray-50 p-8 rounded-xl shadow-md">
+                        <h3 class="text-2xl font-bold text-blue-800">Infrastructure as a Service (IaaS)</h3>
+                        <p class="mt-2 text-gray-600">Offers fundamental computing infrastructure—virtual servers, storage, and networking—on demand. The user has the most control and is responsible for managing the operating system, middleware, and applications.</p>
+                        <p class="mt-4"><strong>Analogy:</strong> Renting a commercial kitchen. You get the oven, gas, and water (the infrastructure), but you bring your own ingredients and recipes (OS, middleware, apps).</p>
+                        <p class="mt-2"><strong>Examples:</strong> Amazon Web Services (AWS) EC2, Microsoft Azure Virtual Machines, Google Compute Engine.</p>
+                        <p class="mt-2"><strong>Best for:</strong> System administrators who need maximum control and flexibility over their infrastructure.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="comparison" class="page-content hidden py-12 sm:py-16 lg:py-24 bg-white">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900">Interactive Comparison: Who Manages What?</h2>
+                    <p class="mt-4 max-w-3xl mx-auto text-base sm:text-lg text-gray-600">The key difference between cloud service models is the division of responsibility. Use the buttons below to see a visual breakdown of what you manage versus what the cloud provider manages for each model. Hover over each layer in the diagram for a detailed explanation of what it is.</p>
+                </div>
+                <div class="mt-12 max-w-4xl mx-auto bg-gray-50 p-8 rounded-xl shadow-md">
+                    <div class="flex flex-wrap justify-center gap-2 mb-6">
+                        <button data-model="on-premises" class="comparison-btn px-4 py-2 bg-gray-600 text-white font-semibold rounded-lg shadow-md hover:bg-gray-700 transition">On-Premises</button>
+                        <button data-model="iaas" class="comparison-btn px-4 py-2 bg-gray-200 text-gray-800 font-semibold rounded-lg shadow-md hover:bg-gray-300 transition">IaaS</button>
+                        <button data-model="paas" class="comparison-btn px-4 py-2 bg-gray-200 text-gray-800 font-semibold rounded-lg shadow-md hover:bg-gray-300 transition">PaaS</button>
+                        <button data-model="saas" class="comparison-btn px-4 py-2 bg-gray-200 text-gray-800 font-semibold rounded-lg shadow-md hover:bg-gray-300 transition">SaaS</button>
+                    </div>
+                    <div id="comparison-diagram" class="bg-white p-4 rounded-lg shadow-inner">
+                        <div class="space-y-1 font-semibold text-center text-sm">
+                            <div id="layer-app" class="comparison-layer p-3 rounded"><span class="tooltip">The software you use or build, like a document editor or a custom web app.</span>Application</div>
+                            <div id="layer-data" class="comparison-layer p-3 rounded"><span class="tooltip">The information your application creates and uses, like user profiles or documents.</span>Data</div>
+                            <div id="layer-runtime" class="comparison-layer p-3 rounded"><span class="tooltip">The environment where your application runs (e.g., Java, Python, .NET).</span>Runtime</div>
+                            <div id="layer-middleware" class="comparison-layer p-3 rounded"><span class="tooltip">Software that connects applications and services, like a database management system.</span>Middleware</div>
+                            <div id="layer-os" class="comparison-layer p-3 rounded"><span class="tooltip">The core software that manages the hardware, like Windows Server or Linux.</span>Operating System</div>
+                            <div id="layer-virtualization" class="comparison-layer p-3 rounded"><span class="tooltip">Software that creates virtual machines, allowing multiple OS instances on one physical server.</span>Virtualization</div>
+                            <div id="layer-servers" class="comparison-layer p-3 rounded"><span class="tooltip">The physical computer hardware (CPU, RAM, etc.) that runs the software.</span>Servers</div>
+                            <div id="layer-storage" class="comparison-layer p-3 rounded"><span class="tooltip">The physical hard drives (HDDs/SSDs) where data is stored.</span>Storage</div>
+                            <div id="layer-networking" class="comparison-layer p-3 rounded"><span class="tooltip">The physical routers, switches, and firewalls that manage traffic.</span>Networking</div>
+                        </div>
+                    </div>
+                    <div class="mt-4 flex justify-center space-x-6 text-sm font-semibold">
+                        <div><span class="inline-block w-4 h-4 bg-blue-500 rounded-sm mr-2 align-middle"></span>You Manage</div>
+                        <div><span class="inline-block w-4 h-4 bg-gray-400 rounded-sm mr-2 align-middle"></span>Provider Manages</div>
+                    </div>
+                    <div id="comparison-explanation" class="mt-6 bg-white p-4 rounded-lg border">
+                        <h4 class="font-bold text-lg text-gray-800" id="explanation-title">On-Premises</h4>
+                        <p id="explanation-text" class="mt-2 text-gray-600">With traditional on-premises IT, you are responsible for managing everything: the physical servers, the networking, the operating system, and all the software and applications. This gives you maximum control but also maximum responsibility and cost.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="scenarios" class="page-content hidden py-12 sm:py-16 lg:py-24 bg-white">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900">Real-World Scenarios</h2>
+                    <p class="mt-4 max-w-3xl mx-auto text-base sm:text-lg text-gray-600">Understanding the trade-offs between control, flexibility, and ease of use is key to choosing the right cloud model. Here’s how different users would approach their needs.</p>
+                </div>
+                <div class="mt-12 max-w-4xl mx-auto space-y-6">
+                    <div class="bg-gray-50 p-6 rounded-lg shadow-md border-l-4 border-blue-500">
+                        <h3 class="text-xl font-bold text-gray-800">Scenario 1: The Startup</h3>
+                        <p class="mt-2 text-gray-600"><strong>Problem:</strong> A small team of developers wants to build and launch a web application quickly. They have limited budget and no IT staff to manage servers, databases, or operating systems. Their primary focus is writing code and getting their product to market.</p>
+                        <p class="mt-4 font-semibold text-blue-700"><strong>Best Choice: Platform as a Service (PaaS).</strong> PaaS provides the perfect balance. It handles all the complex infrastructure (OS, servers, networking), allowing the developers to simply upload their code and have it run. This maximizes their development speed and minimizes their operational overhead.</p>
+                    </div>
+                    <div class="bg-gray-50 p-6 rounded-lg shadow-md border-l-4 border-blue-500">
+                        <h3 class="text-xl font-bold text-gray-800">Scenario 2: The Global Corporation</h3>
+                        <p class="mt-2 text-gray-600"><strong>Problem:</strong> A large enterprise needs to run a complex, legacy application that requires a specific version of an operating system and custom network configurations. They need full control over the virtual machine environment to ensure compatibility and security.</p>
+                        <p class="mt-4 font-semibold text-blue-700"><strong>Best Choice: Infrastructure as a Service (IaaS).</strong> IaaS offers the highest degree of control and flexibility. The corporation's IT team can provision virtual machines with the exact OS version they need, configure the networking precisely, and manage the entire environment as if it were their own hardware, but without the physical maintenance.</p>
+                    </div>
+                     <div class="bg-gray-50 p-6 rounded-lg shadow-md border-l-4 border-blue-500">
+                        <h3 class="text-xl font-bold text-gray-800">Scenario 3: The School District</h3>
+                        <p class="mt-2 text-gray-600"><strong>Problem:</strong> A school district needs to provide email and document collaboration tools for 10,000 students and staff. They have no interest in hosting email servers or managing software updates. They need a solution that is ready to use immediately and accessible from anywhere.</p>
+                        <p class="mt-4 font-semibold text-blue-700"><strong>Best Choice: Software as a Service (SaaS).</strong> SaaS is the perfect fit. A service like Google Workspace or Microsoft 365 provides the applications out-of-the-box. The school district simply manages user accounts, while the provider handles all security, maintenance, and infrastructure, ensuring high resource availability.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="quiz" class="page-content hidden py-12 sm:py-16 lg:py-24 bg-white">
+             <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900">IB-Style Knowledge Assessment</h2>
+                    <p class="mt-4 max-w-3xl mx-auto text-base sm:text-lg text-gray-600">This quiz is designed to mirror the style of an IB examination. You will be tested on your ability to recall key facts and apply your understanding to various scenarios.</p>
+                </div>
+                <div id="quiz-wrapper" class="mt-12 max-w-4xl mx-auto">
+                    <div id="quiz-start-screen" class="text-center bg-gray-50 p-8 rounded-lg shadow-md">
+                        <h3 class="text-2xl font-bold text-gray-800">Ready to Test Your Knowledge?</h3>
+                        <p class="mt-2 text-gray-600">You will have <strong>37 minutes</strong> to answer <strong>60 questions</strong> randomly selected from our large, topic-specific question bank.</p>
+                        <button id="start-quiz-btn" class="mt-6 px-8 py-3 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 transition">Start Quiz</button>
+                    </div>
+
+                    <div id="quiz-container" class="hidden">
+                        <div class="flex justify-between items-center mb-4 p-4 bg-gray-100 rounded-lg">
+                            <h3 class="text-xl font-bold text-gray-800">Cloud Computing Quiz</h3>
+                            <div id="timer" class="text-lg font-bold text-red-500">37:00</div>
+                        </div>
+                        <div id="quiz-questions" class="space-y-6 bg-gray-50 p-6 rounded-lg"></div>
+                        <button id="submit-quiz-btn" class="mt-8 w-full px-8 py-3 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 transition">Submit Answers</button>
+                    </div>
+
+                    <div id="quiz-results-screen" class="hidden text-center bg-gray-50 p-8 rounded-lg shadow-md">
+                        <h3 class="text-2xl font-bold text-gray-800">Quiz Complete!</h3>
+                        <p class="mt-2 text-gray-600">Here are your results.</p>
+                        <div id="quiz-score-display" class="my-4 text-4xl font-extrabold text-blue-600"></div>
+                        <div id="quiz-time-taken" class="text-gray-600"></div>
+                        <button id="review-answers-btn" class="mt-6 px-8 py-3 bg-gray-500 text-white font-semibold rounded-lg shadow-md hover:bg-gray-600 transition">Review Your Answers</button>
+                        <div id="quiz-review" class="hidden mt-8 text-left space-y-6"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="resources" class="page-content hidden py-12 sm:py-16 lg:py-24 bg-white">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900">Further Learning Resources</h2>
+                    <p class="mt-4 max-w-3xl mx-auto text-base sm:text-lg text-gray-600">To achieve a world-class understanding, supplement your learning with these curated resources. They provide deeper technical insights and alternative explanations to solidify your knowledge.</p>
+                </div>
+                <div class="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+                    <div class="bg-gray-50 p-6 rounded-lg shadow-md">
+                        <h4 class="font-bold text-lg text-blue-600">IBM: IaaS vs PaaS vs SaaS</h4>
+                        <p class="mt-2 text-sm text-gray-600">A clear, well-explained video from a major cloud provider that breaks down the service models with great analogies.</p>
+                        <a href="https://youtube.com/playlist?list=PLOspHqNVtKAC-_ZAGresP-i0okHe5FjcJ&si=Wu2W11r-Bqp4XUVx" target="_blank" class="mt-4 inline-block text-blue-500 hover:underline font-semibold">Watch on YouTube →</a>
+                    </div>
+                    <div class="bg-gray-50 p-6 rounded-lg shadow-md">
+                        <h4 class="font-bold text-lg text-blue-600"> Cloud Computing Explained</h4>
+                        <p class="mt-2 text-sm text-gray-600">A fast-paced, high-level overview of what the cloud is and the services it provides in under two minutes.</p>
+                        <a href="https://youtube.com/playlist?list=PLEiEAq2VkUUIJ3o1tehvtux0_Ynf42CBN&si=j_g3bbwXdgT-TZ-C" target="_blank" class="mt-4 inline-block text-blue-500 hover:underline font-semibold">Watch on YouTube →</a>
+                    </div>
+                    <div class="bg-gray-50 p-6 rounded-lg shadow-md">
+                        <h4 class="font-bold text-lg text-blue-600">Microsoft Azure: What is PaaS?</h4>
+                        <p class="mt-2 text-sm text-gray-600">A detailed article from Microsoft that explains the scenarios, advantages, and use cases for Platform as a Service.</p>
+                        <a href="https://azure.microsoft.com/en-us/resources/cloud-computing-dictionary/what-is-paas" target="_blank" class="mt-4 inline-block text-blue-500 hover:underline font-semibold">Read Article →</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <footer class="fixed bottom-0 left-0 w-full bg-white py-2 border-t border-stone-200 text-center text-sm text-stone-500">
+        <div class="container mx-auto px-6 flex flex-col sm:flex-row justify-center items-center space-y-2 sm:space-y-0 sm:space-x-4">
+            <div class="flex items-center space-x-4">
+                <a href="https://www.linkedin.com/in/emmayeboah360/" class="text-blue-600 hover:text-blue-800 social-link" target="_blank">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.762s.784-1.762 1.75-1.762 1.75.79 1.75 1.762-.784 1.762-1.75 1.762zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                    </svg>
+                </a>
+                <a href="mailto:yemmanuel308@gmail.com" class="text-rose-600 hover:text-rose-800 social-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 12.713l-11.75 6.287 11.75 5.5zM23.75 18.995l-11.75-6.287v11.748zM12 11.287l-12-6.287v1.868l12 6.287l12-6.287v-1.868z"/>
+                    </svg>
+                </a>
+            </div>
+            <p class="pl-4">&copy; 2025 Emmanuel Yeboah. All rights reserved.</p>
+        </div>
+    </footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const navLinks = document.querySelectorAll('.nav-link');
+    const pages = document.querySelectorAll('.page-content');
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+
+    mobileMenuButton.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+    });
+
+    function switchTab(targetId) {
+        pages.forEach(page => page.classList.remove('active'));
+        const targetPage = document.getElementById(targetId);
+        if (targetPage) {
+            targetPage.classList.add('active');
+        }
+
+        navLinks.forEach(navLink => {
+            navLink.classList.toggle('active', navLink.dataset.target === targetId);
+        });
+        
+        mobileMenu.classList.add('hidden');
+    }
+
+    navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetId = e.currentTarget.dataset.target;
+            switchTab(targetId);
+        });
+    });
+
+    // Comparison Diagram Logic
+    const comparisonBtns = document.querySelectorAll('.comparison-btn');
+    const layers = {
+        app: document.getElementById('layer-app'),
+        data: document.getElementById('layer-data'),
+        runtime: document.getElementById('layer-runtime'),
+        middleware: document.getElementById('layer-middleware'),
+        os: document.getElementById('layer-os'),
+        virtualization: document.getElementById('layer-virtualization'),
+        servers: document.getElementById('layer-servers'),
+        storage: document.getElementById('layer-storage'),
+        networking: document.getElementById('layer-networking'),
+    };
+    const explanationTitle = document.getElementById('explanation-title');
+    const explanationText = document.getElementById('explanation-text');
+    
+    const userManagesColor = 'bg-blue-500 text-white';
+    const providerManagesColor = 'bg-gray-400 text-white';
+
+    const models = {
+        'on-premises': {
+            managedByYou: ['app', 'data', 'runtime', 'middleware', 'os', 'virtualization', 'servers', 'storage', 'networking'],
+            title: 'On-Premises',
+            text: 'With traditional on-premises IT, you are responsible for managing everything: the physical servers, the networking, the operating system, and all the software and applications. This gives you maximum control but also maximum responsibility and cost.'
+        },
+        'iaas': {
+            managedByYou: ['app', 'data', 'runtime', 'middleware', 'os'],
+            title: 'Infrastructure as a Service (IaaS)',
+            text: 'With IaaS, the cloud provider manages the core infrastructure (servers, storage, networking, virtualization). You have control over the operating system and everything above it, offering great flexibility for system administrators.'
+        },
+        'paas': {
+            managedByYou: ['app', 'data'],
+            title: 'Platform as a Service (PaaS)',
+            text: 'With PaaS, the provider manages nearly everything except for your application and data. This allows developers to focus entirely on building and deploying applications without worrying about the underlying platform.'
+        },
+        'saas': {
+            managedByYou: [],
+            title: 'Software as a Service (SaaS)',
+            text: 'With SaaS, everything is managed by the provider. You simply use the software through a web browser or app. This offers the least control but is the easiest to use and manage from a user perspective.'
+        }
+    };
+
+    function updateComparisonDiagram(modelKey) {
+        const model = models[modelKey];
+        Object.keys(layers).forEach(layerKey => {
+            const layerEl = layers[layerKey];
+            if (layerEl) {
+                if (model.managedByYou.includes(layerKey)) {
+                    layerEl.className = `comparison-layer p-3 rounded ${userManagesColor}`;
+                } else {
+                    layerEl.className = `comparison-layer p-3 rounded ${providerManagesColor}`;
+                }
+            }
+        });
+        if (explanationTitle) explanationTitle.textContent = model.title;
+        if (explanationText) explanationText.textContent = model.text;
+
+        comparisonBtns.forEach(btn => {
+            if (btn.dataset.model === modelKey) {
+                btn.classList.remove('bg-gray-200', 'text-gray-800');
+                btn.classList.add('bg-blue-600', 'text-white');
+            } else {
+                btn.classList.remove('bg-blue-600', 'text-white');
+                btn.classList.add('bg-gray-200', 'text-gray-800');
+            }
+        });
+    }
+
+    comparisonBtns.forEach(btn => {
+        btn.addEventListener('click', () => updateComparisonDiagram(btn.dataset.model));
+    });
+
+    // IB Quiz Logic
+    const startQuizBtn = document.getElementById('start-quiz-btn');
+    const quizStartScreen = document.getElementById('quiz-start-screen');
+    const quizContainer = document.getElementById('quiz-container');
+    const quizQuestionsContainer = document.getElementById('quiz-questions');
+    const submitQuizBtn = document.getElementById('submit-quiz-btn');
+    const quizResultsScreen = document.getElementById('quiz-results-screen');
+    const quizScoreDisplay = document.getElementById('quiz-score-display');
+    const quizTimeTakenEl = document.getElementById('quiz-time-taken');
+    const reviewAnswersBtn = document.getElementById('review-answers-btn');
+    const quizReviewEl = document.getElementById('quiz-review');
+    const timerEl = document.getElementById('timer');
+
+    let timerInterval;
+    let timeRemaining;
+    let activeQuizQuestions = [];
+    const userAnswers = [];
+
+    const questionBank = [
+        // Foundational Concepts (1-20)
+        { q: "Which cloud service model provides the highest level of control to the user over the operating system and virtualized hardware?", options: ["SaaS", "PaaS", "IaaS", "FaaS"], answer: "IaaS" },
+        { q: "Salesforce and Dropbox are prominent examples of which cloud service model?", options: ["IaaS", "PaaS", "SaaS", "On-Premises"], answer: "SaaS" },
+        { q: "A developer team wants to focus solely on writing code and deploying their application, without managing the underlying runtime environment or servers. Which model is most suitable?", options: ["SaaS", "PaaS", "IaaS", "Bare Metal"], answer: "PaaS" },
+        { q: "In the 'Pizza as a Service' analogy, what does PaaS represent?", options: ["Dining at a restaurant", "A take-and-bake pizza kit", "Making pizza from scratch in your own kitchen", "Renting a fully equipped kitchen"], answer: "A take-and-bake pizza kit" },
+        { q: "What is the primary responsibility of the user in a SaaS model?", options: ["Managing the operating system", "Managing their own data and user access", "Managing the network infrastructure", "Managing the application runtime"], answer: "Managing their own data and user access" },
+        { q: "Which of the following is managed by the cloud provider in an IaaS model?", options: ["Application", "Data", "Operating System", "Virtualization"], answer: "Virtualization" },
+        { q: "Which service model abstracts away the most infrastructure, offering a ready-to-use application to the end-user?", options: ["IaaS", "PaaS", "SaaS", "CaaS"], answer: "SaaS" },
+        { q: "Google App Engine is an example of which cloud service model?", options: ["IaaS", "PaaS", "SaaS", "DaaS"], answer: "PaaS" },
+        { q: "A key benefit of IaaS is the ability to provision raw computing resources like virtual machines and storage on demand. This is often referred to as:", options: ["Software licensing", "Platform abstraction", "Utility computing", "Application streaming"], answer: "Utility computing" },
+        { q: "Which statement best describes the division of responsibility in PaaS?", options: ["The user manages everything.", "The provider manages everything.", "The provider manages the platform; the user manages the application.", "The user manages the hardware; the provider manages the software."], answer: "The provider manages the platform; the user manages the application." },
+        { q: "In an on-premises model, who is responsible for physical security of the data center?", options: ["The cloud provider", "A third-party security firm", "The user/organization", "It is a shared responsibility"], answer: "The user/organization" },
+        { q: "Which model typically involves a pay-as-you-go pricing structure based on consumption of resources like CPU cycles and storage?", options: ["On-Premises", "IaaS", "SaaS (always fixed subscription)", "PaaS (never usage-based)"], answer: "IaaS" },
+        { q: "The ability to scale resources up or down based on demand is a core feature of cloud computing known as:", options: ["Elasticity", "Durability", "Abstraction", "Virtualization"], answer: "Elasticity" },
+        { q: "Which layer is the user responsible for managing in PaaS but not in SaaS?", options: ["Networking", "Storage", "Application and Data", "Operating System"], answer: "Application and Data" },
+        { q: "Microsoft Azure Virtual Machines fall under which service category?", options: ["SaaS", "PaaS", "IaaS", "On-Premises"], answer: "IaaS" },
+        { q: "In the context of cloud services, 'multitenancy' refers to:", options: ["A single customer using multiple services", "Multiple customers sharing the same infrastructure", "A service being available in multiple countries", "A user having multiple accounts"], answer: "Multiple customers sharing the same infrastructure" },
+        { q: "Which model gives a system administrator the flexibility to install custom operating systems and software stacks?", options: ["SaaS", "PaaS", "IaaS", "FaaS"], answer: "IaaS" },
+        { q: "What does the 'as a Service' part of IaaS, PaaS, and SaaS signify?", options: ["The service is free", "The service is delivered and managed over the internet", "The service is a physical product", "The service requires a long-term contract"], answer: "The service is delivered and managed over the internet" },
+        { q: "Which model is most analogous to renting an apartment where the landlord handles maintenance (the infrastructure), but you furnish it (install OS, apps)?", options: ["SaaS", "PaaS", "IaaS", "On-Premises (owning a house)"], answer: "IaaS" },
+        { q: "A primary advantage of SaaS for a non-technical small business is:", options: ["Complete control over the hardware", "Reduced need for in-house IT expertise", "Ability to customize the application source code", "Management of the network firewall"], answer: "Reduced need for in-house IT expertise" },
+        
+        // Scenario-Based Questions (21-50)
+        { q: "A gaming company needs to host a massively multiplayer online game that experiences huge traffic spikes during evenings and weekends. They require granular control over network configurations to minimize latency. Which model is best?", options: ["SaaS", "PaaS", "IaaS", "On-Premises"], answer: "IaaS" },
+        { q: "A university wants to provide an email service for 50,000 students. They do not have the IT staff to manage email servers, security patching, and uptime. What is their best option?", options: ["Build their own servers (On-Premises)", "Use an IaaS provider to build mail servers", "Subscribe to a SaaS solution like Google Workspace", "Use a PaaS solution to code their own email client"], answer: "Subscribe to a SaaS solution like Google Workspace" },
+        { q: "A mobile app development startup wants to rapidly prototype and deploy their backend services. They use standard programming languages and don't want to manage database administration or server patching. Which model accelerates their development?", options: ["SaaS", "PaaS", "IaaS", "Colocation"], answer: "PaaS" },
+        { q: "A financial institution must run a legacy application that only works on a specific, outdated version of Windows Server. They want to move off their aging hardware but retain full administrative access to the OS. What should they choose?", options: ["SaaS, because it's managed", "PaaS, to rewrite the application", "IaaS, to create a VM with the specific OS", "On-Premises is the only option"], answer: "IaaS, to create a VM with the specific OS" },
+        { q: "A freelance graphic designer needs access to professional video editing software but cannot afford the high upfront cost of a perpetual license. Which model allows them to access the software on a subscription basis?", options: ["IaaS", "PaaS", "SaaS", "Bare Metal"], answer: "SaaS" },
+        { q: "A data science team needs to process a massive dataset for a one-time research project. They need a cluster of powerful virtual machines for a few days. Which model is most cost-effective?", options: ["Buying physical servers (On-Premises)", "Using an IaaS provider", "Subscribing to a SaaS analytics tool", "Using a PaaS web hosting service"], answer: "Using an IaaS provider" },
+        { q: "A company is developing a new IoT application. The developers want a managed environment that handles message queuing, database services, and automatic scaling for them, so they can focus on the application logic. What is the ideal choice?", options: ["SaaS", "PaaS", "IaaS", "On-Premises"], answer: "PaaS" },
+        { q: "A marketing team wants to launch a new website using a popular CMS like WordPress. They want a solution that is pre-configured and optimized for WordPress, requiring minimal technical setup. What should they look for?", options: ["An IaaS VM to install WordPress from scratch", "A specialized PaaS for WordPress hosting", "A SaaS website builder like Wix", "An on-premises server in their office"], answer: "A specialized PaaS for WordPress hosting" },
+        { q: "A large e-commerce retailer needs complete control over their infrastructure for security compliance (PCI DSS). They need to define their own virtual private cloud (VPC) and network access control lists (ACLs). Which model provides this level of control?", options: ["SaaS", "PaaS", "IaaS", "Multi-tenant PaaS"], answer: "IaaS" },
+        { q: "A high school wants to use a learning management system (LMS) to deliver online courses. The school has no IT department. The system must be accessible via a web browser and require no installation for students. What is the appropriate model?", options: ["IaaS", "PaaS", "SaaS", "On-Premises"], answer: "SaaS" },
+        { q: "A research lab needs to run complex simulations that require specialized hardware (GPUs). Which model allows them to rent virtual machines with specific hardware configurations?", options: ["SaaS", "PaaS", "IaaS", "All models provide this"], answer: "IaaS" },
+        { q: "A startup has built a web application and now needs a database. They don't want to manage database replication, backups, or patching. Which type of service would they seek?", options: ["IaaS virtual machine with a manual database install", "A managed database service (often considered PaaS/DBaaS)", "A SaaS spreadsheet tool", "An on-premises database server"], answer: "A managed database service (often considered PaaS/DBaaS)" },
+        { q: "A government agency needs to host a public-facing website. They have a dedicated IT team that wants to manage the web server and application stack but wants to offload the physical hardware and data center management. What model fits?", options: ["SaaS", "PaaS", "IaaS", "Fully On-Premises"], answer: "IaaS" },
+        { q: "An individual blogger wants to start a personal blog. They have no coding knowledge and want the simplest, quickest way to get started. Which of these is the most suitable SaaS solution?", options: ["AWS EC2 (IaaS)", "Heroku (PaaS)", "WordPress.com (SaaS)", "A self-hosted Ghost instance (On-Premises)"], answer: "WordPress.com (SaaS)" },
+        { q: "A company's primary goal is to reduce capital expenditure (CapEx) on hardware and shift to operational expenditure (OpEx). Which of the following directly achieves this goal?", options: ["Building a new on-premises data center", "Adopting any cloud service model (IaaS, PaaS, or SaaS)", "Buying perpetual software licenses", "Hiring more IT staff"], answer: "Adopting any cloud service model (IaaS, PaaS, or SaaS)" },
+        { q: "A software company wants to offer a trial version of their desktop application to users without requiring them to install it. They could use a service that streams the application to the user's browser. This is a form of:", options: ["IaaS", "PaaS", "SaaS", "On-Premises"], answer: "SaaS" },
+        { q: "A financial services company is legally required to store its data in a specific geographic region. How does IaaS address this?", options: ["It cannot; data location is unknown", "By allowing the company to choose the data center region for their resources", "This is only possible with SaaS", "This requires an on-premises solution"], answer: "By allowing the company to choose the data center region for their resources" },
+        { q: "A developer is building a serverless application using functions that trigger on events (e.g., AWS Lambda). This 'Functions as a Service' (FaaS) model is generally considered an evolution of which core model?", options: ["IaaS", "PaaS", "SaaS", "On-Premises"], answer: "PaaS" },
+        { q: "A video streaming service like Netflix needs to store and deliver petabytes of video content globally. Which cloud model's fundamental building blocks of storage and networking are essential for this?", options: ["SaaS for their CRM", "PaaS for their website", "IaaS for their core content delivery infrastructure", "On-premises for all their servers"], answer: "IaaS for their core content delivery infrastructure" },
+        { q: "A user wants to use an online photo editing tool like Canva. They upload photos, apply filters, and download the result, all within their browser. What service model are they using?", options: ["IaaS", "PaaS", "SaaS", "A local application"], answer: "SaaS" },
+        { q: "An organization is migrating to the cloud. Their IT team is experienced in managing servers but not in cloud-native development. Which model provides the smoothest transition, leveraging their existing skills?", options: ["SaaS", "PaaS", "IaaS", "Serverless"], answer: "IaaS" },
+        { q: "A retail company experiences a massive surge in website traffic during Black Friday. The ability of the cloud to automatically add more servers to handle the load is an example of a benefit most directly associated with:", options: ["Fixed capacity of on-premises", "The elasticity of IaaS and PaaS", "The user interface of SaaS", "The physical security of the data center"], answer: "The elasticity of IaaS and PaaS" },
+        { q: "A developer needs to deploy a Docker container. They want a service that manages the container orchestration (like Kubernetes) for them. This managed Kubernetes service would be classified as:", options: ["IaaS", "A form of PaaS (sometimes called CaaS)", "SaaS", "Bare Metal"], answer: "A form of PaaS (sometimes called CaaS)" },
+        { q: "A company decides to use Microsoft 365 for its office productivity tools. What is the company's responsibility regarding the application software?", options: ["They must install updates and patches for Word and Excel.", "They are responsible for nothing; the provider manages all software updates.", "They must manage the server operating system for the applications.", "They have to write the code for the applications."], answer: "They are responsible for nothing; the provider manages all software updates." },
+        { q: "A media company wants to transcode large video files into different formats. They can write a script and run it on a fleet of virtual machines that they can provision for the task and then shut down. This is a use case for:", options: ["SaaS email", "A PaaS web platform", "IaaS compute resources", "An on-premises file server"], answer: "IaaS compute resources" },
+        { q: "The 'shared responsibility model' is a key concept in cloud security. In an IaaS model, who is responsible for patching the guest operating system on a virtual machine?", options: ["The cloud provider", "The hardware manufacturer", "The customer", "It is fully automated and no one's responsibility"], answer: "The customer" },
+        { q: "A startup wants to use a cloud-based database, but their developers are skilled in different database technologies (SQL and NoSQL). Which cloud model gives them the freedom to install and manage any database software they choose?", options: ["SaaS", "PaaS", "IaaS", "FaaS"], answer: "IaaS" },
+        { q: "A non-profit organization wants a simple way to collect donations online. They decide to use a service like PayPal or Stripe. This service, which integrates into their website, is an example of:", options: ["IaaS", "PaaS", "SaaS", "On-Premises accounting"], answer: "SaaS" },
+        { q: "A large enterprise wants to perform a 'lift and shift' migration, moving their existing applications to the cloud with minimal changes. Which model is most suitable for this initial step?", options: ["Rewriting everything for PaaS", "Using SaaS equivalents for all apps", "Moving the applications to IaaS virtual machines", "Keeping everything on-premises"], answer: "Moving the applications to IaaS virtual machines" },
+        { q: "A developer is using Heroku to deploy their Ruby on Rails application. They push their code to Heroku, and the platform automatically handles the server, runtime, and dependencies. This is a classic example of:", options: ["IaaS", "PaaS", "SaaS", "On-Premises"], answer: "PaaS" },
+
+        // Comparative & Analytical Questions (51-100)
+        { q: "What is the primary trade-off when choosing IaaS over PaaS?", options: ["Less cost for more features", "Less control for more convenience", "More control for more management responsibility", "Less security for more speed"], answer: "More control for more management responsibility" },
+        { q: "Moving from an On-Premises solution to IaaS offloads which of the following responsibilities to the cloud provider?", options: ["Application development", "User access management", "Physical server maintenance", "Data classification"], answer: "Physical server maintenance" },
+        { q: "Which two layers of the technology stack are typically managed by the user in PaaS?", options: ["Virtualization and Servers", "Runtime and Middleware", "Application and Data", "Networking and Storage"], answer: "Application and Data" },
+        { q: "A key difference between SaaS and PaaS from a developer's perspective is that PaaS allows for:", options: ["Access to the underlying hardware", "Custom application development", "No need to manage data", "A fixed monthly subscription cost"], answer: "Custom application development" },
+        { q: "Which cloud model presents the lowest barrier to entry for a company wanting to use a specific software without any IT overhead?", options: ["IaaS", "PaaS", "SaaS", "On-Premises"], answer: "SaaS" },
+        { q: "In the shared responsibility model, security 'of' the cloud is the provider's duty, while security 'in' the cloud is the user's. In IaaS, which of these is a user responsibility?", options: ["Securing the physical data center", "Configuring network firewalls for their VMs", "Patching the hypervisor", "Managing the storage hardware"], answer: "Configuring network firewalls for their VMs" },
+        { q: "Why would a company choose PaaS over IaaS for a new, standard web application?", options: ["To have root access to the virtual machine", "To install a custom operating system", "To accelerate development by abstracting infrastructure", "To manage their own load balancers"], answer: "To accelerate development by abstracting infrastructure" },
+        { q: "Which statement accurately compares the flexibility of IaaS and SaaS?", options: ["SaaS is more flexible as you can change the source code", "IaaS is more flexible as it provides control over the OS and network", "Both offer the same level of flexibility", "Flexibility is not a feature of cloud services"], answer: "IaaS is more flexible as it provides control over the OS and network" },
+        { q: "The total cost of ownership (TCO) is generally lowest for which model, assuming the application meets the user's needs out-of-the-box?", options: ["On-Premises", "IaaS", "PaaS", "SaaS"], answer: "SaaS" },
+        { q: "Which of the following is managed by the provider in PaaS but by the user in IaaS?", options: ["The application", "The data", "The operating system", "The physical servers"], answer: "The operating system" },
+        { q: "Which characteristic is NOT a primary benefit of SaaS?", options: ["Rapid deployment", "Low upfront cost", "Deep customizability of the core application", "Accessibility from any location"], answer: "Deep customizability of the core application" },
+        { q: "In which model is the risk of vendor lock-in potentially highest, due to reliance on proprietary APIs and services?", options: ["On-Premises", "IaaS", "PaaS", "All have equal risk"], answer: "PaaS" },
+        { q: "A key advantage of IaaS over an on-premises data center is:", options: ["The elimination of software licensing costs", "The conversion of capital expenses to operational expenses", "Complete control over application source code", "No need for IT staff"], answer: "The conversion of capital expenses to operational expenses" },
+        { q: "If a company has a unique security compliance requirement that involves custom server hardening scripts, why would IaaS be a better choice than PaaS?", options: ["PaaS does not have servers", "IaaS provides the necessary OS-level control to run the scripts", "SaaS is the only secure option", "PaaS is more expensive"], answer: "IaaS provides the necessary OS-level control to run the scripts" },
+        { q: "Which service model most reduces the time-to-market for a new software application?", options: ["On-Premises", "IaaS", "PaaS", "Colocation"], answer: "PaaS" },
+        { q: "In all three cloud service models (IaaS, PaaS, SaaS), what is the customer always responsible for?", options: ["The network infrastructure", "The physical servers", "The data and its governance", "The application runtime"], answer: "The data and its governance" },
+        { q: "Which model offers the most straightforward path for disaster recovery by allowing replication of entire virtual machines to a different geographic region?", options: ["SaaS", "PaaS", "IaaS", "On-Premises"], answer: "IaaS" },
+        { q: "The management overhead for the IT team is highest in which of these models?", options: ["SaaS", "PaaS", "IaaS", "On-Premises"], answer: "On-Premises" },
+        { q: "The management overhead for the IT team is lowest in which of these cloud models?", options: ["IaaS", "PaaS", "SaaS", "It is the same for all"], answer: "SaaS" },
+        { q: "Which model is best described as providing 'building blocks' for IT infrastructure?", options: ["SaaS", "PaaS", "IaaS", "FaaS"], answer: "IaaS" },
+        { q: "Why might a developer choose IaaS over PaaS?", options: ["They do not want to manage their own application code.", "They require a specific version of a programming language not supported by the PaaS.", "They want the simplest possible deployment process.", "They want to avoid managing a database."], answer: "They require a specific version of a programming language not supported by the PaaS." },
+        { q: "For a company that consumes a SaaS product, concerns about application uptime and performance are primarily the responsibility of:", options: ["The company's CEO", "The company's IT department", "The SaaS provider", "The end-users"], answer: "The SaaS provider" },
+        { q: "Which of the following components is managed by the user in BOTH IaaS and PaaS?", options: ["Runtime", "Operating System", "Data", "Virtualization"], answer: "Data" },
+        { q: "Scalability in a SaaS application is managed by:", options: ["The user, by adding more licenses", "The developer, by writing scalable code", "The provider, by scaling their underlying infrastructure", "It is not possible to scale SaaS applications"], answer: "The provider, by scaling their underlying infrastructure" },
+        { q: "Which model provides a complete solution stack (hardware, software, application) as a service?", options: ["IaaS", "PaaS", "SaaS", "On-Premises"], answer: "SaaS" },
+        { q: "From a financial perspective, what is a major difference between on-premises and IaaS?", options: ["IaaS has high capital expenditure (CapEx)", "On-premises has predictable monthly operational expenditure (OpEx)", "IaaS turns CapEx into OpEx", "There is no financial difference"], answer: "IaaS turns CapEx into OpEx" },
+        { q: "Which layer of the stack represents the main value-add of a PaaS provider over an IaaS provider?", options: ["Networking", "Storage", "Application", "Managed Runtime and Middleware"], answer: "Managed Runtime and Middleware" },
+        { q: "Which model requires the user to have the most technical expertise in network and server administration?", options: ["SaaS", "PaaS", "IaaS", "All require the same expertise"], answer: "IaaS" },
+        { q: "If a security vulnerability is discovered in the Linux kernel, who is responsible for patching it in a PaaS environment?", options: ["The application developer", "The end-user", "The cloud provider", "The Linux Foundation"], answer: "The cloud provider" },
+        { q: "If a security vulnerability is discovered in the Linux kernel, who is responsible for patching it on an IaaS virtual machine?", options: ["The cloud provider is solely responsible", "The user/customer is solely responsible", "It's a shared responsibility", "The hardware vendor"], answer: "The user/customer is solely responsible" },
+        { q: "Which model is the most opinionated, offering the least choice but the most convenience?", options: ["IaaS", "PaaS", "SaaS", "On-Premises"], answer: "SaaS" },
+        { q: "A company wants to run a containerized application. Which service provides the highest level of abstraction for this task?", options: ["An IaaS VM where they install Docker themselves", "A managed container orchestration service (PaaS/CaaS)", "A SaaS application", "An on-premises server"], answer: "A managed container orchestration service (PaaS/CaaS)" },
+        { q: "The term 'resource pooling' in cloud computing means that a provider's resources are:", options: ["Assigned to only one customer", "Used to serve multiple customers using a multi-tenant model", "Always located in a single physical location", "Never shared between customers"], answer: "Used to serve multiple customers using a multi-tenant model" },
+        { q: "What is a potential disadvantage of SaaS?", options: ["Requires significant IT management", "Limited configuration and customization options", "User is responsible for application uptime", "High upfront hardware costs"], answer: "Limited configuration and customization options" },
+        { q: "In the 'Pizza as a Service' analogy, on-premises is equivalent to:", options: ["Dining out", "Take-and-bake", "Pizza delivery", "Making everything from scratch at home"], answer: "Making everything from scratch at home" },
+        { q: "Which model is focused on the 'what' (the application) rather than the 'how' (the infrastructure)?", options: ["IaaS", "PaaS", "SaaS", "Bare Metal"], answer: "SaaS" },
+        { q: "Which model is focused on providing an environment for developers to build upon?", options: ["IaaS", "PaaS", "SaaS", "FaaS"], answer: "PaaS" },
+        { q: "Which model is focused on providing fundamental compute, storage, and networking resources?", options: ["IaaS", "PaaS", "SaaS", "On-Premises"], answer: "IaaS" },
+        { q: "A user of a SaaS application is typically billed based on:", options: ["CPU cycles consumed", "Per-user subscription fees", "Amount of storage used", "Network bandwidth"], answer: "Per-user subscription fees" },
+        { q: "A user of an IaaS service is typically billed based on:", options: ["A fixed fee per application", "The number of features they use", "Consumption of resources like vCPU hours and GB of storage", "The number of users"], answer: "Consumption of resources like vCPU hours and GB of storage" },
+        { q: "Which model inherently offers the fastest provisioning time for a new user to get started with an application?", options: ["On-Premises", "IaaS", "PaaS", "SaaS"], answer: "SaaS" },
+        { q: "A key business driver for choosing PaaS is:", options: ["Gaining control over hardware virtualization", "Reducing the complexity of software development and deployment", "Avoiding monthly subscription fees", "Managing network switches and routers"], answer: "Reducing the complexity of software development and deployment" },
+        { q: "Which of these is a user responsibility in PaaS but a provider responsibility in SaaS?", options: ["Data security", "Application development and management", "User identity management", "Network security"], answer: "Application development and management" },
+        { q: "What is a potential disadvantage of IaaS?", options: ["It is not scalable", "The user is responsible for securing and managing the OS and software stack", "It cannot be used for web hosting", "The provider manages the entire stack"], answer: "The user is responsible for securing and managing the OS and software stack" },
+        { q: "Which cloud service model would be most appropriate for a business that wants to host its own website but doesn't want to manage the physical servers?", options: ["SaaS", "PaaS", "IaaS", "Only On-Premises is possible"], answer: "IaaS" },
+        { q: "In a PaaS model, the provider is responsible for:", options: ["The user's application data", "The application's business logic", "The underlying operating system and runtime", "The end-user's browser"], answer: "The underlying operating system and runtime" },
+        { q: "Which model requires the customer to manage middleware?", options: ["SaaS", "PaaS", "IaaS", "FaaS"], answer: "IaaS" },
+        { q: "The 'serverless computing' model (FaaS) abstracts the developer even further from the infrastructure than traditional PaaS. What is the primary unit of deployment in a serverless model?", options: ["Virtual Machines", "Containers", "Functions or code snippets", "Applications"], answer: "Functions or code snippets" },
+        { q: "Which statement is true?", options: ["PaaS is a subset of IaaS", "SaaS is a subset of PaaS", "IaaS provides the foundation upon which PaaS and SaaS can be built", "IaaS, PaaS, and SaaS are completely unrelated"], answer: "IaaS provides the foundation upon which PaaS and SaaS can be built" },
+        { q: "Which cloud service model offers the greatest potential for cost savings on IT staff and hardware maintenance for an enterprise?", options: ["IaaS, by a small margin", "PaaS, for developers only", "SaaS, for off-the-shelf needs", "All models offer identical savings"], answer: "SaaS, for off-the-shelf needs" }
+    ];
+
+    function startTimer() {
+        timerInterval = setInterval(() => {
+            timeRemaining--;
+            const minutes = Math.floor(timeRemaining / 60);
+            const seconds = timeRemaining % 60;
+            timerEl.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+            if (timeRemaining <= 0) {
+                clearInterval(timerInterval);
+                submitQuiz();
+            }
+        }, 1000);
+    }
+
+    function displayQuestions() {
+        quizQuestionsContainer.innerHTML = '';
+        activeQuizQuestions.forEach((item, index) => {
+            const questionEl = document.createElement('div');
+            questionEl.className = 'bg-white p-5 rounded-lg shadow-sm';
+            
+            let optionsHtml = item.options.map(option => `<div><label class="quiz-option-label block w-full text-left p-3 my-2 border rounded-md cursor-pointer hover:bg-blue-100"><input type="radio" name="question${index}" value="${option}" class="hidden"> ${option}</label></div>`).join('');
+
+            questionEl.innerHTML = `<p class="font-semibold text-gray-800">${index + 1}. ${item.q}</p><div class="mt-2">${optionsHtml}</div>`;
+            quizQuestionsContainer.appendChild(questionEl);
+        });
+
+        document.querySelectorAll('.quiz-option-label').forEach(label => {
+            label.addEventListener('click', () => {
+                const questionName = label.querySelector('input').name;
+                document.querySelectorAll(`input[name="${questionName}"]`).forEach(radio => {
+                    radio.parentElement.classList.remove('selected');
+                });
+                label.classList.add('selected');
+            });
+        });
+    }
+
+    function submitQuiz() {
+        clearInterval(timerInterval);
+        const totalTime = 37 * 60;
+        const timeTaken = totalTime - timeRemaining;
+        const minutes = Math.floor(timeTaken / 60);
+        const seconds = timeTaken % 60;
+
+        let score = 0;
+        userAnswers.length = 0;
+
+        activeQuizQuestions.forEach((item, index) => {
+            const selectedOption = document.querySelector(`input[name="question${index}"]:checked`);
+            const userAnswer = selectedOption ? selectedOption.value : null;
+            userAnswers.push(userAnswer);
+            if (userAnswer === item.answer) {
+                score++;
+            }
+        });
+
+        quizContainer.classList.add('hidden');
+        quizResultsScreen.classList.remove('hidden');
+
+        quizScoreDisplay.textContent = `You scored ${score} out of ${activeQuizQuestions.length}`;
+        quizTimeTakenEl.textContent = `Time taken: ${minutes} minutes and ${seconds} seconds.`;
+    }
+
+    function displayReview() {
+        quizReviewEl.innerHTML = '';
+        activeQuizQuestions.forEach((item, index) => {
+            const userAnswer = userAnswers[index];
+            const isCorrect = userAnswer === item.answer;
+
+            const questionEl = document.createElement('div');
+            questionEl.className = 'bg-gray-100 p-5 rounded-lg shadow-sm';
+
+            let optionsHtml = item.options.map(option => {
+                let labelClass = 'quiz-option-label block w-full text-left p-3 my-2 border rounded-md';
+                if (option === item.answer) {
+                    labelClass += ' correct';
+                } else if (option === userAnswer && !isCorrect) {
+                    labelClass += ' incorrect';
+                }
+                return `<div><label class="${labelClass}">${option}</label></div>`;
+            }).join('');
+
+            questionEl.innerHTML = `<p class="font-semibold text-gray-800">${index + 1}. ${item.q}</p><p class="text-sm mt-2">Your answer: <strong class="${isCorrect ? 'text-green-600' : 'text-red-600'}">${userAnswer || "Not answered"}</strong></p><div class="mt-2">${optionsHtml}</div>`;
+            quizReviewEl.appendChild(questionEl);
+        });
+    }
+
+    if (startQuizBtn) {
+        startQuizBtn.addEventListener('click', () => {
+            const shuffled = [...questionBank].sort(() => 0.5 - Math.random());
+            activeQuizQuestions = shuffled.slice(0, 60); // Select 60 questions
+
+            quizStartScreen.classList.add('hidden');
+            quizContainer.classList.remove('hidden');
+            quizResultsScreen.classList.add('hidden');
+            quizReviewEl.classList.add('hidden');
+            reviewAnswersBtn.textContent = 'Review Your Answers';
+            
+            timeRemaining = 37 * 60;
+            timerEl.textContent = "37:00";
+            startTimer();
+            displayQuestions();
+        });
+    }
+
+    if(submitQuizBtn) submitQuizBtn.addEventListener('click', submitQuiz);
+    if(reviewAnswersBtn) reviewAnswersBtn.addEventListener('click', () => {
+        quizReviewEl.classList.toggle('hidden');
+        reviewAnswersBtn.textContent = quizReviewEl.classList.contains('hidden') ? 'Review Your Answers' : 'Hide Answers';
+        if (!quizReviewEl.classList.contains('hidden')) {
+            displayReview();
+        }
+    });
+
+    // Initial setup
+    switchTab('home');
+    updateComparisonDiagram('on-premises');
+});
+</script>
+
+</body>
+</html>

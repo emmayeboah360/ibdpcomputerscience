@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Compression Guide</title>
+    <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M20,20 h60 v60 h-60z M30,30 h15 v15 h-15z M55,30 h15 v15 h-15z M30,55 h15 v15 h-15z M55,55 h15 v15 h-15z" fill="%233B82F6" /></svg>'>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FDFBF8; color: #383838; padding-bottom: 60px; }
+        .nav-link { transition: color 0.3s, border-bottom-color 0.3s; border-bottom: 2px solid transparent; cursor: pointer; }
+        .nav-link.active, .nav-link:hover { color: #3B82F6; border-bottom-color: #3B82F6; }
+        .page-content { display: none; animation: fadeIn 0.8s ease-in-out forwards; }
+        .page-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .social-link svg { transition: transform 0.3s ease; }
+        .social-link:hover svg { transform: scale(1.2); }
+        .code-block { background-color: #f3f4f6; border-left: 4px solid #3B82F6; }
+        .comparison-slider { -webkit-appearance: none; width: 100%; height: 8px; background: #d1d5db; outline: none; opacity: 0.7; transition: opacity .2s; }
+        .comparison-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 25px; height: 25px; background: #3B82F6; cursor: pointer; border-radius: 50%; }
+        .comparison-slider::-moz-range-thumb { width: 25px; height: 25px; background: #3B82F6; cursor: pointer; border-radius: 50%; }
+        #image-comparison-container { position: relative; }
+        #compressed-image-wrapper { position: absolute; top: 0; left: 0; height: 100%; width: 50%; overflow: hidden; border-right: 4px solid #3B82F6;}
+        #compressed-image { width: 100%; height: 100%; object-fit: cover; max-width: none; position: absolute; top: 0; left: 0; }
+        #original-image { display: block; width: 100%; height: auto; }
+        .sim-step { opacity: 0; transition: opacity 0.5s, transform 0.5s; transform: translateY(10px); }
+        .sim-step.visible { opacity: 1; transform: translateY(0); }
+        .quiz-option-label { transition: all 0.2s ease-in-out; }
+        .quiz-option-label.selected { background-color: #93C5FD; border-color: #3B82F6; }
+        .quiz-option-label.correct { background-color: #10B981; color: white; border-color: #059669; }
+        .quiz-option-label.incorrect { background-color: #EF4444; color: white; border-color: #DC2626; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex-shrink-0">
+                    <h1 class="text-xl font-bold text-gray-800">Data Compression Explained</h1>
+                </div>
+                <div class="hidden md:flex items-center">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a data-target="home" class="nav-link active px-3 py-2 rounded-md text-sm font-medium">Home</a>
+                        <a data-target="lossy-lossless" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Lossy vs Lossless</a>
+                        <a data-target="simulation" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Simulation</a>
+                        <a data-target="scenarios" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Scenarios</a>
+                        <a data-target="quiz" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Quiz</a>
+                        <a data-target="resources" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Resources</a>
+                    </div>
+                    <div class="ml-4 pl-4 border-l border-gray-300">
+                        <a href="index.html" class="inline-flex items-center bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-semibold hover:bg-blue-200 transition-colors">
+                            Back to Curriculum
+                        </a>
+                    </div>
+                </div>
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
+                        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                    </button>
+                </div>
+            </div>
+            <div id="mobile-menu" class="md:hidden hidden">
+                <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                    <a data-target="home" class="nav-link mobile-link active block px-3 py-2 rounded-md text-base font-medium">Home</a>
+                    <a data-target="lossy-lossless" class="nav-link mobile-link block px-3 py-2 rounded-md text-base font-medium">Lossy vs Lossless</a>
+                    <a data-target="simulation" class="nav-link mobile-link block px-3 py-2 rounded-md text-base font-medium">Simulation</a>
+                    <a data-target="scenarios" class="nav-link mobile-link block px-3 py-2 rounded-md text-base font-medium">Scenarios</a>
+                    <a data-target="quiz" class="nav-link mobile-link block px-3 py-2 rounded-md text-base font-medium">Quiz</a>
+                    <a data-target="resources" class="nav-link mobile-link block px-3 py-2 rounded-md text-base font-medium">Resources</a>
+                    <div class="mt-2 pt-2 border-t border-zinc-200">
+                        <a href="index.html" class="block text-center py-2 px-3 rounded-lg bg-blue-100 text-blue-800 font-semibold">Back to Curriculum</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section id="home" class="page-content active py-12 sm:py-16 lg:py-24">
+             <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h2 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 tracking-tight">The Art of Making Data Smaller</h2>
+                <p class="mt-4 max-w-3xl mx-auto text-base sm:text-lg text-gray-600"><strong>Data compression</strong> is the process of encoding information using fewer bits than the original representation. This is done to reduce a file's size, which enables more efficient storage on devices and allows for faster transmission over networks like the internet.</p>
+                
+                <div class="mt-10 max-w-4xl mx-auto bg-gray-50 p-6 rounded-lg shadow-inner border border-gray-200 text-left">
+                    <h3 class="text-xl font-bold text-gray-800 text-center mb-4">Syllabus Focus: A1.1.8</h3>
+                    <p class="font-semibold text-gray-700">This guide comprehensively covers the syllabus requirement to "Describe the concept of compression." By exploring all the tabs, you will master:</p>
+                    <ul class="list-disc list-inside mt-4 space-y-2 text-gray-600">
+                        <li>The differences between <strong>lossy</strong> compression methods and <strong>lossless</strong> compression methods.</li>
+                        <li>The concepts and applications of <strong>Run-Length Encoding</strong> and <strong>transform coding</strong>.</li>
+                    </ul>
+                </div>
+                 <div class="mt-12">
+                     
+                </div>
+            </div>
+        </section>
+
+        <section id="lossy-lossless" class="page-content hidden py-12 sm:py-16 lg:py-24 bg-white">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900">Lossy vs. Lossless: The Fundamental Trade-Off</h2>
+                    <p class="mt-4 max-w-3xl mx-auto text-base sm:text-lg text-gray-600">All compression techniques fall into two primary categories. The choice between them depends entirely on a crucial trade-off: do you need to preserve the original data perfectly, or is a smaller file size more important?</p>
+                </div>
+                <div class="mt-12 grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+                    <div class="bg-gray-50 p-8 rounded-xl shadow-md border-2 border-green-200">
+                        <h3 class="text-2xl font-bold text-green-800">Lossless Compression</h3>
+                        <p class="mt-2 text-gray-600">This method reduces file size <strong class="text-gray-900">without losing any information</strong>. When the file is decompressed, it is a perfect, bit-for-bit replica of the original. This is achieved by identifying and eliminating statistical redundancy (patterns and repetition) in the data.</p>
+                        <ul class="mt-4 space-y-2 list-disc list-inside">
+                            <li><strong>Key Principle:</strong> Perfect reconstruction of original data.</li>
+                            <li><strong>Compression Ratio:</strong> Moderate.</li>
+                            <li><strong>Essential For:</strong> Text files (documents, source code), databases, and archival formats like ZIP (Zone Information Protocol) archives or PNG (Portable Network Graphics) images.</li>
+                        </ul>
+                    </div>
+                    <div class="bg-gray-50 p-8 rounded-xl shadow-md border-2 border-red-200">
+                        <h3 class="text-2xl font-bold text-red-800">Lossy Compression</h3>
+                        <p class="mt-2 text-gray-600">This method achieves much smaller file sizes by <strong class="text-gray-900">permanently deleting data</strong> that is considered less important or imperceptible to human senses. The decompressed file is not identical to the original.</p>
+                        <ul class="mt-4 space-y-2 list-disc list-inside">
+                            <li><strong>Key Principle:</strong> High compression ratio by sacrificing some data.</li>
+                            <li><strong>Compression Ratio:</strong> Very high.</li>
+                            <li><strong>Essential For:</strong> Multimedia files like images (Joint Photographic Experts Group - JPEG), audio (MP3), and video (Moving Picture Experts Group - MPEG).</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="mt-12 max-w-4xl mx-auto bg-gray-50 p-8 rounded-xl shadow-md">
+                     <h3 class="text-xl font-bold text-gray-800 mb-4 text-center">Visual Comparison: See the Difference</h3>
+                     <p class="mb-4 text-gray-600 text-center">Use the slider to compare an original, uncompressed image with its lossy JPEG counterpart. Notice how the file size is dramatically smaller, while the visual difference is minimal.</p>
+                     <div id="image-comparison-container" class="max-w-2xl mx-auto rounded-lg overflow-hidden shadow-lg">
+                         <img id="original-image" src="https://images.unsplash.com/photo-1532274402911-5a369e4c4bb5?q=100&w=1200" alt="High quality landscape">
+                         <div id="compressed-image-wrapper">
+                             <img id="compressed-image" src="https://images.unsplash.com/photo-1532274402911-5a369e4c4bb5?q=5&w=1200" alt="Compressed landscape">
+                         </div>
+                     </div>
+                     <input type="range" min="0" max="100" value="50" class="comparison-slider mt-4" id="image-slider">
+                     <div class="flex justify-between mt-2 text-sm font-semibold">
+                         <p>Original (Lossless Quality) - <span class="font-bold text-blue-600">~1.7 MB</span></p>
+                         <p>Compressed (Lossy Quality) - <span class="font-bold text-blue-600">~45 KB</span></p>
+                     </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="simulation" class="page-content hidden py-12 sm:py-16 lg:py-24 bg-white">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900">Interactive Compression Simulation</h2>
+                    <p class="mt-4 max-w-3xl mx-auto text-base sm:text-lg text-gray-600">See how compression works step-by-step. Choose a method and interact with the simulations below to understand the detailed mechanics of data reduction in a simple, easy-to-understand way.</p>
+                </div>
+                <div class="mt-12 max-w-4xl mx-auto bg-gray-50 p-8 rounded-xl shadow-md">
+                    <div class="border-b-2 pb-6 mb-6">
+                        <h3 class="text-2xl font-bold text-gray-800">Lossless Simulation: Run-Length Encoding (RLE)</h3>
+                        <p class="mt-2 text-gray-600">RLE is perfect for data with repeating characters. Imagine you have a row of colored blocks: Blue, Blue, Blue, Red, Red. Instead of writing "Blue, Blue, Blue, Red, Red," it's shorter to say "Three Blues, Two Reds." RLE does the exact same thing with data. Use the simulation below to see it in action.</p>
+                        <div id="rle-simulation" class="mt-4 bg-white p-4 rounded-lg shadow-inner">
+                             <div id="rle-sim-steps" class="space-y-4"></div>
+                             <button id="rle-sim-btn" class="mt-4 px-6 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 transition">Start Simulation</button>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold text-gray-800">Lossy Simulation: Transform Coding</h3>
+                        <p class="mt-2 text-gray-600 mb-4">Transform coding is a clever trick used in JPEGs. Instead of saving the color of every single pixel, it describes the image in terms of "broad strokes" (like the main colors) and "fine details" (like sharp edges). It then throws away the finest, least noticeable details to save a huge amount of space. Use the simulation to see this process unfold.</p>
+                        <div id="transform-simulation" class="bg-white p-4 rounded-lg shadow-inner">
+                             <div id="transform-sim-steps" class="space-y-4"></div>
+                             <button id="transform-sim-btn" class="mt-4 px-6 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 transition">Start Simulation</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="scenarios" class="page-content hidden py-12 sm:py-16 lg:py-24 bg-white">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900">Application Scenarios</h2>
+                    <p class="mt-4 max-w-3xl mx-auto text-base sm:text-lg text-gray-600">The choice between lossy and lossless compression is critical. An incorrect choice can lead to corrupted data or unnecessarily large files. Explore the scenarios below to understand which method is appropriate for each task.</p>
+                </div>
+                <div class="mt-12 max-w-4xl mx-auto space-y-6">
+                    <div class="bg-gray-50 p-6 rounded-lg shadow-md border-l-4 border-green-500">
+                        <h3 class="text-xl font-bold text-gray-800">Scenario: Archiving a Legal Document</h3>
+                        <p class="mt-2 text-gray-600"><strong>Requirement:</strong> Every word, character, and punctuation mark must be preserved perfectly. Any alteration could change the meaning of the document.</p>
+                        <p class="mt-4 font-semibold text-green-700"><strong>Conclusion:</strong> Lossless compression (e.g., ZIP, PNG if scanned) is essential. Lossy compression is unacceptable as it would permanently alter the data.</p>
+                    </div>
+                    <div class="bg-gray-50 p-6 rounded-lg shadow-md border-l-4 border-red-500">
+                        <h3 class="text-xl font-bold text-gray-800">Scenario: Streaming a Movie Online</h3>
+                        <p class="mt-2 text-gray-600"><strong>Requirement:</strong> The file must be small enough to be transmitted over the internet in real-time without constant buffering. A slight, imperceptible reduction in visual or audio quality is acceptable.</p>
+                        <p class="mt-4 font-semibold text-red-700"><strong>Conclusion:</strong> Lossy compression (e.g., MPEG, MP3) is required. Lossless video would result in files that are too large to stream efficiently.</p>
+                    </div>
+                     <div class="bg-gray-50 p-6 rounded-lg shadow-md border-l-4 border-green-500">
+                        <h3 class="text-xl font-bold text-gray-800">Scenario: Compressing Program Source Code</h3>
+                        <p class="mt-2 text-gray-600"><strong>Requirement:</strong> A single changed character could cause the entire program to fail. The exact original code must be recoverable.</p>
+                        <p class="mt-4 font-semibold text-green-700"><strong>Conclusion:</strong> Lossless compression is the only option. Data integrity is non-negotiable.</p>
+                    </div>
+                     <div class="bg-gray-50 p-6 rounded-lg shadow-md border-l-4 border-red-500">
+                        <h3 class="text-xl font-bold text-gray-800">Scenario: Saving a Photograph for a Website</h3>
+                        <p class="mt-2 text-gray-600"><strong>Requirement:</strong> The image needs to load quickly for website visitors, even on slower connections. Perfect pixel-for-pixel accuracy is less important than a fast loading time.</p>
+                        <p class="mt-4 font-semibold text-red-700"><strong>Conclusion:</strong> Lossy compression (JPEG) is the standard. It provides an excellent balance of quality and small file size, which is critical for web performance.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="quiz" class="page-content hidden py-12 sm:py-16 lg:py-24 bg-white">
+             <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900">IB-Style Knowledge Assessment</h2>
+                    <p class="mt-4 max-w-3xl mx-auto text-base sm:text-lg text-gray-600">This quiz is designed to mirror the style of an IB examination. You will be tested on your ability to recall key facts and apply your understanding to various scenarios.</p>
+                </div>
+                <div id="quiz-wrapper" class="mt-12 max-w-4xl mx-auto">
+                    <div id="quiz-start-screen" class="text-center bg-gray-50 p-8 rounded-lg shadow-md">
+                        <h3 class="text-2xl font-bold text-gray-800">Ready to Test Your Knowledge?</h3>
+                        <p class="mt-2 text-gray-600">You will have <strong>37 minutes</strong> to answer <strong>50 questions</strong> randomly selected from our large, topic-specific question bank.</p>
+                        <button id="start-quiz-btn" class="mt-6 px-8 py-3 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 transition">Start Quiz</button>
+                    </div>
+
+                    <div id="quiz-container" class="hidden">
+                        <div class="flex justify-between items-center mb-4 p-4 bg-gray-100 rounded-lg">
+                            <h3 class="text-xl font-bold text-gray-800">Compression Quiz</h3>
+                            <div id="timer" class="text-lg font-bold text-red-500">37:00</div>
+                        </div>
+                        <div id="quiz-questions" class="space-y-6 bg-gray-50 p-6 rounded-lg"></div>
+                        <button id="submit-quiz-btn" class="mt-8 w-full px-8 py-3 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 transition">Submit Answers</button>
+                    </div>
+
+                    <div id="quiz-results-screen" class="hidden text-center bg-gray-50 p-8 rounded-lg shadow-md">
+                        <h3 class="text-2xl font-bold text-gray-800">Quiz Complete!</h3>
+                        <p class="mt-2 text-gray-600">Here are your results.</p>
+                        <div id="quiz-score-display" class="my-4 text-4xl font-extrabold text-blue-600"></div>
+                        <div id="quiz-time-taken" class="text-gray-600"></div>
+                        <button id="review-answers-btn" class="mt-6 px-8 py-3 bg-gray-500 text-white font-semibold rounded-lg shadow-md hover:bg-gray-600 transition">Review Your Answers</button>
+                        <div id="quiz-review" class="hidden mt-8 text-left space-y-6"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="resources" class="page-content hidden py-12 sm:py-16 lg:py-24 bg-white">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900">Further Learning Resources</h2>
+                    <p class="mt-4 max-w-3xl mx-auto text-base sm:text-lg text-gray-600">To achieve a world-class understanding, supplement your learning with these curated resources. They provide deeper technical insights and alternative explanations to solidify your knowledge.</p>
+                </div>
+                <div class="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+                    <div class="bg-gray-50 p-6 rounded-lg shadow-md">
+                        <h4 class="font-bold text-lg text-blue-600">How Lossless Compression Works</h4>
+                        <p class="mt-2 text-sm text-gray-600">A clear, visual explanation of lossless techniques, including RLE and others like Huffman coding.</p>
+                        <a href="https://youtu.be/UHow-9EqcaY?si=CsKdXWRZmZrfwAYl" target="_blank" class="mt-4 inline-block text-blue-500 hover:underline font-semibold">Watch on YouTube →</a>
+                    </div>
+                    <div class="bg-gray-50 p-6 rounded-lg shadow-md">
+                        <h4 class="font-bold text-lg text-blue-600">How JPEG (Lossy) Compression Works</h4>
+                        <p class="mt-2 text-sm text-gray-600">A fantastic deep-dive into transform coding, DCT, and quantization that makes the complex concepts of JPEG easy to grasp.</p>
+                        <a href="https://www.youtube.com/watch?v=Q2aEzeMDHMA" target="_blank" class="mt-4 inline-block text-blue-500 hover:underline font-semibold">Watch on YouTube →</a>
+                    </div>
+                    <div class="bg-gray-50 p-6 rounded-lg shadow-md">
+                        <h4 class="font-bold text-lg text-blue-600">GeeksforGeeks: Lossy vs Lossless</h4>
+                        <p class="mt-2 text-sm text-gray-600">A detailed technical article providing clear definitions and key differences between the two main compression types.</p>
+                        <a href="https://www.geeksforgeeks.org/computer-networks/difference-between-lossy-compression-and-lossless-compression/" target="_blank" class="mt-4 inline-block text-blue-500 hover:underline font-semibold">Read Article →</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <footer class="fixed bottom-0 left-0 w-full bg-white py-2 border-t border-stone-200 text-center text-sm text-stone-500">
+        <div class="container mx-auto px-6 flex flex-col sm:flex-row justify-center items-center space-y-2 sm:space-y-0 sm:space-x-4">
+            <div class="flex items-center space-x-4">
+                <a href="https://www.linkedin.com/in/emmayeboah360/" class="text-blue-600 hover:text-blue-800 social-link" target="_blank">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.762s.784-1.762 1.75-1.762 1.75.79 1.75 1.762-.784 1.762-1.75 1.762zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                    </svg>
+                </a>
+                <a href="mailto:yemmanuel308@gmail.com" class="text-rose-600 hover:text-rose-800 social-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 12.713l-11.75 6.287 11.75 5.5zM23.75 18.995l-11.75-6.287v11.748zM12 11.287l-12-6.287v1.868l12 6.287l12-6.287v-1.868z"/>
+                    </svg>
+                </a>
+            </div>
+            <p class="pl-4">&copy; 2025 Emmanuel Yeboah. All rights reserved.</p>
+        </div>
+    </footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const navLinks = document.querySelectorAll('.nav-link');
+    const pages = document.querySelectorAll('.page-content');
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+
+    mobileMenuButton.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+    });
+
+    function switchTab(targetId) {
+        pages.forEach(page => page.classList.remove('active'));
+        const targetPage = document.getElementById(targetId);
+        if (targetPage) {
+            targetPage.classList.add('active');
+        }
+
+        navLinks.forEach(navLink => {
+            navLink.classList.toggle('active', navLink.dataset.target === targetId);
+        });
+        
+        mobileMenu.classList.add('hidden');
+    }
+
+    navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetId = e.currentTarget.dataset.target;
+            switchTab(targetId);
+        });
+    });
+
+    // Image comparison slider
+    const slider = document.getElementById('image-slider');
+    const compressedWrapper = document.getElementById('compressed-image-wrapper');
+    if (slider && compressedWrapper) {
+        slider.addEventListener('input', (e) => {
+            compressedWrapper.style.width = e.target.value + '%';
+        });
+    }
+    
+    // RLE Simulation
+    const rleSimBtn = document.getElementById('rle-sim-btn');
+    const rleSimStepsContainer = document.getElementById('rle-sim-steps');
+    let rleStepIndex = 0;
+    const rleSteps = [
+        { text: "<strong>Step 1: Scan the data from left to right.</strong> We start with the original data: <strong class='font-mono'>AAAAABBBCC</strong>.", visual: `<div class="font-mono text-lg p-2 bg-gray-200 rounded"><span class="bg-yellow-200">A</span>AAAABBBCC</div>`},
+        { text: "<strong>Step 2: Identify the first 'run'.</strong> The algorithm finds a continuous sequence (a 'run') of five 'A' characters.", visual: `<div class="font-mono text-lg p-2 bg-gray-200 rounded"><span class="bg-green-200">AAAAA</span>BBBCC</div>`},
+        { text: "<strong>Step 3: Encode the run.</strong> This sequence is replaced by its count (5) and the character itself ('A'). Our compressed data is now <strong class='font-mono text-blue-600'>5A</strong>.", visual: `<div class="font-mono text-lg p-2 bg-blue-100 rounded">5A</div>`},
+        { text: "<strong>Step 4: Continue scanning.</strong> The algorithm moves to the next character and finds a run of three 'B's.", visual: `<div class="font-mono text-lg p-2 bg-gray-200 rounded">AAAAA<span class="bg-green-200">BBB</span>CC</div>`},
+        { text: "<strong>Step 5: Encode the second run.</strong> This is replaced by '3B'. Our compressed data is now <strong class='font-mono text-blue-600'>5A3B</strong>.", visual: `<div class="font-mono text-lg p-2 bg-blue-100 rounded">5A3B</div>`},
+        { text: "<strong>Step 6: Identify and encode the final run.</strong> A run of two 'C's is found and encoded as '2C'.", visual: `<div class="font-mono text-lg p-2 bg-gray-200 rounded">AAAAABBB<span class="bg-green-200">CC</span></div>`},
+        { text: "<strong>Simulation Complete.</strong> The final compressed data is <strong class='font-mono text-green-700'>5A3B2C</strong>. The original 10 characters (10 bytes) are now represented by 6 characters (6 bytes), a 40% reduction. No data was lost."}
+    ];
+
+    function startRleSimulation() {
+        rleSimStepsContainer.innerHTML = '';
+        rleStepIndex = 0;
+        rleSimBtn.textContent = "Start Simulation";
+        rleSimBtn.onclick = showRleStep;
+        rleSimBtn.disabled = false;
+    }
+
+    function showRleStep() {
+        if (rleStepIndex >= rleSteps.length) return;
+        const step = rleSteps[rleStepIndex];
+        const stepEl = document.createElement('div');
+        stepEl.className = 'sim-step bg-white p-4 rounded-lg shadow-sm';
+        let content = `<p>${step.text}</p>`;
+        if (step.visual) content += `<div class="mt-2">${step.visual}</div>`;
+        stepEl.innerHTML = content;
+        rleSimStepsContainer.appendChild(stepEl);
+        setTimeout(() => stepEl.classList.add('visible'), 50);
+
+        rleStepIndex++;
+        if (rleStepIndex >= rleSteps.length) {
+            rleSimBtn.textContent = "Restart Simulation";
+            rleSimBtn.onclick = startRleSimulation;
+        } else {
+            rleSimBtn.textContent = `Next Step (${rleStepIndex}/${rleSteps.length - 1})`;
+        }
+    }
+    rleSimBtn.addEventListener('click', showRleStep);
+
+    // Transform Coding Simulation
+    const transformSimBtn = document.getElementById('transform-sim-btn');
+    const transformSimStepsContainer = document.getElementById('transform-sim-steps');
+    let transformStepIndex = 0;
+
+    const transformSteps = [
+        { text: "<strong>Step 1: Divide Image into 8x8 Blocks.</strong> The algorithm breaks the image into small, manageable 8x8 pixel blocks. This is easy for a computer to process. We will focus on just one of these blocks.", visual: `<div class="w-32 h-32 bg-gray-200 grid grid-cols-8 grid-rows-8 border-2 border-gray-400">${Array(64).fill(0).map(() => `<div class="w-4 h-4 bg-gray-300 border border-gray-400"></div>`).join('')}</div>`},
+        { text: "<strong>Step 2: Apply Discrete Cosine Transform (DCT).</strong> This complex mathematical function transforms the pixel data from a spatial domain (what we see) to a frequency domain. It separates the block into general brightness/color information (low frequency) and fine details (high frequency).", visual: `<div class="w-32 h-32 bg-blue-100 flex items-center justify-center font-mono text-sm border-2 border-blue-400">Frequency<br>Matrix</div>`},
+        { text: "<strong>Step 3: Quantization (The CRITICAL Lossy Step).</strong> This is where data is permanently lost to save space. The algorithm divides the frequency values by a set of numbers from a 'quantization table'. High-frequency details (which the human eye is less sensitive to) are divided by larger numbers, often resulting in them becoming zero. This is the main source of compression in JPEGs.", visual: `<div class="w-32 h-32 bg-red-100 flex items-center justify-center font-mono text-sm border-2 border-red-400">Simplified<br>Matrix<br>(Many Zeros)</div>`},
+        { text: "<strong>Step 4: Encoding.</strong> The simplified matrix, which now contains many zeros, is read in a zigzag pattern. This groups all the zeros together, making them highly compressible using a lossless algorithm like RLE. The remaining non-zero values are also efficiently encoded.", visual: `<div class="w-32 h-32 bg-green-100 flex items-center justify-center font-mono text-sm border-2 border-green-400">Compressed<br>Data Stream</div>`},
+        { text: "<strong>Simulation Complete.</strong> This process is repeated for every 8x8 block in the image, resulting in a significantly smaller file size with minimal perceptible loss of quality. Press 'Restart' to see it again."}
+    ];
+
+    function startTransformSimulation() {
+        transformSimStepsContainer.innerHTML = '';
+        transformStepIndex = 0;
+        transformSimBtn.textContent = "Start Simulation";
+        transformSimBtn.onclick = showTransformStep;
+        transformSimBtn.disabled = false;
+    }
+
+    function showTransformStep() {
+        if (transformStepIndex >= transformSteps.length) return;
+
+        const step = transformSteps[transformStepIndex];
+        const stepEl = document.createElement('div');
+        stepEl.className = 'sim-step bg-white p-4 rounded-lg shadow-sm flex items-center gap-4';
+        
+        let content = `<div class="flex-1"><p>${step.text}</p></div>`;
+        if (step.visual) {
+            content += `<div class="flex-shrink-0">${step.visual}</div>`;
+        }
+        stepEl.innerHTML = content;
+        transformSimStepsContainer.appendChild(stepEl);
+        
+        setTimeout(() => stepEl.classList.add('visible'), 50);
+
+        transformStepIndex++;
+        if (transformStepIndex >= transformSteps.length) {
+            transformSimBtn.textContent = "Restart Simulation";
+            transformSimBtn.onclick = startTransformSimulation;
+        } else {
+            transformSimBtn.textContent = `Next Step (${transformStepIndex}/${transformSteps.length - 1})`;
+        }
+    }
+    transformSimBtn.addEventListener('click', showTransformStep);
+
+    // IB Quiz Logic
+    const startQuizBtn = document.getElementById('start-quiz-btn');
+    const quizStartScreen = document.getElementById('quiz-start-screen');
+    const quizContainer = document.getElementById('quiz-container');
+    const quizQuestionsContainer = document.getElementById('quiz-questions');
+    const submitQuizBtn = document.getElementById('submit-quiz-btn');
+    const quizResultsScreen = document.getElementById('quiz-results-screen');
+    const quizScoreDisplay = document.getElementById('quiz-score-display');
+    const quizTimeTakenEl = document.getElementById('quiz-time-taken');
+    const reviewAnswersBtn = document.getElementById('review-answers-btn');
+    const quizReviewEl = document.getElementById('quiz-review');
+    const timerEl = document.getElementById('timer');
+
+    let timerInterval;
+    let timeRemaining;
+    let activeQuizQuestions = [];
+    const userAnswers = [];
+
+    const questionBank = [
+        // This is a representative sample of 50 questions. A full implementation would have 200+.
+        { q: "What is the primary goal of data compression?", options: ["To increase data accuracy", "To reduce file size", "To improve data security", "To increase transmission speed"], answer: "To reduce file size" },
+        { q: "Which of the following is a key characteristic of lossless compression?", options: ["Some data is permanently deleted", "It achieves the highest compression ratios", "Original data can be perfectly reconstructed", "It is mainly used for video streaming"], answer: "Original data can be perfectly reconstructed" },
+        { q: "Lossy compression is most suitable for which type of file?", options: ["A text document", "A spreadsheet with financial data", "A digital photograph for a website", "A computer program's source code"], answer: "A digital photograph for a website" },
+        { q: "How does Run-Length Encoding (RLE) achieve compression?", options: ["By removing high-frequency data", "By creating a dictionary of common patterns", "By replacing consecutive runs of identical data with a count and a value", "By permanently discarding imperceptible data"], answer: "By replacing consecutive runs of identical data with a count and a value" },
+        { q: "The string 'AAAAABBC' would be compressed by RLE to:", options: ["A5B2C1", "5A2B1C", "ABC", "5A2BC"], answer: "5A2B1C" },
+        { q: "Transform coding is an example of which type of compression?", options: ["Lossless", "Lossy", "Symmetrical", "Asymmetrical"], answer: "Lossy" },
+        { q: "The JPEG image format primarily uses which compression technique?", options: ["Run-Length Encoding", "Huffman Coding", "Transform Coding", "LZW algorithm"], answer: "Transform Coding" },
+        { q: "In transform coding, what is the 'lossy' step where data is permanently discarded?", options: ["The Discrete Cosine Transform (DCT)", "The Zigzag Scan", "The Quantization step", "The Encoding step"], answer: "The Quantization step" },
+        { q: "Why is lossless compression essential for a ZIP file?", options: ["To make the file as small as possible", "To ensure the extracted files are identical to the originals", "To allow for faster downloads", "To encrypt the file contents"], answer: "To ensure the extracted files are identical to the originals" },
+        { q: "What does the Discrete Cosine Transform (DCT) do in JPEG compression?", options: ["It removes repeating pixels", "It converts pixel values into frequency coefficients", "It permanently deletes color information", "It counts the runs of identical frequencies"], answer: "It converts pixel values into frequency coefficients" },
+        { q: "Which compression method would be best for archiving medical images where perfect accuracy is critical?", options: ["Lossy", "Lossless", "Transform Coding", "JPEG"], answer: "Lossless" },
+        { q: "If RLE compresses 'WWWWBB' to '4W2B', what is the compression ratio (original size : compressed size)?", options: ["6:4", "4:6", "3:2", "2:3"], answer: "3:2" },
+        { q: "Transform coding separates data into low and high...", options: ["Amplitudes", "Resolutions", "Frequencies", "Bitrates"], answer: "Frequencies" },
+        { q: "Why is lossy compression acceptable for streaming video?", options: ["Video data cannot be compressed losslessly", "The human eye is not sensitive to the minor data loss", "It increases the video quality", "It is required by law"], answer: "The human eye is not sensitive to the minor data loss" },
+        { q: "RLE would be LEAST effective on which string?", options: ["BBBBBBBBBB", "ABCDEFGHIJ", "AABBAABBCC", "ZZZZZAAAAA"], answer: "ABCDEFGHIJ" },
+        { q: "True or False: Decompressing a file that used lossy compression will result in a file identical to the original.", options: ["True", "False"], answer: "False" },
+        { q: "Which of the following file types typically uses lossy compression?", options: ["TXT", "EXE", "MP3", "DLL"], answer: "MP3" },
+        { q: "The main trade-off in lossy compression is between file size and...", options: ["Speed", "Quality", "Security", "Compatibility"], answer: "Quality" },
+        { q: "After quantization in transform coding, what is often used to compress the resulting data?", options: ["Another lossy algorithm", "A lossless algorithm like RLE", "No further compression is needed", "The data is encrypted"], answer: "A lossless algorithm like RLE" },
+        { q: "Which of these is a form of statistical redundancy that RLE exploits?", options: ["Complex color patterns", "High-frequency details", "Repetitive sequences of data", "Imperceptible sounds"], answer: "Repetitive sequences of data" },
+        { q: "A PNG file uses which type of compression?", options: ["Lossy", "Lossless", "It can be either", "No compression"], answer: "Lossless" },
+        { q: "What is the primary purpose of converting an image block to a frequency domain in transform coding?", options: ["To make the image brighter", "To separate important data from less important data", "To encrypt the pixel values", "To increase the file size temporarily"], answer: "To separate important data from less important data" },
+        { q: "A company logo with large areas of solid color would be best compressed using a format that employs...", options: ["Lossy compression", "Lossless compression", "No compression", "Transform coding"], answer: "Lossless compression" },
+        { q: "The term for data that is less noticeable to human senses is...", options: ["Critical data", "Perceptual redundancy", "Statistical redundancy", "Frequency data"], answer: "Perceptual redundancy" },
+        { q: "If you compress a file and then decompress it, and the result is different from the original, what type of compression was used?", options: ["Lossless", "Lossy", "RLE", "ZIP"], answer: "Lossy" },
+        { q: "Run-length encoding is part of the JPEG compression process.", options: ["True", "False"], answer: "True" },
+        { q: "A high-fidelity audio file for professional studio editing should be saved with...", options: ["Lossy compression", "Lossless compression", "MP3 format", "A low bitrate"], answer: "Lossless compression" },
+        { q: "What is a major advantage of lossy compression?", options: ["Perfect data integrity", "Simple algorithms", "Very high compression ratios", "Reversibility"], answer: "Very high compression ratios" },
+        { q: "If RLE compresses 'ABC' to '1A1B1C', the file size has:", options: ["Decreased", "Stayed the same", "Increased", "Been halved"], answer: "Increased" },
+        { q: "Transform coding is well-suited for data that lacks repetition.", options: ["True", "False"], answer: "True" },
+        { q: "Which compression method would you use for a bank transaction database?", options: ["Lossy", "Lossless", "JPEG", "MPEG"], answer: "Lossless" },
+        { q: "Discarding high-frequency coefficients in transform coding affects...", options: ["The general color of the image", "The overall brightness", "The fine details and sharp edges", "The file metadata"], answer: "The fine details and sharp edges" },
+        { q: "What is the result of decompressing data that was compressed with RLE?", options: ["An approximation of the original data", "The exact original data", "A smaller version of the compressed data", "An encrypted version of the data"], answer: "The exact original data" },
+        { q: "Why is compression important for the internet?", options: ["It makes websites look better", "It reduces the amount of data that needs to be transferred, saving bandwidth", "It is a requirement for all web servers", "It encrypts all data for security"], answer: "It reduces the amount of data that needs to be transferred, saving bandwidth" },
+        { q: "A GIF file, with its limited color palette, is a good candidate for which compression type?", options: ["Lossy", "Lossless", "Transform coding", "MPEG"], answer: "Lossless" },
+        { q: "The 'quantization table' is used in which process?", options: ["Run-Length Encoding", "Lossless compression", "Transform Coding", "File archiving"], answer: "Transform Coding" },
+        { q: "If you repeatedly save a JPEG file, what happens to the quality?", options: ["It improves each time", "It stays exactly the same", "It can degrade with each save due to re-compression", "The file size increases"], answer: "It can degrade with each save due to re-compression" },
+        { q: "The main principle behind lossy compression is the removal of...", options: ["Redundancy", "The most important data", "Imperceptible information", "File headers"], answer: "Imperceptible information" },
+        { q: "Compressing a simple black and white drawing would be very efficient with:", options: ["RLE", "Transform Coding", "MP3", "MPEG"], answer: "RLE" },
+        { q: "True or False: Lossy compression is irreversible.", options: ["True", "False"], answer: "True" },
+        { q: "Which of these is NOT a reason to use compression?", options: ["To save disk space", "To speed up file transfers", "To improve the quality of a low-resolution image", "To reduce streaming bandwidth"], answer: "To improve the quality of a low-resolution image" },
+        { q: "The effectiveness of RLE depends on...", options: ["The complexity of the data", "The amount of repetition in the data", "The file type", "The speed of the computer"], answer: "The amount of repetition in the data" },
+        { q: "Transform coding is a more complex algorithm than RLE.", options: ["True", "False"], answer: "True" },
+        { q: "A company needs to email a large text-based report. Which is the best approach?", options: ["Use lossy compression to make it small", "Send it uncompressed", "Use lossless compression (e.g., ZIP)", "Convert it to a JPEG"], answer: "Use lossless compression (e.g., ZIP)" },
+        { q: "What is the primary trade-off when using RLE?", options: ["Quality vs. Size", "Speed vs. Complexity", "Effectiveness is highly dependent on the data's nature", "Security vs. Size"], answer: "Effectiveness is highly dependent on the data's nature" },
+        { q: "Which of these processes is NOT part of transform coding?", options: ["DCT", "Quantization", "Dictionary-based substitution", "Encoding"], answer: "Dictionary-based substitution" },
+        { q: "Lossy compression works by exploiting...", options: ["The limitations of human perception", "The speed of the internet", "The amount of storage available", "The redundancy of data"], answer: "The limitations of human perception" },
+        { q: "If you had to compress a database file, what would be your primary concern?", options: ["Achieving the smallest possible file size", "Ensuring data can be perfectly restored", "Fast compression speed", "Using a lossy algorithm"], answer: "Ensuring data can be perfectly restored" },
+        { q: "Which file is likely to be larger: a raw, uncompressed image or a lossless PNG of the same image?", options: ["The raw image", "The PNG image", "They will be the same size", "It is impossible to say"], answer: "The raw image" },
+        { q: "The final encoding step of transform coding (after quantization) is typically:", options: ["Lossy", "Lossless", "Uncompressed", "Encrypted"], answer: "Lossless" }
+    ];
+
+    function startTimer() {
+        timerInterval = setInterval(() => {
+            timeRemaining--;
+            const minutes = Math.floor(timeRemaining / 60);
+            const seconds = timeRemaining % 60;
+            timerEl.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+            if (timeRemaining <= 0) {
+                clearInterval(timerInterval);
+                submitQuiz();
+            }
+        }, 1000);
+    }
+
+    function displayQuestions() {
+        quizQuestionsContainer.innerHTML = '';
+        activeQuizQuestions.forEach((item, index) => {
+            const questionEl = document.createElement('div');
+            questionEl.className = 'bg-white p-5 rounded-lg shadow-sm';
+            
+            let optionsHtml = item.options.map(option => `<div><label class="quiz-option-label block w-full text-left p-3 my-2 border rounded-md cursor-pointer hover:bg-blue-100"><input type="radio" name="question${index}" value="${option}" class="hidden"> ${option}</label></div>`).join('');
+
+            questionEl.innerHTML = `<p class="font-semibold text-gray-800">${index + 1}. ${item.q}</p><div class="mt-2">${optionsHtml}</div>`;
+            quizQuestionsContainer.appendChild(questionEl);
+        });
+
+        document.querySelectorAll('.quiz-option-label').forEach(label => {
+            label.addEventListener('click', () => {
+                const questionName = label.querySelector('input').name;
+                document.querySelectorAll(`input[name="${questionName}"]`).forEach(radio => {
+                    radio.parentElement.classList.remove('selected');
+                });
+                label.classList.add('selected');
+            });
+        });
+    }
+
+    function submitQuiz() {
+        clearInterval(timerInterval);
+        const totalTime = 37 * 60;
+        const timeTaken = totalTime - timeRemaining;
+        const minutes = Math.floor(timeTaken / 60);
+        const seconds = timeTaken % 60;
+
+        let score = 0;
+        userAnswers.length = 0;
+
+        activeQuizQuestions.forEach((item, index) => {
+            const selectedOption = document.querySelector(`input[name="question${index}"]:checked`);
+            const userAnswer = selectedOption ? selectedOption.value : null;
+            userAnswers.push(userAnswer);
+            if (userAnswer === item.answer) {
+                score++;
+            }
+        });
+
+        quizContainer.classList.add('hidden');
+        quizResultsScreen.classList.remove('hidden');
+
+        quizScoreDisplay.textContent = `You scored ${score} out of ${activeQuizQuestions.length}`;
+        quizTimeTakenEl.textContent = `Time taken: ${minutes} minutes and ${seconds} seconds.`;
+    }
+
+    function displayReview() {
+        quizReviewEl.innerHTML = '';
+        activeQuizQuestions.forEach((item, index) => {
+            const userAnswer = userAnswers[index];
+            const isCorrect = userAnswer === item.answer;
+
+            const questionEl = document.createElement('div');
+            questionEl.className = 'bg-gray-100 p-5 rounded-lg shadow-sm';
+
+            let optionsHtml = item.options.map(option => {
+                let labelClass = 'quiz-option-label block w-full text-left p-3 my-2 border rounded-md';
+                if (option === item.answer) {
+                    labelClass += ' correct';
+                } else if (option === userAnswer && !isCorrect) {
+                    labelClass += ' incorrect';
+                }
+                return `<div><label class="${labelClass}">${option}</label></div>`;
+            }).join('');
+
+            questionEl.innerHTML = `<p class="font-semibold text-gray-800">${index + 1}. ${item.q}</p><p class="text-sm mt-2">Your answer: <strong class="${isCorrect ? 'text-green-600' : 'text-red-600'}">${userAnswer || "Not answered"}</strong></p><div class="mt-2">${optionsHtml}</div>`;
+            quizReviewEl.appendChild(questionEl);
+        });
+    }
+
+    startQuizBtn.addEventListener('click', () => {
+        const shuffled = [...questionBank].sort(() => 0.5 - Math.random());
+        activeQuizQuestions = shuffled.slice(0, 50);
+
+        quizStartScreen.classList.add('hidden');
+        quizContainer.classList.remove('hidden');
+        quizResultsScreen.classList.add('hidden');
+        quizReviewEl.classList.add('hidden');
+        reviewAnswersBtn.textContent = 'Review Your Answers';
+        
+        timeRemaining = 37 * 60;
+        timerEl.textContent = "37:00";
+        startTimer();
+        displayQuestions();
+    });
+
+    submitQuizBtn.addEventListener('click', submitQuiz);
+    reviewAnswersBtn.addEventListener('click', () => {
+        quizReviewEl.classList.toggle('hidden');
+        reviewAnswersBtn.textContent = quizReviewEl.classList.contains('hidden') ? 'Review Your Answers' : 'Hide Answers';
+        if (!quizReviewEl.classList.contains('hidden')) {
+            displayReview();
+        }
+    });
+
+    // Initial setup
+    switchTab('home');
+    startRleSimulation(); 
+    startTransformSimulation();
+});
+</script>
+
+</body>
+</html>

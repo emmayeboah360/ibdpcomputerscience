@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Representation Guide</title>
+    <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">💻</text></svg>'>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+    };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #F8FAFC; color: #334155; padding-bottom: 60px; }
+        .nav-link { transition: color 0.3s, border-bottom-color 0.3s; border-bottom: 2px solid transparent; cursor: pointer; }
+        .nav-link.active, .nav-link:hover { color: #3B82F6; border-bottom-color: #3B82F6; }
+        .page-content { display: none; animation: fadeIn 0.8s ease-in-out forwards; }
+        .page-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .social-link svg { transition: transform 0.3s ease; }
+        .social-link:hover svg { transform: scale(1.2); }
+        .quiz-option-label { transition: all 0.2s ease-in-out; }
+        .quiz-option-label.selected { background-color: #BFDBFE; border-color: #3B82F6; }
+        .quiz-option-label.correct { background-color: #D1FAE5 !important; color: #065F46 !important; border-color: #10B981 !important; }
+        .quiz-option-label.incorrect { background-color: #FEE2E2 !important; color: #991B1B !important; border-color: #EF4444 !important; }
+        .code-block { background-color: #F1F5F9; border-left: 4px solid #3B82F6; padding: 1rem; font-family: 'Courier New', Courier, monospace; border-radius: 0 0.25rem 0.25rem 0; overflow-x: auto; font-size: 0.9rem; line-height: 1.5; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #CBD5E1; padding: 8px; text-align: center; }
+        th { background-color: #E2E8F0; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex-shrink-0">
+                    <h1 class="text-xl font-bold text-gray-800">Data Representation</h1>
+                </div>
+                <div class="hidden md:flex items-center">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a data-target="home" class="nav-link active px-3 py-2 rounded-md text-sm font-medium">Home</a>
+                        <a data-target="number-systems" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Number Systems</a>
+                        <a data-target="conversions" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Conversions</a>
+                        <a data-target="converter-tool" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Converter Tool</a>
+                        <a data-target="quiz" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Quiz</a>
+                        <a data-target="resources" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Resources</a>
+                    </div>
+                     <div class="ml-4 pl-4 border-l border-gray-300">
+                        <a href="index.html" class="inline-flex items-center bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-semibold hover:bg-blue-200 transition-colors">
+                            Back to Curriculum
+                        </a>
+                    </div>
+                </div>
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
+                        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                    </button>
+                </div>
+            </div>
+            <div id="mobile-menu" class="md:hidden hidden">
+                <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                    <a data-target="home" class="nav-link mobile-link active block px-3 py-2 rounded-md text-base font-medium">Home</a>
+                    <a data-target="number-systems" class="nav-link mobile-link block px-3 py-2 rounded-md text-base font-medium">Number Systems</a>
+                    <a data-target="conversions" class="nav-link mobile-link block px-3 py-2 rounded-md text-base font-medium">Conversions</a>
+                    <a data-target="converter-tool" class="nav-link mobile-link block px-3 py-2 rounded-md text-base font-medium">Converter Tool</a>
+                    <a data-target="quiz" class="nav-link mobile-link block px-3 py-2 rounded-md text-base font-medium">Quiz</a>
+                    <a data-target="resources" class="nav-link mobile-link block px-3 py-2 rounded-md text-base font-medium">Resources</a>
+                     <div class="mt-2 pt-2 border-t border-zinc-200">
+                        <a href="index.html" class="block text-center py-2 px-3 rounded-lg bg-blue-100 text-blue-800 font-semibold">Back to Curriculum</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section id="home" class="page-content active py-12 sm:py-16 lg:py-24">
+             <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h2 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 tracking-tight">The Language of Computers</h2>
+                <p class="mt-4 max-w-3xl mx-auto text-base sm:text-lg text-slate-600">At its core, all data in a computer is stored and processed as numbers. This guide explores the principal methods of representing this data, focusing on the number systems that form the foundation of all modern computing.</p>
+                
+                <div class="mt-10 max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-sm border border-slate-200 text-left">
+                    <h3 class="text-xl font-bold text-gray-800 text-center mb-4">Syllabus Focus: A1.2.1</h3>
+                    <p class="font-semibold text-slate-700">This guide comprehensively covers the syllabus requirement to "Describe the principal methods of representing data." By exploring all the tabs, you will master:</p>
+                    <ul class="list-disc list-inside mt-4 space-y-2 text-slate-600">
+                        <li>The representation of integers in <strong>binary</strong> and <strong>hexadecimal</strong>.</li>
+                        <li>Conversion of binary and hexadecimal integers to <strong>decimal</strong>, and vice versa.</li>
+                        <li>Conversion of integers from <strong>binary to hexadecimal</strong>, and vice versa.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="number-systems" class="page-content hidden py-12 sm:py-16 lg:py-24 bg-white">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900">Understanding Number Systems</h2>
+                    <p class="mt-4 max-w-3xl mx-auto text-base sm:text-lg text-slate-600">While we use the decimal system in daily life, computers rely on binary. Programmers often use hexadecimal as a more convenient shorthand for large binary values.</p>
+                </div>
+                <div class="mt-12 grid md:grid-cols-3 gap-8 max-w-7xl mx-auto">
+                    <div class="bg-slate-50 p-8 rounded-xl shadow-md">
+                        <h3 class="text-2xl font-bold text-blue-800">Decimal (Base-10)</h3>
+                        <p class="mt-2 text-slate-600">This is the familiar number system we use in everyday life. It is called "base-10" because it uses ten unique digits (0, 1, 2, 3, 4, 5, 6, 7, 8, 9). The position of each digit in a number determines its value, based on powers of 10.</p>
+                        <p class="mt-4"><strong>Example:</strong> The number <strong>123</strong> is interpreted as:<br> $(1 \times 10^2) + (2 \times 10^1) + (3 \times 10^0)$ <br> $= 100 + 20 + 3 = 123$.</p>
+                    </div>
+                    <div class="bg-slate-50 p-8 rounded-xl shadow-md">
+                        <h3 class="text-2xl font-bold text-blue-800">Binary (Base-2)</h3>
+                        <p class="mt-2 text-slate-600">Binary is the fundamental language of computers. It uses only two digits: <strong>0</strong> and <strong>1</strong>. Each digit is called a <strong>bit</strong>. This system is ideal for electronic circuits, which can exist in one of two states: off (0) or on (1). Each position in a binary number represents a power of 2.</p>
+                         <p class="mt-4"><strong>Example:</strong> The binary number <strong>$1101_2$</strong> is interpreted as:<br> $(1 \times 2^3) + (1 \times 2^2) + (0 \times 2^1) + (1 \times 2^0)$ <br> $= 8 + 4 + 0 + 1 = 13_{10}$.</p>
+                    </div>
+                    <div class="bg-slate-50 p-8 rounded-xl shadow-md">
+                        <h3 class="text-2xl font-bold text-blue-800">Hexadecimal (Base-16)</h3>
+                        <p class="mt-2 text-slate-600">Hexadecimal is used by programmers as a more compact and human-friendly way to represent long binary numbers. It uses 16 unique symbols: the digits <strong>0-9</strong> and the letters <strong>A-F</strong> to represent the values 10 through 15. Each position represents a power of 16.</p>
+                        <p class="mt-4"><strong>Example:</strong> The hexadecimal number <strong>$8B_{16}$</strong> is interpreted as:<br> $(8 \times 16^1) + (11 \times 16^0)$ <br> $= 128 + 11 = 139_{10}$.</p>
+                        <p class="mt-2 text-slate-600">Its main advantage is that one hexadecimal digit can represent exactly four binary digits (a "nibble"), making conversion between the two systems very straightforward.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="conversions" class="page-content hidden py-12 sm:py-16 lg:py-24 bg-white">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
+                <div class="text-center">
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900">How to Convert Between Systems</h2>
+                    <p class="mt-4 max-w-3xl mx-auto text-base sm:text-lg text-slate-600">Knowing how to convert numbers between these systems is a fundamental skill in computer science. Here are the step-by-step methods.</p>
+                </div>
+                <div class="mt-12 space-y-12">
+                    <div>
+                        <h3 class="text-2xl font-bold text-gray-800">Binary to Decimal</h3>
+                        <p class="mt-2 text-slate-600">To convert a binary number to decimal, multiply each binary digit by its corresponding positional value (a power of 2) and sum the results. The rightmost digit has a positional value of $2^0$, the next is $2^1$, and so on.</p>
+                        <div class="code-block mt-2">
+                           <p class="font-bold mb-2">Example: Convert $10110_2$ to Decimal</p>
+                           1. Write the binary number: 1 0 1 1 0<br>
+                           2. Assign positional values (powers of 2) from right to left:<br>
+                           &nbsp;&nbsp; $2^4$ &nbsp;$2^3$ &nbsp;$2^2$ &nbsp;$2^1$ &nbsp;$2^0$<br>
+                           &nbsp;&nbsp; 16 &nbsp; 8 &nbsp; 4 &nbsp; 2 &nbsp; 1<br>
+                           3. Multiply each binary digit by its positional value:<br>
+                           &nbsp;&nbsp; $(1 \times 16) + (0 \times 8) + (1 \times 4) + (1 \times 2) + (0 \times 1)$<br>
+                           4. Sum the results:<br>
+                           &nbsp;&nbsp; $16 + 0 + 4 + 2 + 0 = 22$<br><br>
+                           <strong>Result: $10110_2 = 22_{10}$</strong>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold text-gray-800">Decimal to Binary</h3>
+                        <p class="mt-2 text-slate-600">The most common method is successive division by 2. Divide the decimal number by 2 repeatedly, recording the remainder at each step until the quotient is 0. The binary equivalent is the sequence of remainders read from the bottom up.</p>
+                        <div class="code-block mt-2">
+                           <p class="font-bold mb-2">Example: Convert $22_{10}$ to Binary</p>
+                           1. Divide the number by 2 and record the remainder:<br>
+                           &nbsp;&nbsp; $22 \div 2 = 11$ Remainder <strong>0</strong><br>
+                           2. Divide the new quotient (11) by 2:<br>
+                           &nbsp;&nbsp; $11 \div 2 = 5$ &nbsp;Remainder <strong>1</strong><br>
+                           3. Continue this process until the quotient is 0:<br>
+                           &nbsp;&nbsp; $5 \div 2 = 2$ &nbsp; Remainder <strong>1</strong><br>
+                           &nbsp;&nbsp; $2 \div 2 = 1$ &nbsp; Remainder <strong>0</strong><br>
+                           &nbsp;&nbsp; $1 \div 2 = 0$ &nbsp; Remainder <strong>1</strong><br>
+                           4. Read the remainder digits from the bottom up.<br><br>
+                           <strong>Result: $22_{10} = 10110_2$</strong>
+                        </div>
+                    </div>
+                     <div>
+                        <h3 class="text-2xl font-bold text-gray-800">Hexadecimal to Decimal</h3>
+                        <p class="mt-2 text-slate-600">This is similar to binary-to-decimal, but uses powers of 16. Multiply each hexadecimal digit by its positional value and sum the results, remembering that A=10, B=11, etc.</p>
+                        <div class="code-block mt-2">
+                           <p class="font-bold mb-2">Example: Convert $D6_{16}$ to Decimal</p>
+                           1. Write the hexadecimal number: D 6<br>
+                           2. Assign positional values (powers of 16) from right to left:<br>
+                           &nbsp;&nbsp; $16^1$ &nbsp;$16^0$<br>
+                           &nbsp;&nbsp; 16 &nbsp; 1<br>
+                           3. Convert hex digits to decimal (D = 13) and multiply:<br>
+                           &nbsp;&nbsp; $(13 \times 16) + (6 \times 1)$<br>
+                           4. Sum the results:<br>
+                           &nbsp;&nbsp; $208 + 6 = 214$<br><br>
+                           <strong>Result: $D6_{16} = 214_{10}$</strong>
+                        </div>
+                    </div>
+                     <div>
+                        <h3 class="text-2xl font-bold text-gray-800">Decimal to Hexadecimal</h3>
+                        <p class="mt-2 text-slate-600">Use successive division by 16. Record the remainders, converting any remainder from 10-15 to its corresponding A-F letter. Read the results from bottom to top.</p>
+                        <div class="code-block mt-2">
+                           <p class="font-bold mb-2">Example: Convert $214_{10}$ to Hexadecimal</p>
+                           1. Divide the number by 16 and record the remainder:<br>
+                           &nbsp;&nbsp; $214 \div 16 = 13$ Remainder <strong>6</strong><br>
+                           2. Divide the new quotient (13) by 16:<br>
+                           &nbsp;&nbsp; $13 \div 16 = 0$ &nbsp;Remainder <strong>13</strong> (which is <strong>D</strong> in hex)<br>
+                           3. Read the remainders from bottom to top.<br><br>
+                           <strong>Result: $214_{10} = D6_{16}$</strong>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold text-gray-800">Binary to Hexadecimal</h3>
+                        <p class="mt-2 text-slate-600">This conversion is a simple grouping exercise. Group the binary number into sets of four digits (nibbles) from right to left. Add leading zeros if the leftmost group has fewer than four bits. Convert each group to its single hexadecimal digit.</p>
+                        <div class="code-block mt-2">
+                            <p class="font-bold mb-2">Example: Convert $11010110_2$ to Hexadecimal</p>
+                            1. Write the binary number: 11010110<br>
+                            2. Group into nibbles (4 bits) from right to left:<br>
+                            &nbsp;&nbsp; <strong>1101</strong> <strong>0110</strong><br>
+                            3. Convert each nibble to its hexadecimal digit (1101₂ = 13₁₀ = D₁₆):<br>
+                            &nbsp;&nbsp; $1101_2 \rightarrow D_{16}$<br>
+                            &nbsp;&nbsp; $0110_2 \rightarrow 6_{16}$<br><br>
+                            <strong>Result: $11010110_2 = D6_{16}$</strong>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold text-gray-800">Hexadecimal to Binary</h3>
+                        <p class="mt-2 text-slate-600">This is the reverse of the previous process. Convert each hexadecimal digit individually into its 4-bit binary representation, ensuring each group has four digits by adding leading zeros where needed.</p>
+                        <div class="code-block mt-2">
+                            <p class="font-bold mb-2">Example: Convert $A9_{16}$ to Binary</p>
+                            1. Write down the hexadecimal number: A 9<br>
+                            2. Convert each digit to its 4-bit binary equivalent:<br>
+                            &nbsp;&nbsp; $A_{16} \rightarrow 10_{10} \rightarrow 1010_2$<br>
+                            &nbsp;&nbsp; $9_{16} \rightarrow 9_{10} \rightarrow 1001_2$<br>
+                            3. Combine the binary groups.<br><br>
+                            <strong>Result: $A9_{16} = 10101001_2$</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="converter-tool" class="page-content hidden py-12 sm:py-16 lg:py-24 bg-white">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-2xl">
+                 <div class="text-center">
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900">Live Number System Converter</h2>
+                    <p class="mt-4 max-w-3xl mx-auto text-base sm:text-lg text-slate-600">Use this tool to practice and verify your conversions. Enter a valid number in any field, and the others will update automatically.</p>
+                </div>
+                <div class="mt-12 bg-slate-50 p-8 rounded-xl shadow-md space-y-6">
+                    <div>
+                        <label for="decimalInput" class="block text-lg font-semibold text-slate-700">Decimal (Base-10)</label>
+                        <input type="text" id="decimalInput" class="mt-2 block w-full p-3 border border-slate-300 rounded-md shadow-sm text-lg focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., 173">
+                    </div>
+                    <div>
+                        <label for="binaryInput" class="block text-lg font-semibold text-slate-700">Binary (Base-2)</label>
+                        <input type="text" id="binaryInput" class="mt-2 block w-full p-3 border border-slate-300 rounded-md shadow-sm text-lg focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., 10101101">
+                    </div>
+                    <div>
+                        <label for="hexInput" class="block text-lg font-semibold text-slate-700">Hexadecimal (Base-16)</label>
+                        <input type="text" id="hexInput" class="mt-2 block w-full p-3 border border-slate-300 rounded-md shadow-sm text-lg focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., AD">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="quiz" class="page-content hidden py-12 sm:py-16 lg:py-24 bg-white">
+             <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900">Knowledge Check</h2>
+                    <p class="mt-4 max-w-3xl mx-auto text-base sm:text-lg text-slate-600">Test your understanding of data representation and number system conversions.</p>
+                </div>
+                <div id="quiz-wrapper" class="mt-12 max-w-4xl mx-auto">
+                    <div id="quiz-start-screen" class="text-center bg-slate-50 p-8 rounded-lg shadow-md">
+                        <h3 class="text-2xl font-bold text-gray-800">Ready to Test Your Knowledge?</h3>
+                        <p class="mt-2 text-slate-600">You will have <strong>35 minutes</strong> to answer <strong>60 questions</strong> selected from a large question bank.</p>
+                        <button id="start-quiz-btn" class="mt-6 px-8 py-3 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 transition">Start Quiz</button>
+                    </div>
+                    <div id="quiz-container" class="hidden">
+                        <div class="flex justify-between items-center mb-4 p-4 bg-slate-100 rounded-lg">
+                            <h3 class="text-xl font-bold text-gray-800">Data Representation Quiz</h3>
+                            <div id="timer" class="text-lg font-bold text-red-500">35:00</div>
+                        </div>
+                        <div id="quiz-questions" class="space-y-6 bg-slate-50 p-6 rounded-lg"></div>
+                        <button id="submit-quiz-btn" class="mt-8 w-full px-8 py-3 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 transition">Submit Answers</button>
+                    </div>
+                    <div id="quiz-results-screen" class="hidden text-center bg-slate-50 p-8 rounded-lg shadow-md">
+                        <h3 class="text-2xl font-bold text-gray-800">Quiz Complete!</h3>
+                        <p class="mt-2 text-slate-600">Here are your results.</p>
+                        <div id="quiz-score-display" class="my-4 text-4xl font-extrabold text-blue-600"></div>
+                        <div id="quiz-time-taken" class="text-slate-600"></div>
+                        <button id="review-answers-btn" class="mt-6 px-8 py-3 bg-gray-500 text-white font-semibold rounded-lg shadow-md hover:bg-gray-600 transition">Review Your Answers</button>
+                        <div id="quiz-review" class="hidden mt-8 text-left space-y-6"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="resources" class="page-content hidden py-12 sm:py-16 lg:py-24 bg-white">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900">Further Learning Resources</h2>
+                    <p class="mt-4 max-w-3xl mx-auto text-base sm:text-lg text-slate-600">Deepen your understanding with these curated external resources.</p>
+                </div>
+                <div class="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+                    <div class="bg-slate-50 p-6 rounded-lg shadow-md">
+                        <h4 class="font-bold text-lg text-blue-600">Number Systems Introduction</h4>
+                        <p class="mt-2 text-sm text-slate-600">A great visual introduction to binary, decimal, and hexadecimal from CrashCourse Computer Science.</p>
+                        <a href="https://www.youtube.com/watch?v=1GSjbWt0c9M" target="_blank" class="mt-4 inline-block text-blue-500 hover:underline font-semibold">Watch on YouTube →</a>
+                    </div>
+                    <div class="bg-slate-50 p-6 rounded-lg shadow-md">
+                        <h4 class="font-bold text-lg text-blue-600">Khan Academy: Binary & Hexadecimal</h4>
+                        <p class="mt-2 text-sm text-slate-600">In-depth lessons and practice exercises on number system conversions.</p>
+                        <a href="https://www.khanacademy.org/math/algebra-home/alg-intro-to-algebra/algebra-alternate-number-bases/v/number-systems-introduction" target="_blank" class="mt-4 inline-block text-blue-500 hover:underline font-semibold">Explore Lessons →</a>
+                    </div>
+                    <div class="bg-slate-50 p-6 rounded-lg shadow-md">
+                        <h4 class="font-bold text-lg text-blue-600">RapidTables Converters</h4>
+                        <p class="mt-2 text-sm text-slate-600">A set of reliable online tools for quickly converting between number systems to check your work.</p>
+                        <a href="https://www.rapidtables.com/convert/number/index.html" target="_blank" class="mt-4 inline-block text-blue-500 hover:underline font-semibold">Use Converters →</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <footer class="fixed bottom-0 left-0 w-full bg-white py-2 border-t border-slate-200 text-center text-sm text-slate-500">
+        <div class="container mx-auto px-6 flex flex-col sm:flex-row justify-center items-center space-y-2 sm:space-y-0 sm:space-x-4">
+            <div class="flex items-center space-x-4">
+                <a href="https://www.linkedin.com/in/emmayeboah360/" class="text-blue-600 hover:text-blue-800 social-link" target="_blank">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.762s.784-1.762 1.75-1.762 1.75.79 1.75 1.762-.784 1.762-1.75 1.762zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                </a>
+                <a href="mailto:yemmanuel308@gmail.com" class="text-rose-600 hover:text-rose-800 social-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12.713l-11.75 6.287 11.75 5.5zM23.75 18.995l-11.75-6.287v11.748zM12 11.287l-12-6.287v1.868l12 6.287l12-6.287v-1.868z"/></svg>
+                </a>
+            </div>
+            <p class="pl-4">&copy; 2025 Emmanuel Yeboah. All rights reserved.</p>
+        </div>
+    </footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // --- Navigation ---
+    const navLinks = document.querySelectorAll('.nav-link');
+    const pages = document.querySelectorAll('.page-content');
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+
+    mobileMenuButton.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+
+    function switchTab(targetId) {
+        pages.forEach(page => page.classList.remove('active'));
+        const targetPage = document.getElementById(targetId);
+        if (targetPage) targetPage.classList.add('active');
+        navLinks.forEach(link => link.classList.toggle('active', link.dataset.target === targetId));
+        mobileMenu.classList.add('hidden');
+    }
+
+    navLinks.forEach(link => link.addEventListener('click', (e) => {
+        e.preventDefault();
+        switchTab(e.currentTarget.dataset.target);
+    }));
+    
+    // --- Converter Tool Logic ---
+    const decInput = document.getElementById('decimalInput');
+    const binInput = document.getElementById('binaryInput');
+    const hexInput = document.getElementById('hexInput');
+    let isUpdating = false;
+
+    function updateConverters(source) {
+        if (isUpdating) return;
+        isUpdating = true;
+        
+        try {
+            if (source === 'dec') {
+                if (decInput.value.trim() === '') { clearInputs(source); return; }
+                if (!/^\d+$/.test(decInput.value)) throw new Error("Invalid decimal");
+                const decValue = parseInt(decInput.value, 10);
+                if (isNaN(decValue)) { clearInputs(source); return; }
+                binInput.value = decValue.toString(2);
+                hexInput.value = decValue.toString(16).toUpperCase();
+            } else if (source === 'bin') {
+                if (binInput.value.trim() === '') { clearInputs(source); return; }
+                if (!/^[01]+$/.test(binInput.value)) throw new Error("Invalid binary");
+                const decValue = parseInt(binInput.value, 2);
+                if (isNaN(decValue)) { clearInputs(source); return; }
+                decInput.value = decValue;
+                hexInput.value = decValue.toString(16).toUpperCase();
+            } else if (source === 'hex') {
+                if (hexInput.value.trim() === '') { clearInputs(source); return; }
+                if (!/^[0-9a-fA-F]+$/.test(hexInput.value)) throw new Error("Invalid hexadecimal");
+                const decValue = parseInt(hexInput.value, 16);
+                if (isNaN(decValue)) { clearInputs(source); return; }
+                decInput.value = decValue;
+                binInput.value = decValue.toString(2);
+            }
+        } catch (e) {
+            // Invalid input, just stop. The live validation is visual.
+        } finally {
+            isUpdating = false;
+        }
+    }
+
+    function clearInputs(source) {
+        if (source !== 'dec') decInput.value = '';
+        if (source !== 'bin') binInput.value = '';
+        if (source !== 'hex') hexInput.value = '';
+        isUpdating = false;
+    }
+
+    decInput.addEventListener('input', () => updateConverters('dec'));
+    binInput.addEventListener('input', () => updateConverters('bin'));
+    hexInput.addEventListener('input', () => updateConverters('hex'));
+
+
+    // --- Quiz Logic ---
+    const startQuizBtn = document.getElementById('start-quiz-btn');
+    const quizStartScreen = document.getElementById('quiz-start-screen');
+    const quizContainer = document.getElementById('quiz-container');
+    const quizQuestionsContainer = document.getElementById('quiz-questions');
+    const submitQuizBtn = document.getElementById('submit-quiz-btn');
+    const quizResultsScreen = document.getElementById('quiz-results-screen');
+    const quizScoreDisplay = document.getElementById('quiz-score-display');
+    const quizTimeTakenEl = document.getElementById('quiz-time-taken');
+    const reviewAnswersBtn = document.getElementById('review-answers-btn');
+    const quizReviewEl = document.getElementById('quiz-review');
+    const timerEl = document.getElementById('timer');
+
+    let timerInterval;
+    let timeRemaining;
+    let activeQuizQuestions = [];
+    let userAnswers = [];
+
+    const questionBank = [
+        // Easy Conversions (20 questions)
+        { q: "What is the decimal equivalent of the binary number 1011?", options: ["9", "10", "11", "13"], answer: "11" },
+        { q: "Which of the following is the binary representation of the decimal number 25?", options: ["11001", "10011", "11101", "11010"], answer: "11001" },
+        { q: "What is the hexadecimal equivalent of the binary number 11100101?", options: ["E5", "D5", "F5", "E4"], answer: "E5" },
+        { q: "What is the binary equivalent of the hexadecimal number 3A?", options: ["00111010", "00111001", "01001010", "00111110"], answer: "00111010" },
+        { q: "The number 192 in decimal is what in hexadecimal?", options: ["C0", "B0", "A0", "D0"], answer: "C0" },
+        { q: "The hexadecimal number FF is equivalent to what decimal number?", options: ["128", "255", "256", "512"], answer: "255" },
+        { q: "Convert the decimal number 42 to binary.", options: ["101010", "110010", "100101", "001100"], answer: "101010" },
+        { q: "Convert the binary number 10010 to decimal.", options: ["16", "18", "20", "22"], answer: "18" },
+        { q: "Convert the hexadecimal number 1A to decimal.", options: ["16", "26", "36", "110"], answer: "26" },
+        { q: "The decimal number 15 is represented in hexadecimal as:", options: ["15", "E", "F", "10"], answer: "F" },
+        { q: "What is the decimal value of $1000_2$?", options: ["4", "6", "8", "10"], answer: "8" },
+        { q: "Convert $1111_2$ to hexadecimal.", options: ["E", "F", "15", "16"], answer: "F" },
+        { q: "Convert $7_{16}$ to decimal.", options: ["7", "16", "70", "17"], answer: "7" },
+        { q: "Convert $10_{10}$ to hexadecimal.", options: ["10", "A", "B", "F"], answer: "A" },
+        { q: "What is the binary for the decimal number 8?", options: ["100", "10000", "1000", "0100"], answer: "1000"},
+        { q: "What is the decimal for the binary number 111?", options: ["3", "6", "7", "8"], answer: "7"},
+        { q: "Convert the hexadecimal number B to decimal.", options: ["10", "11", "12", "16"], answer: "11"},
+        { q: "Convert the decimal number 14 to hexadecimal.", options: ["D", "E", "F", "14"], answer: "E"},
+        { q: "What is the hexadecimal of 10010011 in binary?", options: ["93", "92", "A3", "39"], answer: "93"},
+        { q: "What is the binary of C4 in hexadecimal?", options: ["11000100", "11000010", "10100100", "11100100"], answer: "11000100"},
+        // Conceptual Questions (20 questions)
+        { q: "Why is hexadecimal often used in computer science?", options: ["It is the native language of the CPU.", "It provides a shorter, more human-readable way to represent binary.", "It is more precise than decimal.", "It has more digits."], answer: "It provides a shorter, more human-readable way to represent binary." },
+        { q: "How many bits are represented by a single hexadecimal digit?", options: ["1", "2", "4", "8"], answer: "4" },
+        { q: "A group of 4 bits is commonly known as a:", options: ["Byte", "Bit", "Word", "Nibble"], answer: "Nibble"},
+        { q: "What is the value of the digit 'C' in hexadecimal?", options: ["10", "11", "12", "13"], answer: "12" },
+        { q: "The base of the binary number system is:", options: ["10", "16", "8", "2"], answer: "2" },
+        { q: "Which number system is most fundamental to the operation of digital electronics?", options: ["Decimal", "Hexadecimal", "Binary", "Octal"], answer: "Binary" },
+        { q: "The base of the hexadecimal number system is:", options: ["2", "8", "10", "16"], answer: "16"},
+        { q: "What is the largest decimal number that can be represented with 4 bits?", options: ["8", "15", "16", "32"], answer: "15"},
+        { q: "What is the purpose of using subscripts like in $101_2$?", options: ["To make the number look important.", "To indicate the base of the number system.", "To show it is a negative number.", "It has no purpose."], answer: "To indicate the base of the number system."},
+        { q: "If a computer uses 8-bits to store a positive integer, what is the largest possible value?", options: ["127", "128", "255", "256"], answer: "255"},
+        { q: "Which digit is NOT used in the hexadecimal system?", options: ["A", "F", "G", "9"], answer: "G"},
+        { q: "The value of a digit in a number is determined by its position and the _______ of the system.", options: ["base", "height", "length", "name"], answer: "base"},
+        { q: "How is the binary system perfectly suited for electronic computers?", options: ["It can represent fractions easily.", "It uses letters and numbers.", "Its two states (0, 1) can represent on/off electrical signals.", "It is easier for humans to read."], answer: "Its two states (0, 1) can represent on/off electrical signals."},
+        { q: "A byte is typically composed of how many bits?", options: ["4", "8", "16", "32"], answer: "8"},
+        { q: "Two hexadecimal digits can be used to represent a single ____.", options: ["Bit", "Nibble", "Byte", "Word"], answer: "Byte"},
+        { q: "In the number 538, what does the '5' represent?", options: ["$5 \times 10^0$", "$5 \times 10^1$", "$5 \times 10^2$", "$5 \times 10^3$"], answer: "$5 \times 10^2$"},
+        { q: "In the number $110_2$, what does the leftmost '1' represent?", options: ["$1 \times 2^0$", "$1 \times 2^1$", "$1 \times 2^2$", "$1 \times 2^3$"], answer: "$1 \times 2^2$"},
+        { q: "Which of the following would likely be represented using hexadecimal in programming?", options: ["The text of an error message.", "A memory address or color code.", "The number of users online.", "The speed of the CPU."], answer: "A memory address or color code."},
+        { q: "The term 'bit' is short for:", options: ["Binary Integer", "Binary Digit", "Bilateral Item", "Byte Integer"], answer: "Binary Digit"},
+        { q: "Which system is positional, where the position of a digit determines its value?", options: ["Binary only", "Decimal only", "Hexadecimal only", "All of the above"], answer: "All of the above"},
+        // Medium/Hard Conversions (40+ questions)
+        { q: "What is the decimal equivalent of 10101010?", options: ["160", "170", "180", "190"], answer: "170"},
+        { q: "What is 205 in binary?", options: ["11001101", "11001100", "11011101", "11001001"], answer: "11001101"},
+        { q: "Convert $FACE_{16}$ to binary.", options: ["1111101011001110", "1111101011011110", "1110101011001110", "1111101111001110"], answer: "1111101011001110"},
+        { q: "Convert 101101110101 from binary to hexadecimal.", options: ["B75", "C75", "B85", "A75"], answer: "B75"},
+        { q: "What is 400 in decimal converted to hexadecimal?", options: ["190", "180", "1A0", "19A"], answer: "190"},
+        { q: "What is $2D9_{16}$ in decimal?", options: ["729", "730", "728", "739"], answer: "729"},
+        { q: "The binary number for $99_{10}$ is:", options: ["01100011", "01100111", "01010011", "01100010"], answer: "01100011"},
+        { q: "The decimal number 111 is what in binary?", options: ["1101110", "1101111", "1001111", "1101101"], answer: "1101111"},
+        { q: "$5C_{16}$ is equivalent to what in decimal?", options: ["82", "92", "102", "90"], answer: "92"},
+        { q: "What is the binary representation of the decimal value 127?", options: ["01111111", "10000000", "01111110", "01111101"], answer: "01111111"},
+        { q: "Convert $1F_16$ to decimal.", options: ["30", "31", "32", "29"], answer: "31"},
+        { q: "Convert $101_10$ to hexadecimal.", options: ["65", "66", "64", "A1"], answer: "65"},
+        { q: "What is the largest 2-digit hexadecimal number?", options: ["EE", "FE", "FF", "F9"], answer: "FF"},
+        { q: "Convert 10000000 in binary to decimal.", options: ["127", "128", "255", "256"], answer: "128"},
+        { q: "How would you write the decimal number 256 in hexadecimal?", options: ["FF", "100", "101", "256"], answer: "100"},
+        { q: "The binary number 1101.101 represents what decimal value?", options: ["13.125", "13.5", "13.625", "13.75"], answer: "13.625"},
+        { q: "The hexadecimal color code #FFFFFF represents what color?", options: ["Black", "Red", "Blue", "White"], answer: "White"},
+        { q: "The hexadecimal color code #000000 represents what color?", options: ["Black", "Red", "Blue", "White"], answer: "Black"},
+        { q: "What is the decimal sum of $10_2$ and $10_{16}$?", options: ["12", "18", "20", "26"], answer: "18"},
+        { q: "Convert 100 from decimal to binary.", options: ["1100100", "1100010", "1101100", "1000100"], answer: "1100100"},
+        { q: "The decimal number 1 is represented in binary as:", options: ["1", "01", "001", "All of the above"], answer: "All of the above"},
+        { q: "Which hexadecimal value is equivalent to the decimal value 12?", options: ["A", "B", "C", "D"], answer: "C"},
+        { q: "Convert the binary value 10 to decimal.", options: ["1", "2", "3", "4"], answer: "2"},
+        { q: "What is 4 + 5 in binary?", options: ["1000", "1001", "1010", "1100"], answer: "1001"},
+        { q: "What is the decimal equivalent of $100_2$?", options: ["2", "3", "4", "8"], answer: "4"},
+        { q: "Convert $55_{10}$ to binary.", options: ["110111", "101101", "111011", "110101"], answer: "110111"},
+        { q: "Convert $E_{16}$ to binary.", options: ["1111", "1110", "1101", "1100"], answer: "1110"},
+        { q: "What is the decimal equivalent of the binary number 11001100?", options: ["200", "202", "204", "206"], answer: "204"},
+        { q: "Convert $10111_2$ to decimal.", options: ["21", "22", "23", "24"], answer: "23"},
+        { q: "What is $3F_{16}$ in decimal?", options: ["61", "62", "63", "64"], answer: "63"},
+        { q: "What is the hexadecimal representation of the binary number 11110000?", options: ["E0", "F0", "F1", "EF"], answer: "F0"},
+        { q: "What is the decimal representation of the hexadecimal number 100?", options: ["16", "100", "256", "255"], answer: "256"},
+        { q: "Convert $123_{10}$ to hexadecimal.", options: ["7A", "7B", "7C", "7D"], answer: "7B"},
+        { q: "What is $11_2 + 1_2$?", options: ["$12_2$", "$100_2$", "$111_2$", "$10_2$"], answer: "$100_2$"},
+        { q: "What is the value of the hexadecimal number $ABC$ in decimal?", options: ["2748", "2749", "2750", "2751"], answer: "2748"},
+        { q: "Convert the binary number 100001 to hexadecimal.", options: ["21", "20", "31", "41"], answer: "21"},
+        { q: "What is the decimal value of the rightmost bit in an 8-bit number?", options: ["1", "2", "8", "128"], answer: "1"},
+        { q: "What is the decimal value of the leftmost bit in an 8-bit number?", options: ["1", "2", "8", "128"], answer: "128"},
+        { q: "The hexadecimal number system is convenient for representing bytes because:", options: ["It is base 8", "It uses two digits per byte", "It is easier to calculate", "It has fewer digits"], answer: "It uses two digits per byte"},
+        { q: "How many unique values can be represented with 3 bits?", options: ["4", "6", "8", "10"], answer: "8"}
+    ];
+
+    function startTimer() {
+        timerInterval = setInterval(() => {
+            timeRemaining--;
+            const minutes = Math.floor(timeRemaining / 60);
+            const seconds = timeRemaining % 60;
+            timerEl.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+            if (timeRemaining <= 0) {
+                clearInterval(timerInterval);
+                submitQuiz();
+            }
+        }, 1000);
+    }
+
+    function displayQuestions() {
+        quizQuestionsContainer.innerHTML = '';
+        activeQuizQuestions.forEach((item, index) => {
+            const questionEl = document.createElement('div');
+            questionEl.className = 'bg-white p-5 rounded-lg shadow-sm';
+            let optionsHtml = item.options.map(option => `<div><label class="quiz-option-label block w-full text-left p-3 my-2 border-2 border-slate-200 rounded-md cursor-pointer hover:bg-slate-100"><input type="radio" name="question${index}" value="${option}" class="hidden"> ${option}</label></div>`).join('');
+            questionEl.innerHTML = `<p class="font-semibold text-gray-800">${index + 1}. ${item.q.replace(/\$(\^|\_\{[^\}]+\}|[a-zA-Z0-9]+)\$/g, (match, p1) => `<code>${p1.replace(/[\$\_\{\}]/g, '')}</code>`)}</p><div class="mt-2">${optionsHtml}</div>`;
+            quizQuestionsContainer.appendChild(questionEl);
+        });
+
+        document.querySelectorAll('.quiz-option-label').forEach(label => {
+            label.addEventListener('click', (e) => {
+                const input = e.currentTarget.querySelector('input');
+                const questionName = input.name;
+                document.querySelectorAll(`input[name="${questionName}"]`).forEach(radio => {
+                    radio.parentElement.classList.remove('selected');
+                });
+                e.currentTarget.classList.add('selected');
+                input.checked = true;
+            });
+        });
+    }
+
+    function submitQuiz() {
+        clearInterval(timerInterval);
+        const totalTime = 35 * 60;
+        const timeTaken = totalTime - timeRemaining;
+        const minutes = Math.floor(timeTaken / 60);
+        const seconds = timeTaken % 60;
+
+        let score = 0;
+        userAnswers = [];
+        activeQuizQuestions.forEach((item, index) => {
+            const selectedOption = document.querySelector(`input[name="question${index}"]:checked`);
+            const userAnswer = selectedOption ? selectedOption.value : null;
+            userAnswers.push(userAnswer);
+            if (userAnswer === item.answer) {
+                score++;
+            }
+        });
+
+        quizContainer.classList.add('hidden');
+        quizResultsScreen.classList.remove('hidden');
+        quizScoreDisplay.textContent = `You scored ${score} out of ${activeQuizQuestions.length}`;
+        quizTimeTakenEl.textContent = `Time taken: ${minutes} minutes and ${seconds} seconds.`;
+    }
+
+    function displayReview() {
+        quizReviewEl.innerHTML = '';
+        activeQuizQuestions.forEach((item, index) => {
+            const userAnswer = userAnswers[index];
+            const isCorrect = userAnswer === item.answer;
+            const questionEl = document.createElement('div');
+            questionEl.className = 'bg-slate-100 p-4 rounded-lg';
+            let optionsHtml = item.options.map(option => {
+                let labelClass = 'quiz-option-label block w-full text-left p-3 my-2 border-2 rounded-md';
+                if (option === item.answer) {
+                    labelClass += ' correct';
+                } else if (option === userAnswer && !isCorrect) {
+                    labelClass += ' incorrect';
+                }
+                return `<div><label class="${labelClass}">${option}</label></div>`;
+            }).join('');
+            questionEl.innerHTML = `<p class="font-semibold text-gray-800">${index + 1}. ${item.q.replace(/\$(\^|\_\{[^\}]+\}|[a-zA-Z0-9]+)\$/g, (match, p1) => `<code>${p1.replace(/[\$\_\{\}]/g, '')}</code>`)}</p><p class="text-sm mt-2">Your answer: <strong class="${isCorrect ? 'text-green-600' : 'text-red-600'}">${userAnswer || "Not answered"}</strong></p>${!isCorrect ? `<p class="text-sm mt-1">Correct answer: <strong class="text-green-700">${item.answer}</strong></p>` : ''}<div class="mt-2">${optionsHtml}</div>`;
+            quizReviewEl.appendChild(questionEl);
+        });
+    }
+
+    startQuizBtn.addEventListener('click', () => {
+        const shuffled = [...questionBank].sort(() => 0.5 - Math.random());
+        activeQuizQuestions = shuffled.slice(0, 60);
+        quizStartScreen.classList.add('hidden');
+        quizContainer.classList.remove('hidden');
+        quizResultsScreen.classList.add('hidden');
+        quizReviewEl.classList.add('hidden');
+        reviewAnswersBtn.textContent = 'Review Your Answers';
+        timeRemaining = 35 * 60;
+        timerEl.textContent = "35:00";
+        startTimer();
+        displayQuestions();
+    });
+
+    submitQuizBtn.addEventListener('click', submitQuiz);
+    reviewAnswersBtn.addEventListener('click', () => {
+        quizReviewEl.classList.toggle('hidden');
+        reviewAnswersBtn.textContent = quizReviewEl.classList.contains('hidden') ? 'Review Your Answers' : 'Hide Answers';
+        if (!quizReviewEl.classList.contains('hidden')) {
+            displayReview();
+        }
+    });
+
+    // Initial setup
+    switchTab('home');
+});
+</script>
+
+</body>
+</html>

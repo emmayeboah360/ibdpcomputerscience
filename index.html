@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Computer Science Syllabus Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2024%2024%22%20stroke-width%3D%221.5%22%20stroke%3D%22currentColor%22%3E%0A%3Cpath%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20d%3D%22M6.75%207.5l3%202.25-3%202.25m4.5%200h3m-9%208.25h13.5A2.25%202.25%200%200021%2018V6a2.25%202.25%200%2000-2.25-2.25H5.25A2.25%202.25%200%20003%206v12a2.25%202.25%200%20002.25%202.25z%22%20/%3E%0A%3C/svg%3E">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .header-glass {
+            background-color: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+        }
+        .topic-link {
+            transition: color 0.2s ease-in-out, transform 0.2s ease-in-out;
+            display: block;
+        }
+        .topic-link:hover {
+            color: #4f46e5; /* Indigo-600 */
+            transform: translateX(4px);
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.7s cubic-bezier(0.83, 0, 0.17, 1);
+        }
+        .accordion-button.open .accordion-icon {
+            transform: rotate(180deg);
+        }
+        .accordion-icon {
+            transition: transform 0.3s ease;
+        }
+        #back-to-top {
+            transition: opacity 0.3s, transform 0.3s;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <!-- Header Section -->
+    <header class="header-glass sticky top-0 z-50 border-b border-gray-200">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <svg class="h-8 w-8 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 7.5l3 2.25-3 2.25m4.5 0h3m-9 8.25h13.5A2.25 2.25 0 0021 18V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v12a2.25 2.25 0 002.25 2.25z" />
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <h1 class="text-xl font-bold text-gray-900">Syllabus Hub</h1>
+                    </div>
+                </div>
+                <nav class="hidden md:flex items-center space-x-8">
+                    <a href="#theme-a" id="nav-a" class="font-medium text-gray-600 hover:text-indigo-600 transition-colors duration-300">Theme A</a>
+                    <a href="#theme-b" id="nav-b" class="font-medium text-gray-600 hover:text-indigo-600 transition-colors duration-300">Theme B</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
+
+        <!-- Introduction -->
+        <div class="text-center mb-16">
+            <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-emerald-600">
+                IB DP Computer Science Curriculum
+            </h2>
+            <p class="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">
+              Embark on a comprehensive journey through the world of computer science. 
+               This interactive syllabus is your roadmap to mastering core concepts and advanced problem-solving techniques, tailored for the IB DP Computer Science curriculum with first assessments in 2027. Dive into computational thinking, programming, and real-world applications with the support of our engaging resources and guides.
+            </p>
+        </div>
+
+        <!-- Themes Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+
+            <!-- Theme A Column -->
+            <section id="theme-a" class="scroll-mt-16">
+                <div class="flex items-center mb-6">
+                     <span class="flex items-center justify-center h-12 w-12 rounded-full bg-indigo-100">
+                        <svg class="h-6 w-6 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 3v1.5M4.5 8.25H3m18 0h-1.5M4.5 12H3m18 0h-1.5m-15 3.75H3m18 0h-1.5M8.25 19.5V21M12 3v1.5m0 15V21m3.75-18v1.5m0 15V21m-9-1.5h10.5a2.25 2.25 0 002.25-2.25V6.75a2.25 2.25 0 00-2.25-2.25H6.75A2.25 2.25 0 004.5 6.75v10.5a2.25 2.25 0 002.25 2.25z" /></svg>
+                    </span>
+                    <h3 class="ml-4 text-3xl font-bold text-gray-900">Theme A: Concepts</h3>
+                </div>
+                <div class="space-y-4">
+                    <!-- Accordion Items for Theme A -->
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+                        <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-gray-800 focus:outline-none">
+                            <span>A1: Computer Fundamentals</span>
+                            <svg class="accordion-icon h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                        </button>
+                        <div class="accordion-content">
+                            <div class="p-5 border-t border-gray-200 space-y-6 text-sm">
+                                <div class="space-y-2">
+                                    <h4 class="font-semibold text-gray-700">A1.1 Computer hardware and operation</h4>
+                                    <ul class="pl-4 space-y-2">
+                                        <li><a href="lesson1.html" class="topic-link text-gray-600">A1.1.1 Functions and interactions of CPU components</a></li>
+                                        <li><a href="lesson2_3.html" class="topic-link text-gray-600">A1.1.2 Role of a GPU</a></li>
+                                        <li><a href="lesson2_3.html" class="topic-link text-gray-600">A1.1.3 Differences between CPU and GPU (HL only)</a></li>
+                                        <li><a href="lesson4.html" class="topic-link text-gray-600">A1.1.4 Purposes of primary memory types</a></li>
+                                        <li><a href="lesson5.html" class="topic-link text-gray-600">A1.1.5 Fetch, decode and execute cycle</a></li>
+                                        <li><a href="lesson6.html" class="topic-link text-gray-600">A1.1.6 Pipelining in multi-core architectures (HL only)</a></li>
+                                        <li><a href="Lesson7.html" class="topic-link text-gray-600">A1.1.7 Secondary memory storage</a></li>
+                                        <li><a href="lesson8.html" class="topic-link text-gray-600">A1.1.8 Concept of compression</a></li>
+                                        <li><a href="lesson9.html" class="topic-link text-gray-600">A1.1.9 Services in cloud computing</a></li>
+                                    </ul>
+                                </div>
+                                <div class="space-y-2">
+                                    <h4 class="font-semibold text-gray-700">A1.2 Data representation and computer logic</h4>
+                                    <ul class="pl-4 space-y-2">
+                                        <li><a href="lesson10.html" class="topic-link text-gray-600">A1.2.1 Methods of representing data</a></li>
+                                        <li><a href="lesson11.html" class="topic-link text-gray-600">A1.2.2 How binary is used to store data</a></li>
+                                        <li><a href="lesson12.html" class="topic-link text-gray-600">A1.2.3 Purpose and use of logic gates</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">A1.2.4 Construct and analyse truth tables</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">A.1.2.5 Construct logic diagrams</a></li>
+                                    </ul>
+                                </div>
+                                <div class="space-y-2">
+                                    <h4 class="font-semibold text-gray-700">A1.3 Operating systems and control systems</h4>
+                                     <ul class="pl-4 space-y-2">
+                                        <li><a href="#" class="topic-link text-gray-600">A1.3.1 Role of operating systems</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">A1.3.2 Functions of an operating system</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">A1.3.3 Approaches to scheduling</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">A1.3.4 Use of polling and interrupt handling</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">A1.3.5 OS in managing multitasking (HL only)</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">A1.3.6 Use of control system components (HL only)</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">A1.3.7 Use of control systems in applications (HL only)</a></li>
+                                    </ul>
+                                </div>
+                                <div class="space-y-2">
+                                    <h4 class="font-semibold text-gray-700">A1.4 Translation (HL only)</h4>
+                                     <ul class="pl-4 space-y-2">
+                                        <li><a href="#" class="topic-link text-gray-600">A1.4.1 Translation processes of interpreters and compilers</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+                        <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-gray-800 focus:outline-none">
+                            <span>A2: Networks</span>
+                            <svg class="accordion-icon h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                        </button>
+                        <div class="accordion-content">
+                            <div class="p-5 border-t border-gray-200 space-y-6 text-sm">
+                                <div class="space-y-2">
+                                    <h4 class="font-semibold text-gray-700">A2.1 Network fundamentals</h4>
+                                     <ul class="pl-4 space-y-2">
+                                        <li><a href="#" class="topic-link text-gray-600">A2.1.1 Purpose and characteristics of networks</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">A2.1.2 Modern digital infrastructures</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">A2.1.3 Function of network devices</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">A2.1.4 Network protocols for transport and application</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">A2.1.5 Function of the TCP/IP model (HL only)</a></li>
+                                    </ul>
+                                </div>
+                                <div class="space-y-2">
+                                    <h4 class="font-semibold text-gray-700">A2.2 Network architecture</h4>
+                                    <ul class="pl-4 space-y-2">
+                                        <li><a href="#" class="topic-link text-gray-600">A2.2.1 Functions of network topologies</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">A2.2.2 Function of servers (HL only)</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">A2.2.3 Networking models</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">A2.2.4 Concepts of network segmentation</a></li>
+                                    </ul>
+                                </div>
+                                <div class="space-y-2">
+                                    <h4 class="font-semibold text-gray-700">A2.3 Data transmissions</h4>
+                                    <ul class="pl-4 space-y-2">
+                                        <li><a href="#" class="topic-link text-gray-600">A2.3.1 Types of IP addressing</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">A2.3.2 Media for data transmission</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">A2.3.3 How packet switching is used</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">A2.3.4 Static and dynamic routing (HL only)</a></li>
+                                    </ul>
+                                </div>
+                                <div class="space-y-2">
+                                    <h4 class="font-semibold text-gray-700">A2.4 Network security</h4>
+                                    <ul class="pl-4 space-y-2">
+                                        <li><a href="#" class="topic-link text-gray-600">A2.4.1 Effectiveness of firewalls</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">A2.4.2 Common network vulnerabilities (HL only)</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">A2.4.3 Common network countermeasures (HL only)</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">A2.4.4 Encryption and digital certificates</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                     <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+                        <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-gray-800 focus:outline-none">
+                            <span>A3: Databases</span>
+                            <svg class="accordion-icon h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                        </button>
+                        <div class="accordion-content">
+                             <div class="p-5 border-t border-gray-200 space-y-6 text-sm">
+                                <div class="space-y-2">
+                                    <h4 class="font-semibold text-gray-700">A3.1 Database fundamentals</h4>
+                                    <ul class="pl-4 space-y-2">
+                                        <li><a href="#" class="topic-link text-gray-600">A3.1.1 Features of a relational database</a></li>
+                                    </ul>
+                                </div>
+                                <div class="space-y-2">
+                                    <h4 class="font-semibold text-gray-700">A3.2 Database design</h4>
+                                    <ul class="pl-4 space-y-2">
+                                        <li><a href="#" class="topic-link text-gray-600">A3.2.1 Database schemas</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">A3.2.2 Construct ERDs</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">A3.2.3 Data types in relational databases</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">A3.2.4 Construct tables for relational databases</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">A3.2.5 Difference between normal forms</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">A3.2.6 Construct a database normalized to 3NF</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">A3.2.7 Need for denormalizing databases</a></li>
+                                    </ul>
+                                </div>
+                                <div class="space-y-2">
+                                    <h4 class="font-semibold text-gray-700">A3.3 Database programming</h4>
+                                    <ul class="pl-4 space-y-2">
+                                        <li><a href="#" class="topic-link text-gray-600">A3.3.1 Data language types within SQL</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">A3.3.2 Construct queries in SQL</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">A3.3.3 How SQL can update data</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">A3.3.4 Calculations using SQL aggregate functions (HL only)</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">A3.3.5 Different database views (HL only)</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">A3.3.6 How transactions maintain data integrity (HL only)</a></li>
+                                    </ul>
+                                </div>
+                                <div class="space-y-2">
+                                    <h4 class="font-semibold text-gray-700">A3.4 Alternative databases and data warehouses (HL only)</h4>
+                                    <ul class="pl-4 space-y-2">
+                                        <li><a href="#" class="topic-link text-gray-600">A3.4.1 Types of databases</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">A3.4.2 Objectives of data warehouses</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">A3.4.3 Role of OLAP and data mining</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">A3.4.4 Features of distributed databases</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                     <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+                        <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-gray-800 focus:outline-none">
+                            <span>A4: Machine Learning</span>
+                            <svg class="accordion-icon h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                        </button>
+                        <div class="accordion-content">
+                            <div class="p-5 border-t border-gray-200 space-y-6 text-sm">
+                                <div class="space-y-2">
+                                    <h4 class="font-semibold text-gray-700">A4.1 Machine learning fundamentals</h4>
+                                    <ul class="pl-4 space-y-2">
+                                        <li><a href="#" class="topic-link text-gray-600">A4.1.1 Types of machine learning</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">A4.1.2 Hardware requirements for machine learning</a></li>
+                                    </ul>
+                                </div>
+                                <div class="space-y-2">
+                                    <h4 class="font-semibold text-gray-700">A4.2 Data preprocessing (HL only)</h4>
+                                    <ul class="pl-4 space-y-2">
+                                        <li><a href="#" class="topic-link text-gray-600">A4.2.1 Significance of data cleaning</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">A4.2.2 Role of feature selection</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">A4.2.3 Importance of dimensionality reduction</a></li>
+                                    </ul>
+                                </div>
+                                <div class="space-y-2">
+                                    <h4 class="font-semibold text-gray-700">A4.3 Machine learning approaches (HL only)</h4>
+                                    <ul class="pl-4 space-y-2">
+                                        <li><a href="#" class="topic-link text-gray-600">A4.3.1 Linear regression</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">A4.3.2 Classifications techniques</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">A4.3.3 Role of hyperparameter tuning</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">A4.3.4 Clustering techniques</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">A4.3.5 Association rule learning</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">A4.3.6 Reinforcement learning</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">A4.3.7 Application of genetic algorithms</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">A4.3.8 Structure and function of ANNs</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">A4.3.9 How CNNs are designed</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">A4.3.10 Importance of model selection</a></li>
+                                    </ul>
+                                </div>
+                                <div class="space-y-2">
+                                    <h4 class="font-semibold text-gray-700">A4.4 Ethical considerations</h4>
+                                    <ul class="pl-4 space-y-2">
+                                        <li><a href="#" class="topic-link text-gray-600">A4.4.1 Ethical implications of machine learning</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">A4.4.2 Ethical aspects of computer technologies</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Theme B Column -->
+            <section id="theme-b" class="scroll-mt-16">
+                <div class="flex items-center mb-6">
+                     <span class="flex items-center justify-center h-12 w-12 rounded-full bg-emerald-100">
+                        <svg class="h-6 w-6 text-emerald-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" /></svg>
+                    </span>
+                    <h3 class="ml-4 text-3xl font-bold text-gray-900">Theme B: Problem-Solving</h3>
+                </div>
+                 <div class="space-y-4">
+                    <!-- Accordion Items for Theme B -->
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+                        <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-gray-800 focus:outline-none">
+                            <span>B1: Computational Thinking</span>
+                            <svg class="accordion-icon h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                        </button>
+                        <div class="accordion-content">
+                            <div class="p-5 border-t border-gray-200 space-y-6 text-sm">
+                                <div class="space-y-2">
+                                    <h4 class="font-semibold text-gray-700">B1.1 Approaches to computational thinking</h4>
+                                    <ul class="pl-4 space-y-2">
+                                        <li><a href="#" class="topic-link text-gray-600">B1.1.1 Construct a problem specification</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">B1.1.2 Fundamental concepts of computational thinking</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">B1.1.3 Applying computational thinking to solve problems</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">B1.1.4 Trace flowcharts</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+                        <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-gray-800 focus:outline-none">
+                            <span>B2: Programming</span>
+                            <svg class="accordion-icon h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                        </button>
+                        <div class="accordion-content">
+                           <div class="p-5 border-t border-gray-200 space-y-6 text-sm">
+                                <div class="space-y-2">
+                                    <h4 class="font-semibold text-gray-700">B2.1 Programming fundamentals</h4>
+                                    <ul class="pl-4 space-y-2">
+                                        <li><a href="#" class="topic-link text-gray-600">B2.1.1 Construct and trace programs using variables</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">B2.1.2 Extract and manipulate substrings</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">B2.1.3 Exception handling techniques</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">B2.1.4 Debugging techniques</a></li>
+                                    </ul>
+                                </div>
+                                <div class="space-y-2">
+                                    <h4 class="font-semibold text-gray-700">B2.2 Data structures</h4>
+                                    <ul class="pl-4 space-y-2">
+                                        <li><a href="#" class="topic-link text-gray-600">B2.2.1 Static and dynamic data structures</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">B2.2.2 Programs that apply arrays and Lists</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">B2.2.3 Concept of a stack</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">B2.2.4 Concept of a queue</a></li>
+                                    </ul>
+                                </div>
+                                 <div class="space-y-2">
+                                    <h4 class="font-semibold text-gray-700">B2.3 Programming constructs</h4>
+                                    <ul class="pl-4 space-y-2">
+                                        <li><a href="#" class="topic-link text-gray-600">B2.3.1 Sequence of code instructions</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">B2.3.2 Selection structures</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">B2.3.3 Looping structures</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">B2.3.4 Functions and modularization</a></li>
+                                    </ul>
+                                </div>
+                                <div class="space-y-2">
+                                    <h4 class="font-semibold text-gray-700">B2.4 Programming algorithms</h4>
+                                    <ul class="pl-4 space-y-2">
+                                        <li><a href="#" class="topic-link text-gray-600">B2.4.1 Efficiency of algorithms (Big O notation)</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">B2.4.2 Linear search and a binary search</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">B2.4.3 Bubble sort and selection sort</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">B2.4.4 Concept of recursion (HL only)</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">B2.4.5 Recursive algorithms (HL only)</a></li>
+                                    </ul>
+                                </div>
+                                <div class="space-y-2">
+                                    <h4 class="font-semibold text-gray-700">B2.5 File processing</h4>
+                                    <ul class="pl-4 space-y-2">
+                                        <li><a href="#" class="topic-link text-gray-600">B2.5.1 File-processing operations</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                     <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+                        <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-gray-800 focus:outline-none">
+                            <span>B3: Object-Oriented Programming</span>
+                            <svg class="accordion-icon h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                        </button>
+                        <div class="accordion-content">
+                           <div class="p-5 border-t border-gray-200 space-y-6 text-sm">
+                                <div class="space-y-2">
+                                    <h4 class="font-semibold text-gray-700">B3.1 Fundamentals of OOP for a single class</h4>
+                                    <ul class="pl-4 space-y-2">
+                                        <li><a href="#" class="topic-link text-gray-600">B3.1.1 Fundamentals of OOP</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">B3.1.2 Design of classes</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">B3.1.3 Static and non-static variables</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">B3.1.4 Define classes and instantiate objects</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">B3.1.5 Encapsulation and information hiding</a></li>
+                                    </ul>
+                                </div>
+                                <div class="space-y-2">
+                                    <h4 class="font-semibold text-gray-700">B3.2 Fundamentals of OOP for multiple classes (HL only)</h4>
+                                    <ul class="pl-4 space-y-2">
+                                        <li><a href="#" class="topic-link text-gray-600">B3.2.1 Inheritance in OOP</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">B3.2.2 Polymorphism</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">B3.2.3 Abstraction in OOP</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">B3.2.4 Composition and aggregation</a></li>
+                                        <li><a href="#" class="topic-link text-gray-600">B3.2.5 Design patterns in OOP</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                     <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+                        <button class="accordion-button w-full flex justify-between items-center p-5 text-left font-semibold text-gray-800 focus:outline-none">
+                            <span>B4: Abstract Data Types (HL only)</span>
+                            <svg class="accordion-icon h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                        </button>
+                        <div class="accordion-content">
+                             <div class="p-5 border-t border-gray-200 space-y-6 text-sm">
+                                 <div class="space-y-2">
+                                    <h4 class="font-semibold text-gray-700">B4.1 Fundamentals of ADTs</h4>
+                                    <ul class="pl-4 space-y-2">
+                                       <li><a href="#" class="topic-link text-gray-600">B4.1.1 Properties and purpose of ADTs</a></li>
+                                       <li><a href="#" class="topic-link text-gray-600">B4.1.2 Evaluate linked lists</a></li>
+                                       <li><a href="#" class="topic-link text-gray-600">B4.1.3 Construct and apply linked lists</a></li>
+                                       <li><a href="#" class="topic-link text-gray-600">B4.1.4 Structures and properties of BSTs</a></li>
+                                       <li><a href="#" class="topic-link text-gray-600">B4.1.5 Construct and apply sets as an ADT</a></li>
+                                       <li><a href="#" class="topic-link text-gray-600">B4.1.6 Core principles of ADTs</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+   <footer class="fixed bottom-0 left-0 w-full bg-white py-2 border-t border-stone-200 text-center text-sm text-stone-500">
+        <div class="container mx-auto px-6 flex flex-col sm:flex-row justify-center items-center space-y-2 sm:space-y-0 sm:space-x-4">
+            <div class="flex items-center space-x-4">
+                <a href="https://www.linkedin.com/in/emmayeboah360/" class="text-blue-600 hover:text-blue-800 social-link" target="_blank">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.762s.784-1.762 1.75-1.762 1.75.79 1.75 1.762-.784 1.762-1.75 1.762zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                    </svg>
+                </a>
+                <a href="mailto:yemmanuel308@gmail.com" class="text-rose-600 hover:text-rose-800 social-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 12.713l-11.75 6.287 11.75 5.5zM23.75 18.995l-11.75-6.287v11.748zM12 11.287l-12-6.287v1.868l12 6.287l12-6.287v-1.868z"/>
+                    </svg>
+                </a>
+            </div>
+            <p class="pl-4">&copy; 2025 Emmanuel Yeboah. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <button id="back-to-top" class="fixed bottom-5 right-5 bg-indigo-600 text-white rounded-full p-3 shadow-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 opacity-0 transform translate-y-2">
+        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
+        </svg>
+    </button>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Accordion functionality
+            const accordionButtons = document.querySelectorAll('.accordion-button');
+            accordionButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const content = button.nextElementSibling;
+                    const wasOpen = button.classList.contains('open');
+
+                    // Optional: Close all other accordions
+                    // accordionButtons.forEach(btn => {
+                    //     if (btn !== button) {
+                    //         btn.classList.remove('open');
+                    //         btn.nextElementSibling.style.maxHeight = null;
+                    //     }
+                    // });
+
+                    button.classList.toggle('open');
+                    
+                    if (content.style.maxHeight) {
+                        content.style.maxHeight = null;
+                    } else {
+                        content.style.maxHeight = content.scrollHeight + "px";
+                    }
+                });
+            });
+
+            // Back to Top button functionality
+            const backToTopButton = document.getElementById('back-to-top');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 300) {
+                    backToTopButton.classList.remove('opacity-0', 'translate-y-2');
+                } else {
+                    backToTopButton.classList.add('opacity-0', 'translate-y-2');
+                }
+            });
+            backToTopButton.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+            
+            // Active nav link on scroll
+            const sections = document.querySelectorAll('section[id]');
+            const navLinks = {
+                'theme-a': document.getElementById('nav-a'),
+                'theme-b': document.getElementById('nav-b')
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        Object.values(navLinks).forEach(link => link.classList.remove('text-indigo-600', 'font-semibold'));
+                        const activeLink = navLinks[entry.target.id];
+                        if(activeLink) {
+                           activeLink.classList.add('text-indigo-600', 'font-semibold');
+                        }
+                    }
+                });
+            }, { rootMargin: '-50% 0px -50% 0px' });
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+        });
+    </script>
+
+</body>
+</html>
+

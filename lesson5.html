@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The Fetch-Decode-Execute Cycle</title>
+    <meta name="description" content="A world-class guide to the Fetch-Decode-Execute Cycle, including the interaction of memory, registers, and buses, aligned with IB Syllabus A1.1.5." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' fill='%233B82F6'%3E%3Crect width='24' height='24' x='4' y='4' rx='2' /%3E%3Crect width='14' height='14' x='9' y='9' fill='%23FFFFFF' /%3E%3Cpath d='M4 14h-2v4h2z M30 14h-2v4h2z M14 4h4v-2h-4z M14 30h4v-2h-4z' /%3E%3C/svg%3E" />
+    <style>
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Inter', system-ui, sans-serif; padding-bottom: 80px; background-color: #F8FAFC; }
+        .nav-link { transition: color .2s, border-bottom-color .2s; border-bottom: 2px solid transparent; cursor: pointer; }
+        .nav-link:hover, .nav-link.active { color: #3B82F6; border-bottom-color: #3B82F6; }
+        .page-content { display: none; }
+        .page-content.active { display: block; animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .sim-component, .interaction-component { transition: all 0.3s ease-in-out; border: 2px solid #D1D5DB; }
+        .sim-component.active, .interaction-component.active {
+            transform: scale(1.03);
+            border-color: #3B82F6;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+        }
+        .bus.active { background-color: #3B82F6 !important; }
+        .cycle-step { transition: all 0.5s ease-in-out; }
+        .cycle-step.active { transform: scale(1.1); text-shadow: 0 0 10px currentColor; }
+        #cycle-indicator {
+            position: absolute; width: 20px; height: 20px; background-color: #3B82F6;
+            border-radius: 50%; transition: transform 1s ease-in-out; box-shadow: 0 0 10px #3B82F6;
+        }
+        .quiz-option { transition: all 0.2s ease; }
+        .quiz-option.selected { background-color: #BFDBFE; border-color: #3B82F6; }
+        .quiz-option:disabled { cursor: not-allowed; }
+        .quiz-option.correct { background-color: #D1FAE5 !important; border-color: #10B981 !important; color: #065F46 !important; }
+        .quiz-option.incorrect { background-color: #FEE2E2 !important; border-color: #EF4444 !important; color: #991B1B !important; }
+        #interaction-animation-container .bus-label { position: absolute; background-color: #F8FAFC; padding: 0 5px; font-weight: 600; font-size: 0.9rem; }
+        #interaction-animation-container .data-packet {
+            position: absolute; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; color: #1E40AF;
+            background-color: #DBEAFE; border: 1px solid #3B82F6; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: all 1.5s ease-in-out; z-index: 20; opacity: 0; transform: scale(0.5);
+        }
+    </style>
+</head>
+<body class="antialiased bg-zinc-50 text-slate-700">
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 bg-blue-600 text-white px-3 py-2 rounded-lg z-50">Skip to main content</a>
+
+    <header class="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-40">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold text-gray-800">The Instruction Cycle</h1>
+            <nav class="hidden md:flex items-center space-x-1" aria-label="Primary">
+                <div class="flex items-center space-x-1 lg:space-x-4">
+                    <a data-target="home" class="nav-link font-medium px-3 py-2 rounded-md">Home</a>
+                    <a data-target="cycle" class="nav-link font-medium px-3 py-2 rounded-md">The Cycle</a>
+                    <a data-target="interaction" class="nav-link font-medium px-3 py-2 rounded-md">Interaction</a>
+                    <a data-target="simulation" class="nav-link font-medium px-3 py-2 rounded-md">Simulation</a>
+                    <a data-target="videos" class="nav-link font-medium px-3 py-2 rounded-md">Videos</a>
+                    <a data-target="quiz" class="nav-link font-medium px-3 py-2 rounded-md">Quiz</a>
+                </div>
+                <div class="ml-4 pl-4 border-l border-gray-300">
+                    <a href="index.html" class="inline-flex items-center bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-semibold hover:bg-blue-200 transition-colors">
+                        Back to Curriculum
+                    </a>
+                </div>
+            </nav>
+            <button type="button" id="mobile-menu-button" class="md:hidden focus:outline-none" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open navigation">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </div>
+        <div id="mobile-menu" class="hidden md:hidden">
+            <div class="px-4 pb-4 space-y-1">
+                <a data-target="home" class="nav-link mobile-link block py-2 px-3 rounded-lg">Home</a>
+                <a data-target="cycle" class="nav-link mobile-link block py-2 px-3 rounded-lg">The Cycle</a>
+                <a data-target="interaction" class="nav-link mobile-link block py-2 px-3 rounded-lg">Interaction</a>
+                <a data-target="simulation" class="nav-link mobile-link block py-2 px-3 rounded-lg">Simulation</a>
+                <a data-target="videos" class="nav-link mobile-link block py-2 px-3 rounded-lg">Videos</a>
+                <a data-target="quiz" class="nav-link mobile-link block py-2 px-3 rounded-lg">Quiz</a>
+                <div class="mt-2 pt-2 border-t border-zinc-200">
+                     <a href="index.html" class="block text-center py-2 px-3 rounded-lg bg-blue-100 text-blue-800 font-semibold">Back to Curriculum</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main id="main-content" class="container mx-auto px-6 py-10">
+        <!-- Content sections will be populated by JavaScript -->
+    </main>
+    
+    <footer class="fixed bottom-0 left-0 w-full bg-white/80 backdrop-blur-md py-2 border-t border-stone-200 text-center text-sm text-stone-500 z-30">
+        <div class="container mx-auto px-6 flex justify-center items-center space-x-4">
+            <a href="https://www.linkedin.com/in/emmayeboah360/" class="text-blue-600 hover:text-blue-800" target="_blank" rel="noopener">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.762s.784-1.762 1.75-1.762 1.75.79 1.75 1.762-.784 1.762-1.75 1.762zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+            </a>
+            <a href="mailto:yemmanuel308@gmail.com" class="text-rose-600 hover:text-rose-800">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12.713l-11.75 6.287 11.75 5.5zM23.75 18.995l-11.75-6.287v11.748zM12 11.287l-12-6.287v1.868l12 6.287l12-6.287v-1.868z"/></svg>
+            </a>
+            <p class="pl-4">&copy; 2025 Emmanuel Yeboah. All rights reserved.</p>
+        </div>
+    </footer>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const sections = {
+            home: {
+                title: "Home",
+                content: `<div class="text-center"><h2 class="text-4xl lg:text-5xl font-extrabold text-gray-900 tracking-tight">The Heartbeat of the CPU</h2><p class="mt-4 max-w-3xl mx-auto text-lg text-slate-600">At its core, a computer is a machine that follows instructions. The <strong>Fetch-Decode-Execute Cycle</strong> is the fundamental, repetitive process a CPU uses to carry out these instructions, billions of times per second.</p></div><div class="mt-10 max-w-4xl mx-auto bg-white border border-zinc-200 p-6 rounded-lg shadow-sm text-left"><h3 class="text-xl font-bold text-gray-800 text-center mb-4">Syllabus Focus</h3><p class="font-semibold text-slate-700">This lesson covers the following IB Computer Science syllabus point. By exploring all the tabs, you will master:</p><ul class="mt-4 space-y-4 text-slate-600"><li><div class="p-4 bg-zinc-50 rounded-md border border-zinc-200"><strong class="font-semibold text-blue-800 block">A1.1.5: Describe the fetch, decode and execute cycle.</strong><ul class="list-disc list-inside pl-4 mt-1 text-sm space-y-1"><li>The basic operations a CPU performs to execute a single instruction.</li><li>The interaction between memory and registers via the address, data, and control buses.</li></ul></div></li></ul></div>`
+            },
+            cycle: {
+                title: "The Cycle",
+                content: `<div class="max-w-5xl mx-auto"><div class="text-center"><p class="font-semibold text-blue-600"></p><h2 class="mt-2 text-3xl sm:text-4xl font-extrabold text-gray-900">The Three Stages of Execution</h2><p class="mt-4 text-lg text-slate-600">This animated diagram illustrates the flow of the Fetch-Decode-Execute cycle. Watch as the indicator moves through each stage, with a detailed explanation appearing below for each step.</p></div><div class="mt-12 max-w-2xl mx-auto"><div id="cycle-animation" class="relative flex justify-center items-center h-64"><div class="absolute w-48 h-48 sm:w-56 sm:h-56 border-4 border-dashed border-gray-300 rounded-full"></div><div id="fetch-step" class="cycle-step absolute text-center" style="transform: translate(0, -110px);"><span class="text-lg font-bold text-blue-600 bg-white px-2">1. Fetch</span></div><div id="decode-step" class="cycle-step absolute text-center" style="transform: translate(110px, 60px);"><span class="text-lg font-bold text-yellow-600 bg-white px-2">2. Decode</span></div><div id="execute-step-anim" class="cycle-step absolute text-center" style="transform: translate(-110px, 60px);"><span class="text-lg font-bold text-green-600 bg-white px-2">3. Execute</span></div><div id="cycle-indicator"></div><div class="text-gray-700"><svg class="w-16 h-16 sm:w-20 sm:h-20" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M12 6V4m0 16v-2M8 8l1.88 1.88M14.12 14.12L16 16m-4-8a4 4 0 100 8 4 4 0 000-8z" /></svg></div></div><div id="explanation-box" class="mt-8 min-h-[120px] p-4 bg-gray-50 border border-gray-200 rounded-lg shadow-inner"><h3 id="explanation-title" class="text-xl font-bold text-gray-800"></h3><p id="explanation-text" class="mt-2 text-gray-600"></p></div></div></div>`
+            },
+            interaction: {
+                title: "Interaction",
+                content: `<div class="max-w-6xl mx-auto"><div class="text-center"><p class="font-semibold text-blue-600"></p><h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900">Live Interaction Simulation</h2><p class="mt-4 text-lg text-slate-600">This animated diagram shows the data flow for a complete Fetch cycle. Press the button to see how registers and buses interact to get an instruction from RAM to the CPU.</p></div><div id="interaction-animation-container" class="mt-8 p-6 bg-white border border-zinc-200 rounded-lg shadow-sm relative h-[500px]"></div><div class="mt-4 text-center"><button id="start-interaction-sim" class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition">Run Fetch Simulation</button></div></div>`
+            },
+            simulation: {
+                title: "Simulation",
+                content: `<div class="max-w-6xl mx-auto"><div class="text-center"><h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900">Interactive Worked Example</h2><p class="mt-4 text-lg text-slate-600">Step through the Fetch-Decode-Execute cycle for the instruction <strong>LOAD 104</strong>, which loads the value from memory address 104 into the Accumulator register.</p></div><div id="simulation-container" class="mt-12 bg-white border border-zinc-200 p-4 sm:p-6 rounded-lg shadow-sm relative"></div></div>`
+            },
+            videos: {
+                title: "Videos",
+                content: `<div class="max-w-5xl mx-auto"><div class="text-center mb-12"><h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900">Video Resources</h2><p class="mt-4 text-lg text-slate-600">Visual explanations can often clarify complex topics. This section contains a curated playlist of high-quality videos that reinforce key concepts.</p></div><div class="grid md:grid-cols-2 gap-8"><div class="bg-white border border-zinc-200 p-4 rounded-xl shadow-sm"><div class="aspect-video rounded-xl overflow-hidden"><iframe class="w-full h-full" src="https://www.youtube.com/embed/Z5JC9Ve1sfI" title="CPU Registers Explained" allowfullscreen></iframe></div></div><div class="bg-white border border-zinc-200 p-4 rounded-xl shadow-sm"><div class="aspect-video rounded-xl overflow-hidden"><iframe class="w-full h-full" src="https://www.youtube.com/embed/cNN_tTXABUA" title="Crash Course: The CPU" allowfullscreen></iframe></div></div></div></div>`
+            },
+            quiz: {
+                title: "Quiz",
+                content: `<div class="text-center mb-12"><h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900">Test Your Knowledge</h2><p class="mt-4 text-lg text-slate-600">Answer all 60 questions before submitting. You have 30 minutes. Good luck!</p></div><div id="quiz-container" class="max-w-3xl mx-auto bg-white border border-zinc-200 p-8 rounded-xl shadow-sm"></div>`
+            }
+        };
+
+        const questionBank = [
+            { q: "What is the first step in the fetch-decode-execute cycle?", options: ["Execute", "Decode", "Fetch", "Store"], answer: "Fetch" },
+            { q: "Which register holds the address of the next instruction to be processed?", options: ["Instruction Register (IR)", "Memory Address Register (MAR)", "Program Counter (PC)", "Memory Data Register (MDR)"], answer: "Program Counter (PC)" },
+            { q: "During the fetch stage, where is the instruction retrieved from?", options: ["The Hard Drive", "The Cache", "A Register", "Main Memory (RAM)"], answer: "Main Memory (RAM)" },
+            { q: "What is the main role of the Control Unit (CU) in the decode stage?", options: ["To perform arithmetic calculations.", "To interpret the instruction.", "To store the result of the instruction.", "To fetch the next instruction."], answer: "To interpret the instruction." },
+            { q: "Which component carries out the operation during the execute phase?", options: ["Control Unit (CU)", "Memory Address Register (MAR)", "Arithmetic Logic Unit (ALU)", "Program Counter (PC)"], answer: "Arithmetic Logic Unit (ALU)" },
+            { q: "The address of the memory location to be accessed is placed on which bus?", options: ["Data Bus", "Control Bus", "System Bus", "Address Bus"], answer: "Address Bus" },
+            { q: "The actual data or instruction is transferred between the CPU and RAM via the...", options: ["Address Bus", "Data Bus", "Control Bus", "Internal Bus"], answer: "Data Bus" },
+            { q: "Signals like 'read' and 'write' are sent along which bus?", options: ["Data Bus", "Address Bus", "Control Bus", "Front-side Bus"], answer: "Control Bus" },
+            { q: "Which register acts as a temporary holding area for an instruction that has just been fetched from memory?", options: ["Program Counter (PC)", "Instruction Register (IR)", "Accumulator (ACC)", "Memory Address Register (MAR)"], answer: "Instruction Register (IR)" },
+            { q: "After an instruction is fetched, what happens to the Program Counter (PC)?", options: ["It is cleared to zero.", "It is loaded with the address of the data.", "It is incremented to point to the next instruction.", "It is copied to the MDR."], answer: "It is incremented to point to the next instruction." }
+        ];
+
+        // --- Main App Initialization ---
+        const mainContent = document.getElementById('main-content');
+        Object.keys(sections).forEach(key => {
+            const section = document.createElement('section');
+            section.id = `${key}`;
+            section.className = 'page-content';
+            section.innerHTML = sections[key].content;
+            mainContent.appendChild(section);
+        });
+
+        // --- Feature Initializers ---
+        function initializeNavigation() {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const mobileLinks = document.querySelectorAll('.nav-link-mobile');
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+
+            function updateActiveState(targetId) {
+                document.querySelectorAll('.page-content').forEach(s => s.classList.remove('active'));
+                const targetPage = document.getElementById(targetId);
+                if (targetPage) targetPage.classList.add('active');
+
+                navLinks.forEach(l => l.classList.toggle('active', l.dataset.target === targetId));
+                mobileLinks.forEach(l => l.classList.toggle('active', l.dataset.target === targetId));
+                 if (targetId === 'simulation') { initializeWorkedExample(); }
+                 if (targetId === 'cycle') { initializeAnimatedCycle(); }
+                 if (targetId === 'interaction') { initializeInteractionDiagram(); }
+            }
+            function handleNavClick(e) {
+                e.preventDefault();
+                const targetId = e.currentTarget.dataset.target;
+                updateActiveState(targetId);
+                if (!mobileMenu.classList.contains('hidden')) {
+                    mobileMenu.classList.add('hidden');
+                }
+            }
+
+            navLinks.forEach(link => link.addEventListener('click', handleNavClick));
+            mobileLinks.forEach(link => link.addEventListener('click', handleNavClick));
+            mobileMenuButton.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+            
+            updateActiveState('home');
+        }
+        function initializeAnimatedCycle() {
+            const container = document.getElementById('cycle');
+            if (!container || container.dataset.initialized) return;
+            container.dataset.initialized = 'true';
+            
+            const fetchStep = container.querySelector('#fetch-step');
+            const decodeStep = container.querySelector('#decode-step');
+            const executeStepAnim = container.querySelector('#execute-step-anim');
+            const indicator = container.querySelector('#cycle-indicator');
+            const explanationBox = container.querySelector('#explanation-box');
+            const explanationTitle = container.querySelector('#explanation-title');
+            const explanationText = container.querySelector('#explanation-text');
+
+            if (!fetchStep || !indicator || !explanationBox) return;
+
+            const steps = [fetchStep, decodeStep, executeStepAnim];
+            const positions = [
+                'translate(-10px, -110px)',
+                'translate(100px, 60px)',
+                'translate(-120px, 60px)'
+            ];
+            
+            const explanations = [
+                { title: "1. Fetch", text: "The CPU fetches the next instruction from memory (RAM). The Program Counter (PC) tells the CPU where to look.", color: "text-blue-800" },
+                { title: "2. Decode", text: "The Control Unit (CU) interprets the instruction's binary code to figure out what operation to perform.", color: "text-yellow-800" },
+                { title: "3. Execute", text: "The command is carried out. This could be a calculation by the ALU or moving data. The cycle then repeats.", color: "text-green-800" }
+            ];
+
+            let currentCycleStep = 0;
+
+            function animateCycle() {
+                const currentExplanation = explanations[currentCycleStep];
+                explanationBox.style.opacity = 0;
+                explanationBox.style.transform = 'translateY(10px)';
+
+                setTimeout(() => {
+                    explanationTitle.textContent = currentExplanation.title;
+                    explanationTitle.className = `text-xl font-bold ${currentExplanation.color}`;
+                    explanationText.textContent = currentExplanation.text;
+                    explanationBox.style.opacity = 1;
+                    explanationBox.style.transform = 'translateY(0)';
+                }, 400);
+
+                steps.forEach(step => step.classList.remove('active'));
+                steps[currentCycleStep].classList.add('active');
+                indicator.style.transform = positions[currentCycleStep];
+                
+                currentCycleStep = (currentCycleStep + 1) % steps.length;
+            }
+            
+            if(window.cycleAnimationInterval) clearInterval(window.cycleAnimationInterval);
+            window.cycleAnimationInterval = setInterval(animateCycle, 3000);
+            animateCycle();
+        }
+        function initializeInteractionDiagram() {
+            const container = document.getElementById('interaction-animation-container');
+            if (!container || container.dataset.initialized) return;
+            container.dataset.initialized = 'true';
+
+            container.innerHTML = `
+                <div id="anim-cpu" class="interaction-component absolute top-1/2 -translate-y-1/2 left-4 w-2/5 h-4/5 bg-gray-50 p-4 rounded-lg border-2 border-gray-300 flex flex-col justify-around">
+                    <h3 class="text-lg font-bold text-center text-gray-800">CPU</h3>
+                    <div class="space-y-2">
+                        <div id="anim-cu" class="p-2 bg-gray-200 rounded text-sm text-center"><strong>Control Unit</strong></div>
+                        <div id="anim-alu" class="p-2 bg-gray-200 rounded text-sm text-center"><strong>ALU</strong></div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 text-center text-xs">
+                        <div id="anim-pc" class="p-2 bg-blue-100 rounded"><strong>PC</strong>: 101</div>
+                        <div id="anim-ir" class="p-2 bg-blue-100 rounded"><strong>IR</strong>: ---</div>
+                        <div id="anim-mar" class="p-2 bg-red-100 rounded"><strong>MAR</strong>: ---</div>
+                        <div id="anim-mdr" class="p-2 bg-blue-100 rounded"><strong>MDR</strong>: ---</div>
+                        <div id="anim-acc" class="p-2 bg-blue-100 rounded col-span-2"><strong>ACC</strong>: 0</div>
+                    </div>
+                </div>
+                <div id="anim-ram" class="interaction-component absolute top-1/2 -translate-y-1/2 right-4 w-2/5 h-4/5 bg-gray-50 p-4 rounded-lg border-2 border-gray-300 flex items-center justify-center">
+                    <h3 class="text-lg font-bold text-center text-gray-800">Main Memory (RAM)</h3>
+                </div>
+                <div id="anim-address-bus" class="bus absolute left-1/2 -translate-x-1/2 top-[30%] w-1/5 h-1 bg-red-200"></div>
+                <div class="bus-label text-red-600 top-[calc(30%-20px)] left-1/2 -translate-x-1/2">Address Bus →</div>
+                <div id="anim-data-bus" class="bus absolute left-1/2 -translate-x-1/2 top-[50%] w-1/5 h-1 bg-blue-200"></div>
+                <div class="bus-label text-blue-600 top-[calc(50%-20px)] left-1/2 -translate-x-1/2">↔ Data Bus ↔</div>
+                <div id="anim-control-bus" class="bus absolute left-1/2 -translate-x-1/2 top-[70%] w-1/5 h-1 bg-green-200"></div>
+                <div class="bus-label text-green-600 top-[calc(70%-20px)] left-1/2 -translate-x-1/2">↔ Control Bus ↔</div>
+                <div id="interaction-explanation" class="absolute bottom-0 left-1/2 -translate-x-1/2 w-11/12 text-center text-sm text-slate-600 bg-white/70 backdrop-blur-sm p-2 rounded">Press the button to start the Fetch simulation.</div>
+            `;
+
+            const startBtn = document.getElementById('start-interaction-sim');
+            const explanation = document.getElementById('interaction-explanation');
+            const components = {
+                cpu: container.querySelector('#anim-cpu'), ram: container.querySelector('#anim-ram'),
+                pc: container.querySelector('#anim-pc'), ir: container.querySelector('#anim-ir'),
+                mar: container.querySelector('#anim-mar'), mdr: container.querySelector('#anim-mdr'),
+                acc: container.querySelector('#anim-acc'), alu: container.querySelector('#anim-alu'),
+                cu: container.querySelector('#anim-cu'),
+                addressBus: container.querySelector('#anim-address-bus'),
+                dataBus: container.querySelector('#anim-data-bus'),
+                controlBus: container.querySelector('#anim-control-bus')
+            };
+
+            const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+            async function runInteractionAnimation() {
+                startBtn.disabled = true;
+                
+                const resetState = () => {
+                    Object.values(components).forEach(el => el.classList.remove('active'));
+                    components.mar.innerHTML = "<strong>MAR</strong>: ---";
+                    components.mdr.innerHTML = "<strong>MDR</strong>: ---";
+                    components.ir.innerHTML = "<strong>IR</strong>: ---";
+                };
+
+                const movePacket = async (text, from, to) => {
+                    const packet = document.createElement('div');
+                    packet.className = 'data-packet';
+                    packet.textContent = text;
+                    container.appendChild(packet);
+                    
+                    const fromRect = from.getBoundingClientRect();
+                    const toRect = to.getBoundingClientRect();
+                    const contRect = container.getBoundingClientRect();
+
+                    packet.style.left = `${fromRect.left + fromRect.width/2 - contRect.left}px`;
+                    packet.style.top = `${fromRect.top + fromRect.height/2 - contRect.top}px`;
+
+                    await sleep(50);
+                    packet.style.opacity = '1';
+                    packet.style.transform = 'scale(1)';
+
+                    await sleep(200);
+                    packet.style.left = `${toRect.left + toRect.width/2 - contRect.left}px`;
+                    packet.style.top = `${toRect.top + toRect.height/2 - contRect.top}px`;
+                    
+                    await sleep(1500);
+                    packet.style.opacity = '0';
+                    packet.style.transform = 'scale(0.5)';
+                    await sleep(500);
+                    packet.remove();
+                };
+
+                resetState();
+
+                explanation.textContent = "1. The address in the Program Counter (PC) is sent to the Memory Address Register (MAR).";
+                components.pc.classList.add('active');
+                await movePacket('Addr: 101', components.pc, components.mar);
+                components.mar.innerHTML = "<strong>MAR</strong>: 101";
+                components.pc.classList.remove('active');
+                components.mar.classList.add('active');
+                await sleep(1000);
+
+                explanation.textContent = "2. The address travels from MAR along the Address Bus to Main Memory (RAM).";
+                components.addressBus.classList.add('active');
+                await movePacket('Addr: 101', components.mar, components.ram);
+                components.mar.classList.remove('active');
+                components.ram.classList.add('active');
+                await sleep(1000);
+
+                explanation.textContent = "3. The Control Unit sends a 'read' signal on the Control Bus.";
+                components.cu.classList.add('active');
+                components.controlBus.classList.add('active');
+                await sleep(1000);
+                
+                explanation.textContent = "4. The instruction at address 101 is sent from RAM along the Data Bus to the Memory Data Register (MDR).";
+                components.controlBus.classList.remove('active');
+                components.addressBus.classList.remove('active');
+                components.dataBus.classList.add('active');
+                await movePacket('Inst: LOAD 104', components.ram, components.mdr);
+                components.mdr.innerHTML = "<strong>MDR</strong>: LOAD 104";
+                components.ram.classList.remove('active');
+                components.mdr.classList.add('active');
+                await sleep(1000);
+
+                explanation.textContent = "5. The instruction is copied from the MDR to the Instruction Register (IR) for decoding. The Fetch stage is complete.";
+                await movePacket('Inst: LOAD 104', components.mdr, components.ir);
+                components.ir.innerHTML = "<strong>IR</strong>: LOAD 104";
+                components.mdr.classList.remove('active');
+                components.dataBus.classList.remove('active');
+                components.ir.classList.add('active');
+                await sleep(1000);
+
+                explanation.textContent = "Simulation finished. Press the button to run it again.";
+                startBtn.disabled = false;
+            }
+
+            startBtn.addEventListener('click', runInteractionAnimation);
+        }
+        function initializeWorkedExample() {
+            const container = document.getElementById('simulation-container');
+            if (!container || container.dataset.initialized) return;
+            container.dataset.initialized = 'true';
+            
+            const setupHTML = () => { container.innerHTML = `<div class="grid grid-cols-1 lg:grid-cols-3 gap-4"><div class="lg:col-span-2 bg-white p-4 rounded-lg border"><h3 class="text-lg font-bold text-center mb-2">CPU</h3><div class="grid grid-cols-1 sm:grid-cols-2 gap-4"><div><h4 class="font-semibold text-center">Control Unit</h4><div id="sim-cu" class="sim-component p-2 rounded bg-gray-100"><div class="flex justify-between text-sm"><span class="font-medium">PC</span> <span id="sim-pc" class="font-mono">101</span></div><div class="flex justify-between text-sm"><span class="font-medium">IR</span> <span id="sim-ir" class="font-mono">---</span></div></div><h4 class="font-semibold text-center mt-4">ALU</h4><div id="sim-alu" class="sim-component p-2 rounded bg-gray-100 h-12"></div></div><div><h4 class="font-semibold text-center">Registers</h4><div class="sim-component p-2 rounded bg-gray-100 space-y-1"><div class="flex justify-between text-sm"><span class="font-medium">MAR</span> <span id="sim-mar" class="font-mono">---</span></div><div class="flex justify-between text-sm"><span class="font-medium">MDR</span> <span id="sim-mdr" class="font-mono">---</span></div><div class="flex justify-between text-sm"><span class="font-medium">ACC</span> <span id="sim-acc" class="font-mono">0</span></div></div></div></div></div><div class="bg-white p-4 rounded-lg border"><h3 class="text-lg font-bold text-center mb-2">RAM</h3><div id="sim-ram" class="space-y-1"><div id="ram-101" class="sim-component flex justify-between text-sm p-1 rounded"><span class="font-mono bg-gray-200 px-1 rounded">101</span> <span class="font-mono">LOAD 104</span></div><div id="ram-102" class="sim-component flex justify-between text-sm p-1 rounded"><span class="font-mono bg-gray-200 px-1 rounded">102</span> <span class="font-mono">ADD 105</span></div><div id="ram-103" class="sim-component flex justify-between text-sm p-1 rounded"><span class="font-mono bg-gray-200 px-1 rounded">103</span> <span class="font-mono">STORE 106</span></div><div id="ram-104" class="sim-component flex justify-between text-sm p-1 rounded"><span class="font-mono bg-gray-200 px-1 rounded">104</span> <span class="font-mono">42</span></div><div id="ram-105" class="sim-component flex justify-between text-sm p-1 rounded"><span class="font-mono bg-gray-200 px-1 rounded">105</span> <span class="font-mono">15</span></div><div id="ram-106" class="sim-component flex justify-between text-sm p-1 rounded"><span class="font-mono bg-gray-200 px-1 rounded">106</span> <span class="font-mono">0</span></div></div></div></div><div class="absolute top-1/2 left-0 w-full h-24 -mt-12 px-4 hidden lg:block"><div class="relative h-full w-full"><div id="bus-address" class="bus absolute top-0 left-1/3 w-1/3 h-1 bg-red-200"></div><div id="bus-data" class="bus absolute top-1/2 left-1/3 w-1/3 h-1 bg-blue-200"></div><div id="bus-control" class="bus absolute bottom-0 left-1/3 w-1/3 h-1 bg-green-200"></div></div></div><div class="mt-4 pt-4 border-t"><div id="sim-explanation" class="text-center font-semibold min-h-[3em] p-2 bg-blue-50 text-blue-800 rounded-md">Press 'Start' to begin the simulation.</div><div class="mt-4 flex justify-center space-x-4"><button id="sim-step-btn" class="px-6 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 transition">Start</button><button id="sim-reset-btn" class="px-6 py-2 bg-gray-500 text-white font-semibold rounded-lg shadow-md hover:bg-gray-600 transition">Reset</button></div></div>`;};
+            setupHTML();
+
+            const simStepBtn = container.querySelector('#sim-step-btn'); const simResetBtn = container.querySelector('#sim-reset-btn'); const simExplanation = container.querySelector('#sim-explanation');
+            const simPc = container.querySelector('#sim-pc'); const simIr = container.querySelector('#sim-ir'); const simMar = container.querySelector('#sim-mar');
+            const simMdr = container.querySelector('#sim-mdr'); const simAcc = container.querySelector('#sim-acc');
+            const simRamLocations = { 101: container.querySelector('#ram-101'), 104: container.querySelector('#ram-104') };
+            const buses = { address: container.querySelector('#bus-address'), data: container.querySelector('#bus-data'), control: container.querySelector('#bus-control') };
+
+            let currentSimStep = -1;
+            const simulationSteps = [
+                { text: "<strong>FETCH 1/4:</strong> The Program Counter (PC) contains the address of the next instruction.", highlight: ['sim-cu'] },
+                { text: "<strong>FETCH 2/4:</strong> The address from the PC (101) is copied to the Memory Address Register (MAR).", highlight: ['sim-cu', 'sim-mar'], mar: '101' },
+                { text: "<strong>FETCH 3/4:</strong> The address is placed on the Address Bus. The CU sends a 'read' signal on the Control Bus. The instruction at RAM address 101 is sent along the Data Bus to the MDR.", highlight: ['sim-mar', 'ram-101', 'sim-mdr'], bus: ['address', 'control', 'data'], mdr: 'LOAD 104' },
+                { text: "<strong>FETCH 4/4:</strong> The instruction is copied from the MDR to the Instruction Register (IR). The PC is incremented.", highlight: ['sim-mdr', 'sim-ir', 'sim-pc'], ir: 'LOAD 104', pc: '102' },
+                { text: "<strong>DECODE 1/2:</strong> The Control Unit (CU) decodes the instruction in the IR.", highlight: ['sim-ir', 'sim-cu'] },
+                { text: "<strong>DECODE 2/2:</strong> The CU identifies the operation (LOAD) and the data address (104). The address part of the instruction is placed in the MAR.", highlight: ['sim-cu', 'sim-mar'], mar: '104' },
+                { text: "<strong>EXECUTE 1/2:</strong> The address (104) is put on the Address Bus. The CU sends a 'read' signal. The data at that address (42) is sent on the Data Bus to the MDR.", highlight: ['sim-mar', 'ram-104', 'sim-mdr'], bus: ['address', 'control', 'data'], mdr: '42' },
+                { text: "<strong>EXECUTE 2/2:</strong> The data from the MDR is copied to the Accumulator (ACC). The cycle for this instruction is complete.", highlight: ['sim-mdr', 'sim-acc'], acc: '42' }
+            ];
+
+            function resetSimulation() {
+                currentSimStep = -1; simPc.textContent = '101'; simIr.textContent = '---'; simMar.textContent = '---';
+                simMdr.textContent = '---'; simAcc.textContent = '0';
+                simExplanation.innerHTML = "Press 'Start' to begin the simulation.";
+                simStepBtn.textContent = 'Start'; simStepBtn.disabled = false;
+                document.querySelectorAll('.sim-component').forEach(el => el.classList.remove('active'));
+                Object.values(buses).forEach(bus => bus.classList.remove('active'));
+            }
+
+            function executeSimulationStep() {
+                if (currentSimStep === -1) { simStepBtn.textContent = 'Next Step'; }
+                currentSimStep++;
+                if (currentSimStep >= simulationSteps.length) {
+                    simExplanation.innerHTML = "<strong>Cycle Complete!</strong> Press 'Reset' to start over.";
+                    simStepBtn.disabled = true; return;
+                }
+                const step = simulationSteps[currentSimStep];
+                document.querySelectorAll('.sim-component').forEach(el => el.classList.remove('active'));
+                Object.values(buses).forEach(bus => bus.classList.remove('active'));
+                simExplanation.innerHTML = step.text;
+                if (step.pc) simPc.textContent = step.pc; if (step.ir) simIr.textContent = step.ir;
+                if (step.mar) simMar.textContent = step.mar; if (step.mdr) simMdr.textContent = step.mdr;
+                if (step.acc) simAcc.textContent = step.acc;
+                step.highlight.forEach(id => {
+                    const el = id.startsWith('ram-') ? simRamLocations[id.split('-')[1]] : container.querySelector(`#${id}`);
+                    if (el) el.classList.add('active');
+                });
+                if (step.bus) { step.bus.forEach(busName => buses[busName].classList.add('active')); }
+            }
+            simStepBtn.addEventListener('click', executeSimulationStep);
+            simResetBtn.addEventListener('click', resetSimulation);
+            resetSimulation();
+        }
+        function initializeQuiz() {
+            let currentQuizQuestions = []; let userAnswers = []; let score = 0; let timerInterval; let timeLeft = 1800; 
+            const quizContainer = document.getElementById('quiz-container');
+            if (!quizContainer) return;
+
+            function startQuiz() {
+                let expandedBank = [];
+                while(expandedBank.length < 60) { expandedBank.push(...questionBank); }
+                currentQuizQuestions = expandedBank.sort(() => 0.5 - Math.random()).slice(0, 60); 
+                userAnswers = new Array(currentQuizQuestions.length).fill(null);
+                score = 0; timeLeft = 1800; 
+                clearInterval(timerInterval); timerInterval = setInterval(updateTimer, 1000);
+                showAllQuestions();
+            }
+
+            function updateTimer() {
+                const timerEl = document.getElementById('timer');
+                if (timerEl) {
+                    timeLeft--; const minutes = Math.floor(timeLeft / 60); const seconds = timeLeft % 60;
+                    timerEl.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                    if (timeLeft <= 0) { finishQuiz(); }
+                }
+            }
+
+            function showAllQuestions() {
+                let questionsHtml = `<div class="flex justify-between items-center mb-4 p-4 bg-gray-100 rounded-lg"><h3 class="text-xl font-bold text-gray-800">Instruction Cycle Quiz</h3><div id="timer" class="text-lg font-bold text-red-500">30:00</div></div>`;
+                currentQuizQuestions.forEach((questionData, index) => {
+                    questionsHtml += `<div class="mb-6 bg-white p-4 rounded-lg shadow-sm border"><h4 class="text-lg font-semibold mb-3">${index + 1}. ${questionData.q}</h4><div class="space-y-2">`;
+                    questionData.options.forEach(option => {
+                         questionsHtml += `<div><label class="quiz-option block w-full text-left p-3 border-2 border-gray-200 rounded-lg hover:bg-gray-100 cursor-pointer"><input type="radio" name="question${index}" value="${option}" class="mr-2">${option}</label></div>`;
+                    });
+                    questionsHtml += `</div></div>`;
+                });
+                questionsHtml += `<button id="submit-quiz-btn" class="mt-8 w-full px-8 py-3 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 transition">Submit Answers</button>`;
+                quizContainer.innerHTML = questionsHtml;
+
+                document.querySelectorAll('.quiz-option input').forEach(input => {
+                    input.addEventListener('change', (e) => {
+                        const questionIndex = parseInt(e.target.name.replace('question', ''));
+                        userAnswers[questionIndex] = e.target.value;
+                         document.querySelectorAll(`input[name="question${questionIndex}"]`).forEach(radio => {
+                            radio.parentElement.classList.remove('selected');
+                        });
+                        e.target.parentElement.classList.add('selected');
+                    });
+                });
+                document.getElementById('submit-quiz-btn').addEventListener('click', finishQuiz);
+                updateTimer();
+            }
+
+            function finishQuiz() {
+                clearInterval(timerInterval);
+                score = 0;
+                currentQuizQuestions.forEach((q, index) => {
+                    if (userAnswers[index] === q.answer) {
+                        score++;
+                    }
+                });
+                showResults();
+            }
+
+            function showResults() {
+                quizContainer.innerHTML = `<div class="text-center"><h2 class="text-2xl font-bold mb-2">Quiz Complete!</h2><p class="text-lg mb-4">You scored</p><p class="text-5xl font-extrabold text-blue-600 mb-6">${score} out of ${currentQuizQuestions.length}</p><div class="flex justify-center space-x-4"><button id="review-answers-btn" class="px-6 py-2 bg-gray-500 text-white font-semibold rounded-lg shadow-md hover:bg-gray-600 transition">Review Answers</button><button id="restart-quiz-btn" class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition">Try Again</button></div><div id="quiz-review" class="hidden mt-8 text-left space-y-4"></div></div>`;
+                document.getElementById('restart-quiz-btn').addEventListener('click', showStartScreen);
+                document.getElementById('review-answers-btn').addEventListener('click', () => {
+                    const reviewEl = document.getElementById('quiz-review');
+                    reviewEl.classList.toggle('hidden');
+                    if(!reviewEl.classList.contains('hidden')) {
+                        displayReview();
+                    }
+                });
+            }
+
+            function displayReview(){
+                let reviewHtml = `<h3 class="text-xl font-bold mb-4 text-center">Your Answers</h3>`;
+                currentQuizQuestions.forEach((q, index) => {
+                    const userAnswer = userAnswers[index];
+                    const isCorrect = userAnswer === q.answer;
+                    reviewHtml += `<div class="p-4 rounded-lg ${isCorrect ? 'bg-green-50' : 'bg-red-50'} border ${isCorrect ? 'border-green-200' : 'border-red-200'}"><p class="font-semibold">${index + 1}. ${q.q}</p><p class="text-sm mt-2">Your answer: <strong class="${isCorrect ? 'text-green-600' : 'text-red-600'}">${userAnswer || "Not answered"}</strong></p>`;
+                    if(!isCorrect) {
+                        reviewHtml += `<p class="text-sm mt-1">Correct answer: <strong class="text-green-700">${q.answer}</strong></p>`;
+                    }
+                    reviewHtml += `</div>`;
+                });
+                document.getElementById('quiz-review').innerHTML = reviewHtml;
+            }
+
+            function showStartScreen() {
+                 clearInterval(timerInterval);
+                quizContainer.innerHTML = `<div class="text-center"><button id="start-quiz-btn" class="bg-blue-600 text-white font-bold py-3 px-8 rounded-lg shadow-md hover:bg-blue-700 transition-colors">Start 60-Question Test</button></div>`;
+                document.getElementById('start-quiz-btn').addEventListener('click', startQuiz);
+            }
+            showStartScreen();
+        }
+        
+        // --- Initial Load ---
+        initializeNavigation();
+        initializeQuiz(); 
+    });
+    </script>
+</body>
+</html>
+

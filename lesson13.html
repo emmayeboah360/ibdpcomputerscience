@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Truth Tables & Boolean Logic Guide</title>
+    <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">📊</text></svg>'>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2024%2024%22%20stroke-width%3D%221.5%22%20stroke%3D%22currentColor%22%3E%0A%3Cpath%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20d%3D%22M6.75%207.5l3%202.25-3%202.25m4.5%200h3m-9%208.25h13.5A2.25%202.25%200%200021%2018V6a2.25%202.25%200%2000-2.25-2.25H5.25A2.25%202.25%200%20003%206v12a2.25%202.25%200%20002.25%202.25z%22%20/%3E%0A%3C/svg%3E">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+    };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #F8FAFC; color: #334155; padding-bottom: 60px; }
+        .nav-link { transition: color 0.3s, border-bottom-color 0.3s; border-bottom: 2px solid transparent; cursor: pointer; }
+        .nav-link.active, .nav-link:hover { color: #3B82F6; border-bottom-color: #3B82F6; }
+        .page-content { display: none; animation: fadeIn 0.8s ease-in-out forwards; }
+        .page-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .social-link svg { transition: transform 0.3s ease; }
+        .social-link:hover svg { transform: scale(1.2); }
+        .quiz-option-label { transition: all 0.2s ease-in-out; }
+        .quiz-option-label.selected { background-color: #BFDBFE; border-color: #3B82F6; }
+        .quiz-option-label.correct { background-color: #D1FAE5 !important; color: #065F46 !important; border-color: #10B981 !important; }
+        .quiz-option-label.incorrect { background-color: #FEE2E2 !important; color: #991B1B !important; border-color: #EF4444 !important; }
+        .code-block { background-color: #F1F5F9; border-left: 4px solid #3B82F6; padding: 1rem; font-family: 'Courier New', Courier, monospace; border-radius: 0 0.25rem 0.25rem 0; overflow-x: auto; font-size: 0.9rem; line-height: 1.5; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #CBD5E1; padding: 8px; text-align: center; }
+        th { background-color: #E2E8F0; }
+        /* Circuit Simulator Styles */
+        .truth-table-row.highlighted { background-color: #FEF9C3; }
+        .sim-wire { transition: stroke 0.2s ease-in-out; }
+        .sim-wire.active { stroke: #2563EB; stroke-width: 3px; }
+        .sim-gate text { font-size: 14px; font-weight: bold; font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex-shrink-0">
+                    <h1 class="text-xl font-bold text-gray-800">Truth Tables & Boolean Logic</h1>
+                </div>
+                <div class="hidden md:flex items-center">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a data-target="home" class="nav-link active px-3 py-2 rounded-md text-sm font-medium">Home</a>
+                        <a data-target="building-tables" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Building Tables</a>
+                        <a data-target="diagram-to-table" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Diagrams to Tables</a>
+                        <a data-target="simplification" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Simplification</a>
+                        <a data-target="interactive-tool" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Circuit Simulator</a>
+                        <a data-target="quiz" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Quiz</a>
+                        <a data-target="resources" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Resources</a>
+                    </div>
+                     <div class="ml-4 pl-4 border-l border-gray-300">
+                        <a href="/HOMEPAGE/index.html" class="inline-flex items-center bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-semibold hover:bg-blue-200 transition-colors">
+                            Back to Curriculum
+                        </a>
+                    </div>
+                </div>
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
+                        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                    </button>
+                </div>
+            </div>
+            <div id="mobile-menu" class="md:hidden hidden">
+                <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                    <a data-target="home" class="nav-link mobile-link active block px-3 py-2 rounded-md text-base font-medium">Home</a>
+                    <a data-target="building-tables" class="nav-link mobile-link block px-3 py-2 rounded-md text-base font-medium">Building Tables</a>
+                    <a data-target="diagram-to-table" class="nav-link mobile-link block px-3 py-2 rounded-md text-base font-medium">Diagrams to Tables</a>
+                    <a data-target="simplification" class="nav-link mobile-link block px-3 py-2 rounded-md text-base font-medium">Simplification</a>
+                    <a data-target="interactive-tool" class="nav-link mobile-link block px-3 py-2 rounded-md text-base font-medium">Circuit Simulator</a>
+                    <a data-target="quiz" class="nav-link mobile-link block px-3 py-2 rounded-md text-base font-medium">Quiz</a>
+                    <a data-target="resources" class="nav-link mobile-link block px-3 py-2 rounded-md text-base font-medium">Resources</a>
+                     <div class="mt-2 pt-2 border-t border-zinc-200">
+                        <a href="/HOMEPAGE/index.html" class="block text-center py-2 px-3 rounded-lg bg-blue-100 text-blue-800 font-semibold">Back to Curriculum</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section id="home" class="page-content active py-12 sm:py-16 lg:py-24">
+             <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h2 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 tracking-tight">Mastering Digital Logic</h2>
+                <p class="mt-4 max-w-3xl mx-auto text-base sm:text-lg text-slate-600"><strong>Truth tables</strong> are fundamental tools in computer science used to analyze and design digital logic circuits. They provide a systematic way to map all possible inputs of a logical expression to their corresponding outputs. This guide covers everything from constructing basic tables to using advanced simplification techniques like Karnaugh maps.</p>
+                
+                <div class="mt-10 max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-sm border border-slate-200 text-left">
+                    <h3 class="text-xl font-bold text-gray-800 text-center mb-4">Syllabus Focus: A1.2.4</h3>
+                    <p class="font-semibold text-slate-700">This guide comprehensively covers the syllabus requirement to "Construct and analyse truth tables." By exploring all the tabs, you will master:</p>
+                    <ul class="list-disc list-inside mt-4 space-y-2 text-slate-600">
+                        <li>Using truth tables to predict outputs from circuits, problem descriptions, and Boolean expressions.</li>
+                        <li>Deriving truth tables from logic diagrams.</li>
+                        <li>Using <strong>Karnaugh maps</strong> and <strong>algebraic simplification</strong> to simplify logical expressions.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="building-tables" class="page-content hidden py-12 sm:py-16 lg:py-24 bg-white">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
+                <div class="text-center">
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900">Constructing a Truth Table</h2>
+                    <p class="mt-4 max-w-3xl mx-auto text-base sm:text-lg text-slate-600">Building a truth table is a methodical process. The key is to list every possible combination of inputs and evaluate the expression step-by-step.</p>
+                </div>
+                <div class="mt-12 space-y-8">
+                    <div>
+                        <h3 class="text-2xl font-bold text-gray-800">1. Determine the Number of Rows</h3>
+                        <p class="mt-2 text-slate-600">The number of rows in a truth table is determined by the number of input variables, $n$. The formula is $2^n$. This ensures every possible combination of 0s and 1s is covered.</p>
+                        <ul class="list-disc list-inside ml-4 mt-2">
+                            <li><strong>2 inputs (A, B):</strong> $2^2 = 4$ rows.</li>
+                            <li><strong>3 inputs (A, B, C):</strong> $2^3 = 8$ rows.</li>
+                            <li><strong>4 inputs (A, B, C, D):</strong> $2^4 = 16$ rows.</li>
+                        </ul>
+                    </div>
+                     <div>
+                        <h3 class="text-2xl font-bold text-gray-800">2. List All Input Combinations</h3>
+                        <p class="mt-2 text-slate-600">Create columns for each input variable. Fill them in by counting up in binary. The rightmost column alternates 0, 1, 0, 1... The next column alternates 0, 0, 1, 1... and so on.</p>
+                        <h4 class="font-semibold mt-4 mb-2">Example: 3 Inputs (A, B, C)</h4>
+                        <table><thead><tr><th>A</th><th>B</th><th>C</th></tr></thead><tbody>
+                            <tr><td>0</td><td>0</td><td>0</td></tr>
+                            <tr><td>0</td><td>0</td><td>1</td></tr>
+                            <tr><td>0</td><td>1</td><td>0</td></tr>
+                            <tr><td>0</td><td>1</td><td>1</td></tr>
+                            <tr><td>1</td><td>0</td><td>0</td></tr>
+                            <tr><td>1</td><td>0</td><td>1</td></tr>
+                            <tr><td>1</td><td>1</td><td>0</td></tr>
+                            <tr><td>1</td><td>1</td><td>1</td></tr>
+                        </tbody></table>
+                    </div>
+                     <div>
+                        <h3 class="text-2xl font-bold text-gray-800">3. Evaluate the Expression in Parts</h3>
+                        <p class="mt-2 text-slate-600">For complex expressions, create intermediate columns for each part of the expression, working from the inside out (following the order of operations: parentheses, NOT, AND, then OR). Finally, create a column for the final output.</p>
+                        <h4 class="font-semibold mt-4 mb-2">Example: $Q = A \cdot (B + \overline{C})$</h4>
+                        <table>
+                            <thead><tr><th>A</th><th>B</th><th>C</th><th class="bg-blue-100">$\overline{C}$</th><th class="bg-green-100">$B + \overline{C}$</th><th class="bg-yellow-100">$Q$</th></tr></thead>
+                            <tbody>
+                                <tr><td>0</td><td>0</td><td>0</td><td class="bg-blue-50">1</td><td class="bg-green-50">1</td><td class="bg-yellow-50 font-bold">0</td></tr>
+                                <tr><td>0</td><td>0</td><td>1</td><td class="bg-blue-50">0</td><td class="bg-green-50">0</td><td class="bg-yellow-50 font-bold">0</td></tr>
+                                <tr><td>0</td><td>1</td><td>0</td><td class="bg-blue-50">1</td><td class="bg-green-50">1</td><td class="bg-yellow-50 font-bold">0</td></tr>
+                                <tr><td>0</td><td>1</td><td>1</td><td class="bg-blue-50">0</td><td class="bg-green-50">1</td><td class="bg-yellow-50 font-bold">0</td></tr>
+                                <tr><td>1</td><td>0</td><td>0</td><td class="bg-blue-50">1</td><td class="bg-green-50">1</td><td class="bg-yellow-50 font-bold">1</td></tr>
+                                <tr><td>1</td><td>0</td><td>1</td><td class="bg-blue-50">0</td><td class="bg-green-50">0</td><td class="bg-yellow-50 font-bold">0</td></tr>
+                                <tr><td>1</td><td>1</td><td>0</td><td class="bg-blue-50">1</td><td class="bg-green-50">1</td><td class="bg-yellow-50 font-bold">1</td></tr>
+                                <tr><td>1</td><td>1</td><td>1</td><td class="bg-blue-50">0</td><td class="bg-green-50">1</td><td class="bg-yellow-50 font-bold">1</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="diagram-to-table" class="page-content hidden py-12 sm:py-16 lg:py-24 bg-white">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
+                <div class="text-center">
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900">Deriving a Truth Table from a Logic Diagram</h2>
+                    <p class="mt-4 max-w-3xl mx-auto text-base sm:text-lg text-slate-600">You can systematically determine the behavior of any logic circuit by creating a truth table that tracks the signals through each gate.</p>
+                </div>
+                <div class="mt-12 space-y-8">
+                    <div>
+                        <h3 class="text-2xl font-bold text-gray-800">1. The Logic Diagram</h3>
+                        <p class="mt-2 text-slate-600">Consider the following circuit with inputs A and B, and final output Q. To find its truth table, we must evaluate the intermediate outputs first (labeled here as R and P).</p>
+                        <div class="my-4 p-4 bg-white rounded-lg border shadow-sm flex justify-center">
+                           <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iNDUwcHgiIGhlaWdodD0iMTUwcHgiIHZpZXdCb3g9IjAgMCA0NTAgMTUwIiB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiPgogICAgPGcgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNS4wMDAwMDAsIDIwLjAwMDAwMCkiPgogICAgICAgICAgICA8cGF0aCBkPSJNMTQ1Ljg5ODk4Nyw1NSBMMzYwLjg5ODk4Nyw1NSIgc3Ryb2tlPSIjOUNDQTNGIiBzdHJva2Utd2lkdGg9IjIiIGlkPSJ3aXJlLW9yLXEiPjwvcGF0aD4KICAgICAgICAgICAgPHBhdGggZD0iTTk1Ljg5ODk4NjcsMTUgTDEwNS44OTg5ODYsMTUiIHN0cm9rZT0iIzhDOEFBRSIgc3Ryb2tlLXdpZHRoPSIyIj48L3BhdGg+CiAgICAgICAgICAgIDxwYXRoIGQ9Ik05NS44OTg5ODY3LDExMCBMMTA1Ljg5ODk4NiwxMTAiIHN0cm9rZT0iIzhDOEFBRSIgc3Ryb2tlLXdpZHRoPSIyIj48L3BhdGg+CiAgICAgICAgICAgIDxwYXRoIGQ9Ik0xNS44OTg5ODY3LDE1IGw4MCwwIiBzdHJva2U9IiM5Q0EzQUYiIHN0cm9rZS13aWR0aD0iMiI+PC9wYXRoPgogICAgICAgICAgICA8cGF0aCBkPSJNNjUuODk4OTg2NywxNSBsMCw3MCIgc3Ryb2tlPSIjOUNBM0FGIiBzdHJva2Utd2lkdGg9IjIiPjwvcGF0aD4KICAgICAgICAgICAgPHBhdGggZD0iTTY1Ljg5ODk4NjcsODUgTDY1Ljg5ODk4NjcsOTAgTDEwNS44OTg5ODYsOTAiIHN0cm9rZT0iIzhDOEFBRSIgc3Ryb2tlLXdpZHRoPSIyIj48L3BhdGg+CiAgICAgICAgICAgIDxwYXRoIGQ9Ik0xNS44OTg5ODY3LDkwIGw1MCwwIiBzdHJva2U9IiM5Q0EzQUYiIHN0cm9rZS13aWR0aD0iMiI+PC9wYXRoPgogICAgICAgICAgICA8cGF0aCBkPSJNNjUuODk4OTg2Nyw5MCBsMCwzMCIgc3Ryb2tlPSIjOUNBM0FGIiBzdHJva2Utd2lkdGg9IjIiPjwvcGF0aD4KICAgICAgICAgICAgPHBhdGggZD0iTTY1Ljg5ODk4NjcsMTIwIEwxMDUuODk4OTg2LDEyMCIgc3Ryb2tlPSIjOUNBM0FGIiBzdHJva2Utd2lkdGg9IjIiPjwvcGF0aD4KICAgICAgICAgICAgPHBhdGggZD0iTTE0MC44OTg5ODYsMzIuNSBMMjgwLjg5ODk4NywzMi41IiBzdHJva2U9IiM4QzhBQUUiIHN0cm9rZS13aWR0aD0iMiI+PC9wYXRoPgogICAgICAgICAgICA8cGF0aCBkPSJNMTQ4Ljg5ODk4NywxMTAgTDI4MC44OTg5ODcsMTEwIiBzdHJva2U9IiM4QzhBQUUiIHN0cm9rZS13aWR0aD0iMiI+PC9wYXRoPgogICAgICAgICAgICA8cGF0aCBkPSJNMTI1Ljg5ODk4Nyw0MyBMMTI1Ljg5ODk4NywzMi41IEwyODAuODk4OTg3LDMyLjUgTDI4MC44OTg5ODcsNjUiIHN0cm9rZT0iIzhDOEFBRSIgc3Ryb2tlLXdpZHRoPSIyIj48L3BhdGg+CiAgICAgICAgICAgIDxwYXRoIGQ9Ik0yODAuODk4OTg3LDg1IEwyODAuODk4OTg3LDExMCIgc3Ryb2tlPSIjOEM4QUFGIiBzdHJva2Utd2lkdGg9IjIiPjwvcGF0aD4KICAgICAgICAgICAgPHBhdGggZD0iTTM2MC44OTg5ODcsNTUgTDQwNS44OTg5ODcsNTUiIHN0cm9rZT0iIzhDOEFBRSIgc3Ryb2tlLXdpZHRoPSIyIj48L3BhdGg+CiAgICAgICAgICAgIDxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDI4MS4zOTg5ODYsIDU1LjAwMDAwMCkgc2NhbGUoMSwgLTEpIHRyYW5zbGF0ZSgtMjgxLjM5ODk4NiwgLTU1LjAwMDAwMCkgdHJhbnNsYXRlKDI1Ni4zOTg5ODYsIDM1LjAwMDAwMCkiIGZpbGw9IiNFMEU3RkYiIHN0cm9rZT0iIzY0NzQ4QiIgc3Ryb2tlLXdpZHRoPSIyIj4KICAgICAgICAgICAgICAgIDxwYXRoIGQ9Ik0MCwwIEw0MCwwIEMzMy4zMzMzMzMzLDEzLjMzMzMzMzMgMTYuNjY2NjY2NywyNi42NjY2NjY3IDAsNDAgQzE2LjY2NjY2NjcsNTMuMzMzMzMzMyAzMy4zMzMzMzMzLDY2LjY2NjY2NjcgNDAsODAgTDAsODAgQzExLjU3OTgxMDIsNjQuNTg5MDU3NiAxNy4zNjk3MTUzLDQ5LjU4OTA1NzYgMTcuMzY5NzE1Myw0MCBDMTcuMzY5NzE1MywzMC40MTA5NDI0IDExLjU3OTgxMDIsMTUuNDEwOTQyNCAwLDAgWiI+PC9wYXRoPgogICAgICAgICAgICA8L2c+CiAgICAgICAgICAgIDxwYXRoIGQ9Ik0xMDYuMzk4OTg3LDEzMS42NjY2NjcgTDEzNS4zOTg5ODcsMTE3LjgzMzMzMyBMMTA2LjM5ODk4NywxMDQuMDAwMDAxIEwxMDYuMzk4OTg3LDEzMS42NjY2NjcgWiIgZmlsbD0iI0UwRTdGRiIgc3Ryb2tlPSIjNjQ3NDhCIiBzdHJva2Utd2lkdGg9IjIiPjwvcGF0aD4KICAgICAgICAgICAgPGNpcmNsZSBmaWxsPSIjRkZGRkZGIiBzdHJva2U9IiM2NDc0OEIiIHN0cm9rZS1wZXJjZW50PSJ0cnVlIiBzdHJva2Utd2lkdGg9IjIiIGN4PSIxNDIuODk4OTg3IiBjeT0iMTE3LjgzMzMzMyIgcj0iNCI+PC9jaXJjbGU+CiAgICAgICAgICAgIDxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEwNS44OTg5ODYsIDYuMDAwMDAwKSBzY2FsZSgxLCAtMSkgdHJhbnNsYXRlKC0xMDUuODk4OTg2LCAtNi4wMDAwMDApIHRyYW5zbGF0ZSg5NS44OTg5ODYsIC0xMy4wMDAwMDApIiBmaWxsPSIjRTBFN0ZGIiBzdHJva2U9IiM2NDc0OEIiIHN0cm9rZS13lkdGg9IjIiPgogICAgICAgICAgICAgICAgPHBhdGggZD0iTTEwLDQwIEMxMCw0MCAxMCw0MCAyMCw0MCBDMzAsNDAgNDAsNDAgNDAsNDAgQzQwLDI2LjY2NjY2NjcgNDAsMTMuMzMzMzMzMyA0MCwwIEwwLDAgTDAsODAgTDQwLDgwIEM0MCw2Ni42NjY2NjY3IDQwLDUzLjMzMzMzMzMgNDAsNDAgWiI+PC9wYXRoPgogICAgICAgICAgICA8L2c+CiAgICAgICAgICAgIDx0ZXh0IGZvbnQtZmFtaWx5PSJJbnRlciwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiIgZm9udC13ZWlnaHQ9ImJvbGQiIGZpbGw9IiMzNzQxNTUiPgogICAgICAgICAgICAgICAgPHRzcGFuIHg9IjE3Ni4zOTg5ODYiIHk9IjIwIj5SID0gQSBBTkQgQjwvdHNwYW4+CiAgICAgICAgICAgIDwvdGV4dD4KICAgICAgICAgICAgPHRleHQgZm9udC1mYW1pbHk9IkludGVyLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjEyIiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0iIzM3NDE1NSI+CiAgICAgICAgICAgICAgICA8dHNwYW4geD0iMTc2LjM5ODk4NiIgeT0iMTM1Ij5QID0gTk9UIEI8L3RzcGFuPgogICAgICAgICAgICA8L3RleHQ+CiAgICAgICAgICAgIDx0ZXh0IGZvbnQtZmFtaWx5PSJJbnRlciwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiIgZm9udC13ZWlnaHQ9ImJvbGQiIGZpbGw9IiMxRTJBOTUiPgogICAgICAgICAgICAgICAgPHRzcGFuIHg9IjM5OC4zOTg5ODYiIHk9IjYwIj5RPC90c3Bhbj4KICAgICAgICAgICAgPC90ZXh0PgogICAgICAgICAgICA8dGV4dCBmb250LWZhbWlseT0iSW50ZXIsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTIiIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSIjMUUyQTk1Ij4KICAgICAgICAgICAgICAgIDx0c3BhbiB4PSItMC4xMDEzMjc5MjciIHk9IjIwIj5BPC90c3Bhbj4KICAgICAgICAgICAgPC90ZXh0PgogICAgICAgICAgICA8dGV4dCBmb250LWZhbWlseT0iSW50ZXIsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTIiIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSIjMUUyQTk1Ij4KICAgICAgICAgICAgICAgIDx0c3BhbiB4PSItMC4xMDEzMjc5MjciIHk9Ijk1Ij5CPC90c3Bhbj4KICAgICAgICAgICAgPC90ZXh0PgogICAgICAgIDwvZz4KICAgIDwvZz4KPC9zdmc+" alt="Logic Diagram for Q = (A AND B) OR (NOT B)">
+                        </div>
+                    </div>
+                     <div>
+                        <h3 class="text-2xl font-bold text-gray-800">2. Building the Table Step-by-Step</h3>
+                        <p class="mt-2 text-slate-600">We create columns for the inputs (A, B), each intermediate point (R and P), and the final output (Q).</p>
+                        <ol class="list-decimal list-inside ml-4 mt-4 space-y-2">
+                           <li>List all input combinations for A and B.</li>
+                           <li>Calculate column **R**: R is the output of the AND gate, so it is 1 only when A and B are both 1 ($R = A \cdot B$).</li>
+                           <li>Calculate column **P**: P is the output of the NOT gate, so it is always the opposite of B ($P = \overline{B}$).</li>
+                           <li>Calculate the final column **Q**: Q is the output of the OR gate, which takes R and P as its inputs ($Q = R + P$).</li>
+                        </ol>
+                    </div>
+                     <div>
+                        <h3 class="text-2xl font-bold text-gray-800">3. The Final Truth Table</h3>
+                        <p class="mt-2 text-slate-600">The completed table shows the output for every possible input scenario. The final expression for this circuit is $Q = (A \cdot B) + \overline{B}$.</p>
+                        <table class="mt-4">
+                            <thead><tr><th>A</th><th>B</th><th class="bg-green-100">$R = A \cdot B$</th><th class="bg-blue-100">$P = \overline{B}$</th><th class="bg-yellow-100">$Q = R+P$</th></tr></thead>
+                            <tbody>
+                                <tr><td>0</td><td>0</td><td class="bg-green-50">0</td><td class="bg-blue-50">1</td><td class="bg-yellow-50 font-bold">1</td></tr>
+                                <tr><td>0</td><td>1</td><td class="bg-green-50">0</td><td class="bg-blue-50">0</td><td class="bg-yellow-50 font-bold">0</td></tr>
+                                <tr><td>1</td><td>0</td><td class="bg-green-50">0</td><td class="bg-blue-50">1</td><td class="bg-yellow-50 font-bold">1</td></tr>
+                                <tr><td>1</td><td>1</td><td class="bg-green-50">1</td><td class="bg-blue-50">0</td><td class="bg-yellow-50 font-bold">1</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="simplification" class="page-content hidden py-12 sm:py-16 lg:py-24 bg-white">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
+                 <div class="text-center">
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900">Simplifying Logic Expressions</h2>
+                    <p class="mt-4 max-w-3xl mx-auto text-base sm:text-lg text-slate-600">A complex logical expression can often be simplified to an equivalent expression that uses fewer gates. This makes the resulting circuit cheaper, faster, and more efficient. We can use Boolean algebra or Karnaugh maps for this.</p>
+                </div>
+                <div class="mt-12 space-y-12">
+                    <div>
+                        <h3 class="text-2xl font-bold text-gray-800">Method 1: Boolean Algebra</h3>
+                        <p class="mt-2 text-slate-600">This method uses a set of laws and theorems to manipulate expressions, similar to regular algebra. Key laws include:</p>
+                        <div class="overflow-x-auto mt-4">
+                        <table><thead><tr><th>Law</th><th>AND Form</th><th>OR Form</th></tr></thead><tbody>
+                            <tr><td>Identity</td><td>$A \cdot 1 = A$</td><td>$A + 0 = A$</td></tr>
+                            <tr><td>Annulment</td><td>$A \cdot 0 = 0$</td><td>$A + 1 = 1$</td></tr>
+                            <tr><td>Inverse</td><td>$A \cdot \overline{A} = 0$</td><td>$A + \overline{A} = 1$</td></tr>
+                            <tr><td>Distributive</td><td colspan="2">$A \cdot (B+C) = A \cdot B + A \cdot C$</td></tr>
+                            <tr><td>De Morgan's</td><td>$\overline{A \cdot B} = \overline{A} + \overline{B}$</td><td>$\overline{A + B} = \overline{A} \cdot \overline{B}$</td></tr>
+                        </tbody></table>
+                        </div>
+                         <h4 class="font-semibold mt-4 mb-2">Example: Simplify $Q = A \cdot B + A \cdot \overline{B}$</h4>
+                         <div class="code-block mt-2">
+1. $Q = A \cdot (B + \overline{B})$ &nbsp;&nbsp;&nbsp;&nbsp; (Distributive Law)<br>
+2. $Q = A \cdot 1$ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (Inverse Law: $B + \overline{B} = 1$)<br>
+3. $Q = A$ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (Identity Law: $A \cdot 1 = A$)<br><br>
+<strong>The complex expression simplifies to just A.</strong>
+                         </div>
+                    </div>
+                     <div>
+                        <h3 class="text-2xl font-bold text-gray-800">Method 2: Karnaugh Maps (K-Maps)</h3>
+                        <p class="mt-2 text-slate-600">K-Maps are a graphical method for simplifying expressions. They provide a visual way to find and eliminate redundant terms.</p>
+                        <h4 class="font-semibold mt-4 mb-2">Steps:</h4>
+                        <ol class="list-decimal list-inside ml-4 space-y-2">
+                            <li>Create a grid for the variables. The columns and rows use <strong>Gray code</strong> (00, 01, 11, 10), where only one bit changes between adjacent cells. This is crucial.</li>
+                            <li>Transfer the '1' outputs from the truth table into the corresponding cells on the K-map.</li>
+                            <li>Group adjacent 1s into rectangles. Groups must be a power of 2 in size (1, 2, 4, 8...). You can "wrap around" the edges of the map.</li>
+                            <li>Make the groups as large as possible to maximize simplification. Every '1' must be in at least one group.</li>
+                            <li>For each group, find the variable(s) that do <strong>not</strong> change. These variables form a simplified term.</li>
+                            <li>The final simplified expression is the sum (OR) of all the terms from each group.</li>
+                        </ol>
+                        <h4 class="font-semibold mt-4 mb-2">Example: 3-Variable K-Map</h4>
+                        <p>Let's simplify an expression whose truth table has '1's at minterms 1, 3, 4, and 5.</p>
+                        <div class="grid md:grid-cols-2 gap-8 mt-4 items-center">
+                            <div class="text-center">
+                                <h5 class="font-bold mb-2">K-Map with Grouping</h5>
+                                <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQwIiBoZWlnaHQ9IjE0MCIgdmlld0JveD0iMCAwIDI0MCAxNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgICA8ZyBmb250LWZhbWlseT0iSW50ZXIsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiMzMzQxNTUiPgogICAgICAgIDx0ZXh0IHg9IjEwIiB5PSI1MCIgZm9udC13ZWlnaHQ9ImJvbGQiPkE8L3RleHQ+CiAgICAgICAgPHRleHQgeD0iMzAiIHk9IjUwIj4wPC90ZXh0PgogICAgICAgIDx0ZXh0IHg9IjMwIiB5PSIxMDAiPjE8L3RleHQ+CiAgICAgICAgPHRleHQgeD0iMTMwIiB5PSIyMCIgZm9udC13ZWlnaHQ9ImJvbGQiPkJDPC90ZXh0PgogICAgICAgIDx0ZXh0IHg9IjYwIiB5PSIyMCIgZm9udC1zaXplPSIxMiI+MDA8L3RleHQ+CiAgICAgICAgPHRleHQgeD0iMTEwIiB5PSIyMCIgZm9udC1zaXplPSIxMiI+MDE8L3RleHQ+CiAgICAgICAgPHRleHQgeD0iMTYwIiB5PSIyMCIgZm9udC1zaXplPSIxMiI+MTE8L3RleHQ+CiAgICAgICAgPHRleHQgeD0iMjEwIiB5PSIyMCIgZm9udC1zaXplPSIxMiI+MTA8L3RleHQ+CiAgICA8L2c+CiAgICA8cmVjdCB4PSI1MCIgeT0iMzAiIHdpZHRoPSIyMDAiIGhlaWdodD0iMTAwIiBmaWxsPSJub25lIiBzdHJva2U9IiM5NEE3QjgiIHN0cm9rZS13aWR0aD0iMiIvPgogICAgPHBhdGggZD0iTSA1MCA4MCBoMjAwIE0gMTAwIDMwIHYxMDAgTSAxNTAgMzAcdjEwMCBNIDIwMCAzMCB2MTAwIiBzdHJva2U9IiM5NEE3QjgiLz4KICAgIDxnIGZvbnQtc2l6ZT0iMjQiIGZvbnQtd2VpZ2h0PSJib2xkIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIj4KICAgICAgICA8dGV4dCB4PSI3NSIgeT0iNTUiIGZpbGw9IiM2NDc0OEIiPjA8L3RleHQ+CiAgICAgICAgPHRleHQgeD0iMTI1IiB5PSI1NSIgZmlsbD0iIzEwQjk4MSI+MTwvdGV4dD4KICAgICAgICA8dGV4dCB4PSIxNzUiIHk9IjU1IiBmaWxsPSIjMTBCOTgxIj4xPC90ZXh0PgogICAgICAgIDx0ZXh0IHg9IjIyNSIgeT0iNTUiIGZpbGw9IiM2NDc0OEIiPjA8L3RleHQ+CiAgICAgICAgPHRleHQgeD0iNzUiIHk9IjEwNSIgZmlsbD0iIzEwQjk4MSI+MTwvdGV4dD4KICAgICAgICA8dGV4dCB4PSIxMjUiIHk9IjEwNSIgZmlsbD0iIzEwQjk4MSI+MTwvdGV4dD4KICAgICAgICA8dGV4dCB4PSIxNzUiIHk9IjEwNSIgZmlsbD0iIzY0NzQ4QiI+MDwvdGV4dD4KICAgICAgICA8dGV4dCB4PSIyMjUiIHk9IjEwNSIgZmlsbD0iIzY0NzQ4QiI+MDwvdGV4dD4KICAgIDwvZz4KICAgIDxyZWN0IHg9IjUwIiB5PSI4MiIgd2lkdGg9IjEwMCIgaGVpZ2h0PSI0NiIgcng9IjUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI0VGNDQ0NCIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2Utb3BhY2l0eT0iMC43Ii8+CiAgICA8cmVjdCB4PSIxMDMiIHk9IjMwIiB3aWR0aD0iNDYiIGhlaWdodD0iMTAwIiByeD0iNSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjM0I4MkY2IiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1vcGFjaXR5PSIwLjciLz4KPC9zdmc+" alt="K-map with groups of 1s circled">
+                            </div>
+                            <div class="code-block">
+                                1. <strong>Red Group (Horizontal):</strong><br>
+                                &nbsp;&nbsp; In this group, A=1, B=0. C changes.<br>
+                                &nbsp;&nbsp; Term: $A \cdot \overline{B}$<br><br>
+                                2. <strong>Blue Group (Vertical):</strong><br>
+                                &nbsp;&nbsp; In this group, B=0, C=1. A changes.<br>
+                                &nbsp;&nbsp; Term: $\overline{B} \cdot C$<br><br>
+                                <strong>Final Expression: $Q = A \cdot \overline{B} + \overline{B} \cdot C$</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="interactive-tool" class="page-content hidden py-12 sm:py-16 lg:py-24 bg-white">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
+                <div class="text-center">
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900">Interactive Circuit Simulator</h2>
+                    <p class="mt-4 max-w-3xl mx-auto text-base sm:text-lg text-slate-600">This tool demonstrates how a logic diagram is evaluated. Click the input buttons to toggle their values. Watch the signals flow through the gates to produce the final output Q, and see the corresponding row highlight in the truth table.</p>
+                </div>
+                <div class="mt-8 bg-slate-50 p-6 rounded-xl shadow-md">
+                    <div class="grid lg:grid-cols-2 gap-8 items-center">
+                        <div id="circuit-sim-container" class="relative min-h-[250px] p-4">
+                             <svg id="circuit-svg" viewBox="0 0 450 180" xmlns="http://www.w3.org/2000/svg">
+                                <path id="wire-a-split" d="M80 30 h 20" stroke-width="2" stroke="#9CA3AF" fill="none" class="sim-wire"/>
+                                <path id="wire-b-split" d="M80 150 h 20" stroke-width="2" stroke="#9CA3AF" fill="none" class="sim-wire"/>
+                                <path id="wire-a-to-and" d="M100 30 v 20 h 40" stroke-width="2" stroke="#9CA3AF" fill="none" class="sim-wire"/>
+                                <path id="wire-b-to-and" d="M100 150 v -80 h 40" stroke-width="2" stroke="#9CA3AF" fill="none" class="sim-wire"/>
+                                <path id="wire-b-to-not" d="M100 150 v -10 h 40" stroke-width="2" stroke="#9CA3AF" fill="none" class="sim-wire"/>
+                                <path id="wire-and-to-or" d="M220 60 v 20 h 40" stroke-width="2" stroke="#9CA3AF" fill="none" class="sim-wire"/>
+                                <path id="wire-not-to-or" d="M238 140 v -30 h 22" stroke-width="2" stroke="#9CA3AF" fill="none" class="sim-wire"/>
+                                <path id="wire-or-to-q" d="M372 100 h 40" stroke-width="2" stroke="#9CA3AF" fill="none" class="sim-wire"/>
+
+                                <g id="gate-and" class="sim-gate">
+                                    <path d="M140 50 v20 h20 a10 10 0 0 0 0 -20 z" transform="scale(2)" style="transform-origin: 140px 50px; transform-box: fill-box;" stroke="#64748B" stroke-width="1.5" fill="#F1F5F9"/>
+                                    <text x="170" y="75" class="sim-gate-text">AND</text>
+                                    <text id="gate-and-out" x="225" y="75" class="sim-gate-text">(R=0)</text>
+                                </g>
+                                <g id="gate-not" class="sim-gate">
+                                    <path d="M140 130 l30 10 v-20 z" stroke="#64748B" stroke-width="2" fill="#F1F5F9"/>
+                                    <circle cx="175" cy="140" r="4" stroke="#64748B" stroke-width="2" fill="white" />
+                                    <text x="145" y="145" class="sim-gate-text">NOT</text>
+                                    <text id="gate-not-out" x="195" y="145" class="sim-gate-text">(P=1)</text>
+                                </g>
+                                <g id="gate-or" class="sim-gate">
+                                    <path d="M260 80 v40 c20 0 40 -15 40 -20 c0 -5 -20 -20 -40 -20 z" stroke="#64748B" stroke-width="2" fill="#F1F5F9"/>
+                                    <text x="280" y="105" class="sim-gate-text">OR</text>
+                                </g>
+
+                                <foreignObject x="0" y="10" width="80" height="40">
+                                    <button id="sim-input-a" data-value="0" class="w-full h-full bg-gray-300 text-gray-800 font-bold text-xl rounded shadow">A=0</button>
+                                </foreignObject>
+                                <foreignObject x="0" y="130" width="80" height="40">
+                                    <button id="sim-input-b" data-value="0" class="w-full h-full bg-gray-300 text-gray-800 font-bold text-xl rounded shadow">B=0</button>
+                                </foreignObject>
+                                <foreignObject x="400" y="75" width="50" height="50">
+                                    <div class="text-center">
+                                        <span class="font-bold text-lg">Q</span>
+                                        <div id="sim-output-q" class="w-12 h-12 mt-1 bg-gray-200 font-bold text-2xl rounded-full shadow flex items-center justify-center">?</div>
+                                    </div>
+                                </foreignObject>
+                            </svg>
+                        </div>
+
+                        <div>
+                            <h3 class="font-bold text-lg text-center mb-2">Live Truth Table for $Q = (A \cdot B) + \overline{B}$</h3>
+                            <table id="sim-truth-table" class="w-full text-sm">
+                                <thead><tr><th>A</th><th>B</th><th>$A \cdot B$</th><th>$\overline{B}$</th><th>Q</th></tr></thead>
+                                <tbody>
+                                    <tr id="row-00" class="truth-table-row transition-colors"><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td></tr>
+                                    <tr id="row-01" class="truth-table-row transition-colors"><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td></tr>
+                                    <tr id="row-10" class="truth-table-row transition-colors"><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td></tr>
+                                    <tr id="row-11" class="truth-table-row transition-colors"><td>1</td><td>1</td><td>1</td><td>0</td><td>1</td></tr>
+                                </tbody>
+                            </table>
+                             <div id="sim-explanation-panel" class="mt-4 bg-white p-4 rounded-lg shadow-inner min-h-[180px]">
+                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="quiz" class="page-content hidden py-12 sm:py-16 lg:py-24 bg-white">
+             <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900">Knowledge Check</h2>
+                    <p class="mt-4 max-w-3xl mx-auto text-base sm:text-lg text-slate-600">Test your skills in constructing truth tables and simplifying Boolean expressions.</p>
+                </div>
+                <div id="quiz-wrapper" class="mt-12 max-w-4xl mx-auto">
+                    <div id="quiz-start-screen" class="text-center bg-slate-50 p-8 rounded-lg shadow-md">
+                        <h3 class="text-2xl font-bold text-gray-800">Ready to Test Your Knowledge?</h3>
+                        <p class="mt-2 text-slate-600">You will have <strong>45 minutes</strong> to answer <strong>60 questions</strong> selected from a large question bank.</p>
+                        <button id="start-quiz-btn" class="mt-6 px-8 py-3 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 transition">Start Quiz</button>
+                    </div>
+                    <div id="quiz-container" class="hidden">
+                        <div class="flex justify-between items-center mb-4 p-4 bg-slate-100 rounded-lg">
+                            <h3 class="text-xl font-bold text-gray-800">Truth Tables & Logic Quiz</h3>
+                            <div id="timer" class="text-lg font-bold text-red-500">45:00</div>
+                        </div>
+                        <div id="quiz-questions" class="space-y-6 bg-slate-50 p-6 rounded-lg"></div>
+                        <button id="submit-quiz-btn" class="mt-8 w-full px-8 py-3 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 transition">Submit Answers</button>
+                    </div>
+                    <div id="quiz-results-screen" class="hidden text-center bg-slate-50 p-8 rounded-lg shadow-md">
+                        <h3 class="text-2xl font-bold text-gray-800">Quiz Complete!</h3>
+                        <p class="mt-2 text-slate-600">Here are your results.</p>
+                        <div id="quiz-score-display" class="my-4 text-4xl font-extrabold text-blue-600"></div>
+                        <div id="quiz-time-taken" class="text-slate-600"></div>
+                        <button id="review-answers-btn" class="mt-6 px-8 py-3 bg-gray-500 text-white font-semibold rounded-lg shadow-md hover:bg-gray-600 transition">Review Your Answers</button>
+                        <div id="quiz-review" class="hidden mt-8 text-left space-y-6"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="resources" class="page-content hidden py-12 sm:py-16 lg:py-24 bg-white">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900">Further Learning Resources</h2>
+                    <p class="mt-4 max-w-3xl mx-auto text-base sm:text-lg text-slate-600">Deepen your understanding with these curated external resources.</p>
+                </div>
+                <div class="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+                    <div class="bg-slate-50 p-6 rounded-lg shadow-md">
+                        <h4 class="font-bold text-lg text-blue-600">Introduction to Karnaugh Maps</h4>
+                        <p class="mt-2 text-sm text-slate-600">A very clear, step-by-step video tutorial on how to use K-maps to simplify Boolean expressions.</p>
+                        <a href="https://www.youtube.com/watch?v=CpsVj_o12xc" target="_blank" class="mt-4 inline-block text-blue-500 hover:underline font-semibold">Watch on YouTube →</a>
+                    </div>
+                    <div class="bg-slate-50 p-6 rounded-lg shadow-md">
+                        <h4 class="font-bold text-lg text-blue-600">Boolean Algebra Laws</h4>
+                        <p class="mt-2 text-sm text-slate-600">A comprehensive reference page from All About Circuits detailing the laws and rules of Boolean algebra.</p>
+                        <a href="https://www.allaboutcircuits.com/textbook/digital/chpt-7/boolean-rules-for-simplification/" target="_blank" class="mt-4 inline-block text-blue-500 hover:underline font-semibold">Read Article →</a>
+                    </div>
+                    <div class="bg-slate-50 p-6 rounded-lg shadow-md">
+                        <h4 class="font-bold text-lg text-blue-600">Online Logic Circuit Simulator</h4>
+                        <p class="mt-2 text-sm text-slate-600">A powerful online tool for building and testing your own complex logic circuits.</p>
+                        <a href="https://logic.ly/demo/" target="_blank" class="mt-4 inline-block text-blue-500 hover:underline font-semibold">Use Tool →</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <footer class="fixed bottom-0 left-0 w-full bg-white py-2 border-t border-slate-200 text-center text-sm text-slate-500">
+        <div class="container mx-auto px-6 flex flex-col sm:flex-row justify-center items-center space-y-2 sm:space-y-0 sm:space-x-4">
+            <div class="flex items-center space-x-4">
+                <a href="https://www.linkedin.com/in/emmayeboah360/" class="text-blue-600 hover:text-blue-800 social-link" target="_blank">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.762s.784-1.762 1.75-1.762 1.75.79 1.75 1.762-.784 1.762-1.75 1.762zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                </a>
+                <a href="mailto:yemmanuel308@gmail.com" class="text-rose-600 hover:text-rose-800 social-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12.713l-11.75 6.287 11.75 5.5zM23.75 18.995l-11.75-6.287v11.748zM12 11.287l-12-6.287v1.868l12 6.287l12-6.287v-1.868z"/></svg>
+                </a>
+            </div>
+            <p class="pl-4">&copy; 2025 Emmanuel Yeboah. All rights reserved.</p>
+        </div>
+    </footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // --- Navigation ---
+    const navLinks = document.querySelectorAll('.nav-link');
+    const pages = document.querySelectorAll('.page-content');
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+
+    mobileMenuButton.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+
+    function switchTab(targetId) {
+        pages.forEach(page => page.classList.remove('active'));
+        const targetPage = document.getElementById(targetId);
+        if (targetPage) targetPage.classList.add('active');
+        navLinks.forEach(link => link.classList.toggle('active', link.dataset.target === targetId));
+        mobileMenu.classList.add('hidden');
+        if (targetId === 'interactive-tool' && !document.getElementById('circuit-sim-container').dataset.initialized) {
+             initCircuitSimulator();
+        }
+    }
+
+    navLinks.forEach(link => link.addEventListener('click', (e) => {
+        e.preventDefault();
+        switchTab(e.currentTarget.dataset.target);
+    }));
+    
+    // --- Interactive Tool: Logic Circuit Simulator ---
+    function initCircuitSimulator() {
+        const container = document.getElementById('circuit-sim-container');
+        if (!container || container.dataset.initialized) return;
+        container.dataset.initialized = 'true';
+        
+        const inputA = document.getElementById('sim-input-a');
+        const inputB = document.getElementById('sim-input-b');
+        const outputQ = document.getElementById('sim-output-q');
+        const explanationPanel = document.getElementById('sim-explanation-panel');
+        
+        const gateOutputs = {
+            and: document.getElementById('gate-and-out'),
+            not: document.getElementById('gate-not-out')
+        };
+
+        const wires = {
+            a_and: document.getElementById('wire-a-to-and'),
+            b_and: document.getElementById('wire-b-to-and'),
+            b_not: document.getElementById('wire-b-to-not'),
+            and_or: document.getElementById('wire-and-to-or'),
+            not_or: document.getElementById('wire-not-to-or'),
+            or_q: document.getElementById('wire-or-to-q'),
+            a_split: document.getElementById('wire-a-split'),
+            b_split: document.getElementById('wire-b-split')
+        };
+
+        function updateSimulation() {
+            const valA = parseInt(inputA.dataset.value);
+            const valB = parseInt(inputB.dataset.value);
+
+            const r_and_out = valA & valB;
+            const p_not_out = 1 - valB;
+            const q_or_out = r_and_out | p_not_out;
+
+            outputQ.textContent = q_or_out;
+            gateOutputs.and.textContent = `(R=${r_and_out})`;
+            gateOutputs.not.textContent = `(P=${p_not_out})`;
+
+            Object.values(wires).forEach(w => w.classList.remove('active'));
+            if(valA === 1) { wires.a_split.classList.add('active'); wires.a_and.classList.add('active'); }
+            if(valB === 1) { wires.b_split.classList.add('active'); wires.b_and.classList.add('active'); wires.b_not.classList.add('active'); }
+            if(r_and_out === 1) wires.and_or.classList.add('active');
+            if(p_not_out === 1) wires.not_or.classList.add('active');
+            if(q_or_out === 1) wires.or_q.classList.add('active');
+            
+            document.querySelectorAll('.truth-table-row').forEach(row => row.classList.remove('highlighted'));
+            document.getElementById(`row-${valA}${valB}`).classList.add('highlighted');
+            
+            let explanation = `<h4 class="font-bold text-gray-800">Explanation for A=${valA}, B=${valB}</h4>`;
+            explanation += `<p class="text-sm mt-1">1. <strong>AND Gate</strong>: Receives inputs A=${valA} and B=${valB}. The output (R) is <strong>${r_and_out}</strong>.</p>`;
+            explanation += `<p class="text-sm mt-1">2. <strong>NOT Gate</strong>: Receives input B=${valB}. The output (P) is its inverse, which is <strong>${p_not_out}</strong>.</p>`;
+            explanation += `<p class="text-sm mt-1">3. <strong>OR Gate</strong>: Receives R=${r_and_out} and P=${p_not_out}. Since ${r_and_out} OR ${p_not_out} is <strong>${q_or_out}</strong>, the final output Q is <strong>${q_or_out}</strong>.</p>`;
+            explanationPanel.innerHTML = explanation;
+        }
+
+        [inputA, inputB].forEach(btn => {
+            btn.addEventListener('click', () => {
+                const currentValue = parseInt(btn.dataset.value);
+                const newValue = 1 - currentValue;
+                btn.dataset.value = newValue;
+                btn.textContent = `${btn.id.includes('a') ? 'A' : 'B'} = ${newValue}`;
+                btn.classList.toggle('bg-blue-500', newValue === 1);
+                btn.classList.toggle('text-white', newValue === 1);
+                btn.classList.toggle('bg-gray-300', newValue === 0);
+                btn.classList.toggle('text-gray-800', newValue === 0);
+                updateSimulation();
+            });
+        });
+        
+        updateSimulation(); 
+    }
+    
+    // --- Quiz Logic ---
+    const startQuizBtn = document.getElementById('start-quiz-btn');
+    const quizStartScreen = document.getElementById('quiz-start-screen');
+    const quizContainer = document.getElementById('quiz-container');
+    const quizQuestionsContainer = document.getElementById('quiz-questions');
+    const submitQuizBtn = document.getElementById('submit-quiz-btn');
+    const quizResultsScreen = document.getElementById('quiz-results-screen');
+    const quizScoreDisplay = document.getElementById('quiz-score-display');
+    const quizTimeTakenEl = document.getElementById('quiz-time-taken');
+    const reviewAnswersBtn = document.getElementById('review-answers-btn');
+    const quizReviewEl = document.getElementById('quiz-review');
+    const timerEl = document.getElementById('timer');
+
+    let timerInterval;
+    let timeRemaining;
+    let activeQuizQuestions = [];
+    let userAnswers = [];
+
+    const questionBank = [
+        { q: "How many rows does a truth table for 4 input variables have?", options: ["4", "8", "16", "32"], answer: "16" },
+        { q: "What is the purpose of a truth table?", options: ["To store binary data", "To show all possible input/output combinations of a logic circuit", "To speed up the CPU", "To define variables"], answer: "To show all possible input/output combinations of a logic circuit" },
+        { q: "The expression $A + \\overline{A}$ simplifies to what?", options: ["A", "0", "1", "$\\overline{A}$"], answer: "1" },
+        { q: "According to De Morgan's Law, $\\overline{A + B}$ is equivalent to:", options: ["$\\overline{A} + \\overline{B}$", "$A \\cdot B$", "$\\overline{A} \\cdot \\overline{B}$", "$A + B$"], answer: "$\\overline{A} \\cdot \\overline{B}$" },
+        { q: "What is the main advantage of simplifying a Boolean expression?", options: ["It makes the expression harder to understand", "It uses more logic gates", "It results in a simpler, cheaper, and faster circuit", "It increases the number of inputs"], answer: "It results in a simpler, cheaper, and faster circuit" },
+        { q: "Karnaugh maps are a _______ method for simplifying Boolean expressions.", options: ["graphical", "algebraic", "textual", "numerical"], answer: "graphical" },
+        { q: "What is the correct column ordering for a 3-variable K-map (variables BC)?", options: ["00, 01, 10, 11", "00, 10, 11, 01", "00, 01, 11, 10", "10, 11, 01, 00"], answer: "00, 01, 11, 10" },
+        { q: "In a K-map, you should group the...", options: ["0s", "1s", "variables", "corners"], answer: "1s" },
+        { q: "A valid group size in a K-map must be a power of:", options: ["3", "10", "16", "2"], answer: "2" },
+        { q: "What is the output of the expression $A + (A \\cdot B)$?", options: ["A", "B", "A+B", "1"], answer: "A" },
+        { q: "To derive a truth table from a logic diagram, you should create intermediate columns for the output of each:", options: ["input", "wire", "gate", "row"], answer: "gate" },
+        { q: "The expression $A \\cdot (B + C)$ is an example of which Boolean law?", options: ["Commutative", "Associative", "Distributive", "Identity"], answer: "Distributive" },
+        { q: "A truth table for the expression $Q = A \\oplus B$ will have an output of 1 when:", options: ["A=0, B=0", "A=1, B=1", "A=0, B=1", "A and B are equal"], answer: "A=0, B=1" },
+        { q: "In a K-map, what does 'wrapping around' refer to?", options: ["Grouping cells on opposite edges of the map", "The diagram is circular", "Drawing circles instead of rectangles", "It is not a valid technique"], answer: "Grouping cells on opposite edges of the map" },
+        { q: "The expression $X \\cdot 0$ simplifies to what?", options: ["X", "1", "0", "$\\overline{X}$"], answer: "0" },
+        { q: "A problem states: 'An alarm (Q) should sound if it is armed (A) AND either a door is opened (B) OR a window is opened (C)'. What is the correct expression?", options: ["$Q = A + B \\cdot C$", "$Q = A \\cdot (B + C)$", "$Q = A + B + C$", "$Q = (A+B) \\cdot C$"], answer: "$Q = A \\cdot (B + C)$" },
+        { q: "How many '1's would be in the final output column of a truth table for $Q = A \\cdot B \\cdot C$?", options: ["1", "3", "7", "8"], answer: "1" },
+        { q: "A K-map is filled based on the output column of a:", options: ["Logic Diagram", "Boolean Expression", "Problem Description", "Truth Table"], answer: "Truth Table" },
+        { q: "After grouping 1s in a K-map, you derive a term by identifying the variables that...", options: ["are always 1", "are always 0", "change within the group", "do NOT change within the group"], answer: "do NOT change within the group" },
+        { q: "The expression $A + A$ simplifies to:", options: ["$A^2$", "2A", "A", "1"], answer: "A" },
+        { q: "The rule $A \\cdot B = B \\cdot A$ is an example of the _______ law.", options: ["Associative", "Distributive", "Identity", "Commutative"], answer: "Commutative" },
+        { q: "For a 2-variable K-map, what is the largest possible group size?", options: ["1", "2", "4", "8"], answer: "4" },
+        { q: "If a K-map group covers a region where variable 'A' is both 0 and 1, what happens to 'A' in the simplified term?", options: ["It becomes $\\overline{A}$", "It becomes A", "It is eliminated", "It is ANDed with other variables"], answer: "It is eliminated" },
+        { q: "The truth table for $Q = \\overline{A}$ has how many rows?", options: ["1", "2", "4", "8"], answer: "2" },
+        { q: "What is the primary purpose of Gray code in K-maps?", options: ["To make it harder to read", "To ensure only one variable changes between adjacent cells", "To encrypt the data", "To represent decimal numbers"], answer: "To ensure only one variable changes between adjacent cells" },
+        { q: "Which simplification technique is generally faster and more visual for up to 4 variables?", options: ["Boolean Algebra", "Karnaugh Maps", "Quine-McCluskey", "Guess and Check"], answer: "Karnaugh Maps" },
+        { q: "The expression $A \\cdot (A+B)$ simplifies to what?", options: ["A", "B", "A+B", "A B"], answer: "A" },
+        { q: "If all cells in a K-map contain a 1, the simplified expression is:", options: ["0", "1", "A+B+C", "A B C"], answer: "1" },
+        { q: "If no cells in a K-map contain a 1, the simplified expression is:", options: ["0", "1", "A+B+C", "A B C"], answer: "0" },
+        { q: "A 4-variable K-map has how many cells?", options: ["4", "8", "16", "32"], answer: "16" },
+        { q: "The algebraic expression for an XNOR gate is:", options: ["$A \\cdot B + \\overline{A} \\cdot \\overline{B}$", "$A \\cdot \\overline{B} + \\overline{A} \\cdot B$", "$A+B$", "$A \\cdot B$"], answer: "$A \\cdot B + \\overline{A} \\cdot \\overline{B}$" },
+        { q: "The expression $Q = (A+B) \\cdot (A+C)$ can be simplified to:", options: ["$A + B \\cdot C$", "$A \\cdot (B+C)$", "$A+C$", "$B+C$"], answer: "$A + B \\cdot C$" },
+        { q: "What is the first step in creating a truth table from a logic diagram?", options: ["Simplify the circuit", "Identify all inputs and outputs", "Count the gates", "Write the final expression"], answer: "Identify all inputs and outputs" },
+        { q: "De Morgan's law is particularly useful for simplifying expressions involving which gate?", options: ["AND", "XOR", "NAND/NOR", "NOT"], answer: "NAND/NOR" },
+        { q: "The final output column of a truth table represents the behavior of the entire:", options: ["input variable", "single gate", "logic circuit", "power supply"], answer: "logic circuit" },
+        { q: "In a 3-variable truth table (A, B, C), which row corresponds to the decimal number 5?", options: ["A=1, B=0, C=1", "A=1, B=1, C=0", "A=0, B=1, C=1", "A=1, B=0, C=0"], answer: "A=1, B=0, C=1" },
+        { q: "When using algebraic simplification, what is the goal?", options: ["To make the expression longer", "To reduce the number of terms and variables", "To add more gates", "To convert it to a K-map"], answer: "To reduce the number of terms and variables" },
+        { q: "If you have a group of 4 in a 3-variable K-map, how many variables will be in the simplified term?", options: ["0", "1", "2", "3"], answer: "1" },
+        { q: "A truth table can be used to prove the equivalence of two different:", options: ["input sets", "Boolean expressions", "K-maps", "gate types"], answer: "Boolean expressions" },
+        { q: "The rule $A + (A \\cdot B) = A$ is the _______ law.", options: ["Distributive", "Absorption", "Commutative", "Inverse"], answer: "Absorption" },
+        { q: "The final expression derived from a K-map is in which form?", options: ["Product-of-Sums", "Sum-of-Products", "Both", "Neither"], answer: "Sum-of-Products" },
+        { q: "What is the output of the expression $\\overline{A \\cdot \\overline{A}}$?", options: ["A", "0", "1", "$\\overline{A}$"], answer: "1" },
+        { q: "How many rows are in a truth table for a half-adder circuit (2 inputs)?", options: ["2", "4", "8", "16"], answer: "4" },
+        { q: "Which expression is equivalent to $A \\oplus B$?", options: ["$A \\cdot B + \\overline{A} \\cdot \\overline{B}$", "$A \\cdot \\overline{B} + \\overline{A} \\cdot B$", "$(A+B) \\cdot (\\overline{A}+\\overline{B})$", "$A+B$"], answer: "$A \\cdot \\overline{B} + \\overline{A} \\cdot B$" },
+        { q: "A truth table is a complete description of a logic function's behavior.", options: ["True", "False"], answer: "True" },
+        { q: "What is the simplified expression for a 2-variable K-map with 1s in cells (0,0) and (0,1)? (A is row, B is col)", options: ["$\\overline{A}$", "A", "$\\overline{B}$", "B"], answer: "$\\overline{A}$" },
+        { q: "What is the simplified expression for a 2-variable K-map with 1s in cells (0,1) and (1,1)? (A is row, B is col)", options: ["$\\overline{A}$", "A", "$\\overline{B}$", "B"], answer: "B" },
+        { q: "The expression $A + 1$ always simplifies to:", options: ["A", "0", "1", "$\\overline{A}$"], answer: "1" },
+        { q: "To predict the output of a simple logic circuit, what is the most reliable tool?", options: ["Guessing", "A truth table", "A calculator", "Boolean algebra"], answer: "A truth table" },
+        { q: "Simplifying a logic diagram results in a circuit that is logically:", options: ["Different", "Opposite", "Equivalent", "Larger"], answer: "Equivalent" },
+        { q: "The expression $A \\cdot B + A \\cdot C$ can be factored to:", options: ["$A + (B \\cdot C)$", "$A \\cdot (B+C)$", "$A \\cdot B \\cdot C$", "$A + B + C$"], answer: "$A \\cdot (B+C)$" },
+        { q: "If the output column of a truth table is all 1s, the expression simplifies to:", options: ["0", "1", "A", "A+B"], answer: "1" },
+        { q: "A don't-care condition in a K-map can be treated as:", options: ["Always 0", "Always 1", "Either 0 or 1 to make bigger groups", "An error"], answer: "Either 0 or 1 to make bigger groups" },
+        { q: "The result of simplifying $X + X \\cdot Y$ is:", options: ["X", "Y", "X+Y", "XY"], answer: "X" },
+        { q: "How many outputs does a standard truth table have?", options: ["Always 1", "Usually 1, but can be more", "Always 2", "Depends on the number of inputs"], answer: "Usually 1, but can be more" },
+        { q: "The expression $\\overline{\\overline{A}}$ simplifies to:", options: ["A", "0", "1", "$\\overline{A}$"], answer: "A" },
+        { q: "A truth table derived from a problem description helps to formalize the required:", options: ["Circuit cost", "Logic", "Number of gates", "Power consumption"], answer: "Logic" },
+        { q: "Algebraic simplification requires knowledge of:", options: ["K-maps", "Logic diagrams", "Boolean laws and theorems", "Computer programming"], answer: "Boolean laws and theorems" },
+        { q: "For the expression $Q = A + B$, if A=1 and B=0, what is Q?", options: ["0", "1"], answer: "1" },
+        { q: "The complexity of using a truth table grows _______ with the number of inputs.", options: ["linearly", "logarithmically", "exponentially", "not at all"], answer: "exponentially" }
+    ];
+
+    function startTimer() {
+        timerInterval = setInterval(() => {
+            timeRemaining--;
+            const minutes = Math.floor(timeRemaining / 60);
+            const seconds = timeRemaining % 60;
+            timerEl.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+            if (timeRemaining <= 0) {
+                clearInterval(timerInterval);
+                submitQuiz();
+            }
+        }, 1000);
+    }
+
+    function displayQuestions() {
+        quizQuestionsContainer.innerHTML = '';
+        activeQuizQuestions.forEach((item, index) => {
+            const questionEl = document.createElement('div');
+            questionEl.className = 'bg-white p-5 rounded-lg shadow-sm';
+            let optionsHtml = item.options.map(option => `<div><label class="quiz-option-label block w-full text-left p-3 my-2 border-2 border-slate-200 rounded-md cursor-pointer hover:bg-slate-100"><input type="radio" name="question${index}" value="${option}" class="hidden"> ${option}</label></div>`).join('');
+            questionEl.innerHTML = `<p class="font-semibold text-gray-800">${index + 1}. ${item.q}</p><div class="mt-2">${optionsHtml}</div>`;
+            quizQuestionsContainer.appendChild(questionEl);
+            MathJax.typesetPromise([questionEl]);
+        });
+
+        document.querySelectorAll('.quiz-option-label').forEach(label => {
+            label.addEventListener('click', (e) => {
+                const input = e.currentTarget.querySelector('input');
+                const questionName = input.name;
+                document.querySelectorAll(`input[name="${questionName}"]`).forEach(radio => {
+                    radio.parentElement.classList.remove('selected');
+                });
+                e.currentTarget.classList.add('selected');
+                input.checked = true;
+            });
+        });
+    }
+
+    function submitQuiz() {
+        clearInterval(timerInterval);
+        const totalTime = 45 * 60;
+        const timeTaken = totalTime - timeRemaining;
+        const minutes = Math.floor(timeTaken / 60);
+        const seconds = timeTaken % 60;
+
+        let score = 0;
+        userAnswers = [];
+        activeQuizQuestions.forEach((item, index) => {
+            const selectedOption = document.querySelector(`input[name="question${index}"]:checked`);
+            const userAnswer = selectedOption ? selectedOption.value : null;
+            userAnswers.push(userAnswer);
+            if (userAnswer === item.answer) {
+                score++;
+            }
+        });
+
+        quizContainer.classList.add('hidden');
+        quizResultsScreen.classList.remove('hidden');
+        quizScoreDisplay.textContent = `You scored ${score} out of ${activeQuizQuestions.length}`;
+        quizTimeTakenEl.textContent = `Time taken: ${minutes} minutes and ${seconds} seconds.`;
+    }
+
+    function displayReview() {
+        quizReviewEl.innerHTML = '';
+        activeQuizQuestions.forEach((item, index) => {
+            const userAnswer = userAnswers[index];
+            const isCorrect = userAnswer === item.answer;
+            const questionEl = document.createElement('div');
+            questionEl.className = 'bg-slate-100 p-4 rounded-lg';
+            let optionsHtml = item.options.map(option => {
+                let labelClass = 'quiz-option-label block w-full text-left p-3 my-2 border-2 rounded-md';
+                if (option === item.answer) {
+                    labelClass += ' correct';
+                } else if (option === userAnswer && !isCorrect) {
+                    labelClass += ' incorrect';
+                }
+                return `<div><label class="${labelClass}">${option}</label></div>`;
+            }).join('');
+            questionEl.innerHTML = `<p class="font-semibold text-gray-800">${index + 1}. ${item.q}</p><p class="text-sm mt-2">Your answer: <strong class="${isCorrect ? 'text-green-600' : 'text-red-600'}">${userAnswer || "Not answered"}</strong></p>${!isCorrect ? `<p class="text-sm mt-1">Correct answer: <strong class="text-green-700">${item.answer}</strong></p>` : ''}<div class="mt-2">${optionsHtml}</div>`;
+            quizReviewEl.appendChild(questionEl);
+            MathJax.typesetPromise([questionEl]);
+        });
+    }
+
+    startQuizBtn.addEventListener('click', () => {
+        const shuffled = [...questionBank].sort(() => 0.5 - Math.random());
+        activeQuizQuestions = shuffled.slice(0, 60);
+        quizStartScreen.classList.add('hidden');
+        quizContainer.classList.remove('hidden');
+        quizResultsScreen.classList.add('hidden');
+        quizReviewEl.classList.add('hidden');
+        reviewAnswersBtn.textContent = 'Review Your Answers';
+        timeRemaining = 45 * 60;
+        timerEl.textContent = "45:00";
+        startTimer();
+        displayQuestions();
+    });
+
+    submitQuizBtn.addEventListener('click', submitQuiz);
+    reviewAnswersBtn.addEventListener('click', () => {
+        quizReviewEl.classList.toggle('hidden');
+        reviewAnswersBtn.textContent = quizReviewEl.classList.contains('hidden') ? 'Review Your Answers' : 'Hide Answers';
+        if (!quizReviewEl.classList.contains('hidden')) {
+            displayReview();
+        }
+    });
+
+    // Initial setup
+    switchTab('home');
+});
+</script>
+
+</body>
+</html>

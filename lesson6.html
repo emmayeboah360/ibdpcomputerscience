@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pipelining in Multi-Core Architectures (HL)</title>
+    <meta name="description" content="A world-class guide to instruction pipelining and multi-core processors, aligned with IB Syllabus A1.1.6 (HL Only)." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%233B82F6'/%3E%3Ctext x='50' y='62' font-size='60' text-anchor='middle' fill='white' font-family='Inter' %3E%E2%8E%8A%3C/text%3E%3C/svg%3E" />
+    <style>
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Inter', system-ui, sans-serif; padding-bottom: 80px; background-color: #F8FAFC; }
+        .nav-link { transition: color .2s, border-bottom-color .2s; border-bottom: 2px solid transparent; cursor: pointer; }
+        .nav-link:hover, .nav-link.active { color: #3B82F6; border-bottom-color: #3B82F6; }
+        .page-content { display: none; }
+        .page-content.active { display: block; animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .pipeline-stage { transition: background-color 0.3s ease-in-out, opacity 0.5s; }
+        .quiz-option { transition: all 0.2s ease; }
+        .quiz-option.selected { background-color: #BFDBFE; border-color: #3B82F6; }
+        .quiz-option.correct { background-color: #D1FAE5 !important; border-color: #10B981 !important; color: #065F46 !important; }
+        .quiz-option.incorrect { background-color: #FEE2E2 !important; border-color: #EF4444 !important; color: #991B1B !important; }
+    </style>
+</head>
+<body class="antialiased bg-zinc-50 text-slate-700">
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 bg-blue-600 text-white px-3 py-2 rounded-lg z-50">Skip to main content</a>
+
+    <header class="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-40">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold text-gray-800">Pipelining (HL)</h1>
+            <nav class="hidden md:flex items-center space-x-1" aria-label="Primary">
+                <div class="flex items-center space-x-1 lg:space-x-4">
+                    <a data-target="home" class="nav-link font-medium px-3 py-2 rounded-md">Home</a>
+                    <a data-target="pipelining" class="nav-link font-medium px-3 py-2 rounded-md">Pipelining</a>
+                    <a data-target="multicore" class="nav-link font-medium px-3 py-2 rounded-md">Multi-Core</a>
+                    <a data-target="simulation" class="nav-link font-medium px-3 py-2 rounded-md">Simulation</a>
+                    <a data-target="resources" class="nav-link font-medium px-3 py-2 rounded-md">Resources</a>
+                    <a data-target="quiz" class="nav-link font-medium px-3 py-2 rounded-md">Quiz</a>
+                </div>
+                <div class="ml-4 pl-4 border-l border-gray-300">
+                    <a href="index.html" class="inline-flex items-center bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-semibold hover:bg-blue-200 transition-colors">
+                        Back to Curriculum
+                    </a>
+                </div>
+            </nav>
+            <button type="button" id="mobile-menu-button" class="md:hidden focus:outline-none" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open navigation">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </div>
+        <div id="mobile-menu" class="hidden md:hidden">
+            <div class="px-4 pb-4 space-y-1">
+                <a data-target="home" class="nav-link mobile-link block py-2 px-3 rounded-lg">Home</a>
+                <a data-target="pipelining" class="nav-link mobile-link block py-2 px-3 rounded-lg">Pipelining</a>
+                <a data-target="multicore" class="nav-link mobile-link block py-2 px-3 rounded-lg">Multi-Core</a>
+                <a data-target="simulation" class="nav-link mobile-link block py-2 px-3 rounded-lg">Simulation</a>
+                <a data-target="resources" class="nav-link mobile-link block py-2 px-3 rounded-lg">Resources</a>
+                <a data-target="quiz" class="nav-link mobile-link block py-2 px-3 rounded-lg">Quiz</a>
+                <div class="mt-2 pt-2 border-t border-zinc-200">
+                     <a href="index.html" class="block text-center py-2 px-3 rounded-lg bg-blue-100 text-blue-800 font-semibold">Back to Curriculum</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main id="main-content" class="container mx-auto px-6 py-10">
+        <!-- Content sections will be populated by JavaScript -->
+    </main>
+    
+    <footer class="fixed bottom-0 left-0 w-full bg-white/80 backdrop-blur-md py-2 border-t border-stone-200 text-center text-sm text-stone-500 z-30">
+        <div class="container mx-auto px-6 flex justify-center items-center space-x-4">
+            <a href="https://www.linkedin.com/in/emmayeboah360/" class="text-blue-600 hover:text-blue-800" target="_blank" rel="noopener">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.762s.784-1.762 1.75-1.762 1.75.79 1.75 1.762-.784 1.762-1.75 1.762zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+            </a>
+            <a href="mailto:yemmanuel308@gmail.com" class="text-rose-600 hover:text-rose-800">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12.713l-11.75 6.287 11.75 5.5zM23.75 18.995l-11.75-6.287v11.748zM12 11.287l-12-6.287v1.868l12 6.287l12-6.287v-1.868z"/></svg>
+            </a>
+            <p class="pl-4">&copy; 2025 Emmanuel Yeboah. All rights reserved.</p>
+        </div>
+    </footer>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const sections = {
+            home: {
+                title: "Home",
+                content: `<div class="text-center"><h2 class="text-4xl lg:text-5xl font-extrabold text-gray-900 tracking-tight">Pipelining & Multi-Core Architectures (HL)</h2><p class="mt-4 max-w-3xl mx-auto text-lg text-slate-600">This higher-level guide explores the advanced techniques of pipelining and parallelism that enable modern multi-core processors to achieve incredible performance.</p></div><div class="mt-10 max-w-4xl mx-auto bg-white border border-zinc-200 p-6 rounded-lg shadow-sm text-left"><h3 class="text-xl font-bold text-gray-800 text-center mb-4">Syllabus Focus</h3><p class="font-semibold text-slate-700">This lesson covers the following IB Computer Science HL syllabus point. By exploring all the tabs, you will master:</p><ul class="mt-4 space-y-4 text-slate-600"><li><div class="p-4 bg-zinc-50 rounded-md border border-zinc-200"><strong class="font-semibold text-blue-800 block">A1.1.6: Describe the process of pipelining in multi-core architectures.</strong><ul class="list-disc list-inside pl-4 mt-1 text-sm space-y-1"><li>The instruction fetch, decode, execute, and write-back stages.</li><li>How cores in multi-core processors work independently and in parallel to improve system performance.</li></ul></div></li></ul></div>`
+            },
+            pipelining: {
+                title: "Pipelining",
+                content: `<div class="max-w-4xl mx-auto"><div class="text-center"><p class="font-semibold text-blue-600"></p><h2 class="mt-2 text-3xl sm:text-4xl font-extrabold text-gray-900">The Process of Pipelining</h2></div><div class="mt-12 space-y-8"><div><h3 class="text-2xl font-bold text-gray-800">Improving Performance with Pipelining</h3><p class="mt-2 text-slate-600"><strong>Pipelining</strong> is a technique used in modern CPUs to improve performance by overlapping the execution of multiple instructions. Instead of waiting for one instruction to complete all its stages before starting the next, the CPU breaks the instruction cycle into a series of smaller steps, like an assembly line. This allows different stages of multiple instructions to be processed simultaneously, significantly increasing the CPU's <strong>throughput</strong> (the number of instructions completed per unit of time).</p></div><div><h3 class="text-2xl font-bold text-gray-800">The Pipeline Stages</h3><p class="mt-2 text-slate-600">A typical pipeline includes several stages. The basic Fetch-Decode-Execute cycle is expanded to include a <strong>Write-Back</strong> stage for storing results:</p><ul class="mt-4 list-decimal list-inside space-y-2"><li><strong>Fetch:</strong> Get the instruction from memory.</li><li><strong>Decode:</strong> Interpret the instruction to understand the required operation.</li><li><strong>Execute:</strong> Carry out the operation, often using the ALU.</li><li><strong>Write-Back:</strong> Store the result of the operation back into a register or main memory.</li></ul><p class="mt-2 text-slate-600">With these four stages, the CPU can be working on four different instructions at the same time. As the first instruction is being executed, the second is being decoded, the third is being fetched, and so on. A well-optimized pipeline can achieve a throughput close to one instruction per clock cycle.</p></div></div></div>`
+            },
+            multicore: {
+                title: "Multi-Core",
+                content: `<div class="max-w-4xl mx-auto"><div class="text-center"><p class="font-semibold text-blue-600"></p><h2 class="mt-2 text-3xl sm:text-4xl font-extrabold text-gray-900">How Multi-Core Processors Work</h2></div><div class="mt-12 space-y-8"><div><h3 class="text-2xl font-bold text-gray-800">Independent and Parallel Execution</h3><p class="mt-2 text-slate-600">Each core in a multi-core processor can operate independently, with its own resources like registers, an ALU, and its own instruction pipeline. This allows each core to execute a separate instruction stream (or "thread") on its own.</p><p class="mt-2 text-slate-600">The true power comes from <strong>parallel execution</strong>, where multiple cores work together on a single, larger task. The task is divided into smaller subtasks, and each subtask is assigned to a different core to be processed simultaneously. This significantly reduces the time required for complex computations.</p></div><div><h3 class="text-2xl font-bold text-gray-800">The Role of Pipelining in Multi-Core Systems</h3><p class="mt-2 text-slate-600">Pipelining is crucial for multi-core performance. Since each core has its own pipeline, a quad-core processor can have four separate pipelines running concurrently. While the cores execute their instruction threads independently, they often need to communicate and share data, which is facilitated by shared resources like the L3 cache and main memory. The operating system's scheduler is responsible for allocating threads to different cores to maximize efficiency and ensure that shared resources are accessed in a coordinated manner to maintain data integrity (<strong>cache coherency</strong>).</p></div></div></div>`
+            },
+            simulation: {
+                title: "Simulation",
+                content: `<div class="max-w-5xl mx-auto"><div class="text-center"><h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900">Pipelining Simulation</h2><p class="mt-4 text-lg text-slate-600">Visualize how a 4-stage pipeline handles multiple instructions over several clock cycles.</p></div><div class="mt-8 bg-white border border-zinc-200 p-6 rounded-xl shadow-sm"><div id="pipeline-explanation" class="mb-6 text-slate-600 space-y-3"></div><div id="pipeline-simulation" class="overflow-x-auto"></div><div class="mt-6 flex justify-center"><button id="start-pipeline-sim" class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition">Run Simulation</button></div></div></div>`
+            },
+            resources: {
+                title: "Resources",
+                content: `<div class="max-w-5xl mx-auto"><div class="text-center mb-12"><h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900">Further Learning Resources</h2><p class="mt-4 text-lg text-slate-600">Dive deeper into pipelining and multi-core architectures with these curated resources.</p></div><div class="grid md:grid-cols-2 gap-8"><div class="bg-white border border-zinc-200 p-4 rounded-xl shadow-sm"><h4>What is Pipelining?</h4><p>A clear video that explains the concept using analogies.</p><a href="https://www.youtube.com/watch?v=E5qacBU1XjQ" target="_blank" class="text-blue-500 hover:underline">Watch Video →</a></div><div class="bg-white border border-zinc-200 p-4 rounded-xl shadow-sm"><h4>Pipelining and Parallel Processing</h4><p>An article from GeeksForGeeks detailing the concepts.</p><a href="https://www.geeksforgeeks.org/computer-organization-architecture/computer-organization-and-architecture-pipelining-set-1-execution-stages-and-throughput/" target="_blank" class="text-blue-500 hover:underline">Read Article →</a></div><div class="bg-white border border-zinc-200 p-4 rounded-xl shadow-sm"><h4>Multi-Core Processors Explained</h4><p>A video explaining how multi-core CPUs work.</p><a href="https://www.youtube.com/watch?v=Pr5yosuGZDc" target="_blank" class="text-blue-500 hover:underline">Watch Video →</a></div></div></div>`
+            },
+            quiz: {
+                title: "Quiz",
+                content: `<div class="text-center mb-12"><h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900">Test Your Knowledge</h2><p class="mt-4 text-lg text-slate-600">Answer all 60 questions before submitting. You have 30 minutes. Good luck!</p></div><div id="quiz-container" class="max-w-3xl mx-auto bg-white border border-zinc-200 p-8 rounded-xl shadow-sm"></div>`
+            }
+        };
+
+        const questionBank = [
+            { question: "What is the primary goal of instruction pipelining? (HL)", options: ["To increase the CPU's clock speed.", "To reduce the latency of a single instruction.", "To increase the number of instructions completed per unit of time (throughput).", "To decrease the number of CPU cores needed."], answer: "To increase the number of instructions completed per unit of time (throughput)." },
+            { question: "Which stage is typically added after 'Execute' in a modern pipelined architecture? (HL)", options: ["Pre-fetch", "Write-Back", "Re-order", "Commit"], answer: "Write-Back" },
+            { question: "In a 4-stage pipeline (Fetch, Decode, Execute, Write-Back), how many instructions can be in different stages of execution at the same time? (HL)", options: ["1", "2", "4", "8"], answer: "4" },
+            { question: "What does it mean for cores in a multi-core processor to work independently? (HL)", options: ["They all share a single pipeline.", "Each core can execute its own separate instruction stream or thread.", "They cannot access shared memory.", "One core must wait for another to finish before starting a task."], answer: "Each core can execute its own separate instruction stream or thread." },
+            { question: "How do multi-core processors achieve parallel execution? (HL)", options: ["By increasing the clock speed of a single core.", "By dividing a single large task into subtasks that are run on different cores simultaneously.", "By using a larger L1 cache.", "By processing instructions only in a sequential order."], answer: "By dividing a single large task into subtasks that are run on different cores simultaneously." },
+            { question: "What resource is typically shared between cores in a multi-core CPU to facilitate communication? (HL)", options: ["The Program Counter (PC)", "The L1 Cache", "The L3 Cache", "The Instruction Register (IR)"], answer: "The L3 Cache" },
+            { question: "The process of ensuring that multiple caches have a consistent view of data from main memory is called: (HL)", options: ["Pipelining", "Cache Coherency", "Write-Back", "Parallelism"], answer: "Cache Coherency" },
+            { question: "In the laundry analogy for pipelining, what does starting a new load of washing while the first load is in the dryer represent? (HL)", options: ["A pipeline stall", "Sequential processing", "Overlapping execution stages", "Multi-core processing"], answer: "Overlapping execution stages" },
+            { question: "What is the role of the 'Write-Back' stage in a pipeline? (HL)", options: ["To fetch the next instruction from memory.", "To decode the current instruction.", "To store the result of the executed instruction back into a register or memory.", "To predict the next branch."], answer: "To store the result of the executed instruction back into a register or memory." },
+            { question: "Each core in a multi-core processor has its own independent pipeline. (HL)", options: ["True", "False"], answer: "True" }
+        ];
+
+        // --- Main App Initialization ---
+        const mainContent = document.getElementById('main-content');
+        Object.keys(sections).forEach(key => {
+            const section = document.createElement('section');
+            section.id = `${key}`;
+            section.className = 'page-content';
+            section.innerHTML = sections[key].content;
+            mainContent.appendChild(section);
+        });
+
+        // --- Feature Initializers ---
+        function initializeNavigation() {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const mobileLinks = document.querySelectorAll('.nav-link-mobile');
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+
+            function updateActiveState(targetId) {
+                document.querySelectorAll('.page-content').forEach(s => s.classList.remove('active'));
+                const targetPage = document.getElementById(targetId);
+                if (targetPage) targetPage.classList.add('active');
+
+                navLinks.forEach(l => l.classList.toggle('active', l.dataset.target === targetId));
+                mobileLinks.forEach(l => l.classList.toggle('active', l.dataset.target === targetId));
+                 if (targetId === 'simulation') { initializePipelineSimulation(); }
+            }
+            function handleNavClick(e) {
+                e.preventDefault();
+                const targetId = e.currentTarget.dataset.target;
+                updateActiveState(targetId);
+                if (!mobileMenu.classList.contains('hidden')) {
+                    mobileMenu.classList.add('hidden');
+                }
+            }
+
+            navLinks.forEach(link => link.addEventListener('click', handleNavClick));
+            mobileLinks.forEach(link => link.addEventListener('click', handleNavClick));
+            mobileMenuButton.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+            
+            updateActiveState('home');
+        }
+        function initializePipelineSimulation() {
+            const container = document.getElementById('pipeline-simulation');
+            const startBtn = document.getElementById('start-pipeline-sim');
+            const explanationEl = document.getElementById('pipeline-explanation');
+            if (!container || !startBtn || !explanationEl || container.dataset.initialized) return;
+            container.dataset.initialized = 'true';
+
+            const stages = ['Fetch', 'Decode', 'Execute', 'Write-Back'];
+            const instructions = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
+            const cycles = 10;
+            let currentCycle = 0;
+            let intervalId;
+
+            function renderTable() {
+                let tableHtml = `<table class="min-w-full text-center text-sm border-collapse"><thead><tr class="bg-gray-100"><th class="border p-2 font-semibold">Stage</th>`;
+                for (let i = 1; i <= cycles; i++) {
+                    tableHtml += `<th class="border p-2 font-semibold">Cycle ${i}</th>`;
+                }
+                tableHtml += `</tr></thead><tbody>`;
+
+                stages.forEach((stage, stageIndex) => {
+                    tableHtml += `<tr><td class="border p-2 font-bold bg-gray-50">${stage}</td>`;
+                    for (let cycle = 1; cycle <= cycles; cycle++) {
+                        const instructionIndex = cycle - 1 - stageIndex;
+                        const instruction = (instructionIndex >= 0 && instructionIndex < instructions.length) ? instructions[instructionIndex] : '';
+                        tableHtml += `<td id="cell-${stageIndex}-${cycle-1}" class="pipeline-stage border p-2 w-16 h-16 opacity-0">${instruction}</td>`;
+                    }
+                    tableHtml += `</tr>`;
+                });
+                tableHtml += `</tbody></table>`;
+                container.innerHTML = tableHtml;
+            }
+            
+            function updateExplanation(cycle) {
+                if (cycle === 0) {
+                    explanationEl.innerHTML = `<p>The simulation shows instructions (A, B, C...) moving through the 4 pipeline stages over 10 clock cycles.</p><p>Press "Run Simulation" to begin.</p>`;
+                    return;
+                }
+                explanationEl.innerHTML = `<p><strong>Clock Cycle ${cycle}:</strong></p><ul class="list-disc list-inside">`;
+                for(let stageIndex = 0; stageIndex < stages.length; stageIndex++) {
+                    const instructionIndex = cycle - 1 - stageIndex;
+                    if(instructionIndex >= 0 && instructionIndex < instructions.length) {
+                        explanationEl.innerHTML += `<li>Instruction <strong>${instructions[instructionIndex]}</strong> is in the <strong>${stages[stageIndex]}</strong> stage.</li>`;
+                    }
+                }
+                explanationEl.innerHTML += `</ul>`;
+
+                 if(cycle >= 4){
+                     explanationEl.innerHTML += `<p class="mt-2 font-semibold text-blue-600">Notice that from Cycle 4 onwards, all four stages of the pipeline are active simultaneously, processing four different instructions at once. This is the power of pipelining!</p>`;
+                 }
+            }
+
+            function runAnimation() {
+                startBtn.disabled = true;
+                currentCycle = 0;
+                renderTable();
+
+                intervalId = setInterval(() => {
+                    if (currentCycle >= cycles) {
+                        clearInterval(intervalId);
+                        startBtn.disabled = false;
+                        explanationEl.innerHTML += `<p class="mt-4 font-bold">Simulation complete. Throughput is maximized as multiple instructions are processed in parallel stages.</p>`;
+                        return;
+                    }
+
+                    currentCycle++;
+                    updateExplanation(currentCycle);
+
+                    for (let stageIndex = 0; stageIndex < stages.length; stageIndex++) {
+                        const cell = document.getElementById(`cell-${stageIndex}-${currentCycle-1}`);
+                        const instructionIndex = currentCycle - 1 - stageIndex;
+                        if (cell && instructionIndex >= 0 && instructionIndex < instructions.length) {
+                             const colors = ['bg-blue-200', 'bg-green-200', 'bg-yellow-200', 'bg-red-200', 'bg-indigo-200', 'bg-pink-200', 'bg-purple-200'];
+                            cell.classList.add(colors[instructionIndex % colors.length]);
+                            cell.style.opacity = '1';
+                        }
+                    }
+                }, 800);
+            }
+
+            startBtn.addEventListener('click', runAnimation);
+            renderTable();
+            updateExplanation(0);
+        }
+        function initializeQuiz() {
+            let currentQuizQuestions = []; let userAnswers = []; let score = 0; let timerInterval; let timeLeft = 1800; 
+            const quizContainer = document.getElementById('quiz-container');
+            if (!quizContainer) return;
+
+            function startQuiz() {
+                let expandedBank = [];
+                while(expandedBank.length < 60) { expandedBank.push(...questionBank); }
+                currentQuizQuestions = expandedBank.sort(() => 0.5 - Math.random()).slice(0, 60); 
+                userAnswers = new Array(currentQuizQuestions.length).fill(null);
+                score = 0; timeLeft = 1800; 
+                clearInterval(timerInterval); timerInterval = setInterval(updateTimer, 1000);
+                showAllQuestions();
+            }
+
+            function updateTimer() {
+                const timerEl = document.getElementById('timer');
+                if (timerEl) {
+                    timeLeft--; const minutes = Math.floor(timeLeft / 60); const seconds = timeLeft % 60;
+                    timerEl.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                    if (timeLeft <= 0) { finishQuiz(); }
+                }
+            }
+
+            function showAllQuestions() {
+                let questionsHtml = `<div class="flex justify-between items-center mb-4 p-4 bg-gray-100 rounded-lg"><h3 class="text-xl font-bold text-gray-800">Pipelining Quiz (HL)</h3><div id="timer" class="text-lg font-bold text-red-500">30:00</div></div>`;
+                currentQuizQuestions.forEach((questionData, index) => {
+                    questionsHtml += `<div class="mb-6 bg-white p-4 rounded-lg shadow-sm border"><h4 class="text-lg font-semibold mb-3">${index + 1}. ${questionData.question}</h4><div class="space-y-2">`;
+                    questionData.options.forEach(option => {
+                         questionsHtml += `<div><label class="quiz-option block w-full text-left p-3 border-2 border-gray-200 rounded-lg hover:bg-gray-100 cursor-pointer"><input type="radio" name="question${index}" value="${option}" class="mr-2">${option}</label></div>`;
+                    });
+                    questionsHtml += `</div></div>`;
+                });
+                questionsHtml += `<button id="submit-quiz-btn" class="mt-8 w-full px-8 py-3 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 transition">Submit Answers</button>`;
+                quizContainer.innerHTML = questionsHtml;
+
+                document.querySelectorAll('.quiz-option input').forEach(input => {
+                    input.addEventListener('change', (e) => {
+                        const questionIndex = parseInt(e.target.name.replace('question', ''));
+                        userAnswers[questionIndex] = e.target.value;
+                         document.querySelectorAll(`input[name="question${questionIndex}"]`).forEach(radio => {
+                            radio.parentElement.classList.remove('selected');
+                        });
+                        e.target.parentElement.classList.add('selected');
+                    });
+                });
+                document.getElementById('submit-quiz-btn').addEventListener('click', finishQuiz);
+                updateTimer();
+            }
+
+            function finishQuiz() {
+                clearInterval(timerInterval);
+                score = 0;
+                currentQuizQuestions.forEach((q, index) => {
+                    if (userAnswers[index] === q.answer) {
+                        score++;
+                    }
+                });
+                showResults();
+            }
+
+            function showResults() {
+                quizContainer.innerHTML = `<div class="text-center"><h2 class="text-2xl font-bold mb-2">Quiz Complete!</h2><p class="text-lg mb-4">You scored</p><p class="text-5xl font-extrabold text-blue-600 mb-6">${score} out of ${currentQuizQuestions.length}</p><div class="flex justify-center space-x-4"><button id="review-answers-btn" class="px-6 py-2 bg-gray-500 text-white font-semibold rounded-lg shadow-md hover:bg-gray-600 transition">Review Answers</button><button id="restart-quiz-btn" class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition">Try Again</button></div><div id="quiz-review" class="hidden mt-8 text-left space-y-4"></div></div>`;
+                document.getElementById('restart-quiz-btn').addEventListener('click', showStartScreen);
+                document.getElementById('review-answers-btn').addEventListener('click', () => {
+                    const reviewEl = document.getElementById('quiz-review');
+                    reviewEl.classList.toggle('hidden');
+                    if(!reviewEl.classList.contains('hidden')) {
+                        displayReview();
+                    }
+                });
+            }
+
+            function displayReview(){
+                let reviewHtml = `<h3 class="text-xl font-bold mb-4 text-center">Your Answers</h3>`;
+                currentQuizQuestions.forEach((q, index) => {
+                    const userAnswer = userAnswers[index];
+                    const isCorrect = userAnswer === q.answer;
+                    reviewHtml += `<div class="p-4 rounded-lg ${isCorrect ? 'bg-green-50' : 'bg-red-50'} border ${isCorrect ? 'border-green-200' : 'border-red-200'}"><p class="font-semibold">${index + 1}. ${q.question}</p><p class="text-sm mt-2">Your answer: <strong class="${isCorrect ? 'text-green-600' : 'text-red-600'}">${userAnswer || "Not answered"}</strong></p>`;
+                    if(!isCorrect) {
+                        reviewHtml += `<p class="text-sm mt-1">Correct answer: <strong class="text-green-700">${q.answer}</strong></p>`;
+                    }
+                    reviewHtml += `</div>`;
+                });
+                document.getElementById('quiz-review').innerHTML = reviewHtml;
+            }
+
+            function showStartScreen() {
+                 clearInterval(timerInterval);
+                quizContainer.innerHTML = `<div class="text-center"><button id="start-quiz-btn" class="bg-blue-600 text-white font-bold py-3 px-8 rounded-lg shadow-md hover:bg-blue-700 transition-colors">Start 60-Question Test</button></div>`;
+                document.getElementById('start-quiz-btn').addEventListener('click', startQuiz);
+            }
+            showStartScreen();
+        }
+        
+        // --- Initial Load ---
+        initializeNavigation();
+        initializeQuiz(); 
+    });
+    </script>
+</body>
+</html>
+

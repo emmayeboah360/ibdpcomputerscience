@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Interactive Guide to Computer Memory</title>
+    <meta name="description" content="A world-class guide to the computer memory hierarchy, including RAM, ROM, Cache, and Registers, aligned with the IB Computer Science syllabus." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%233B82F6'/%3E%3Ctext x='50' y='62' font-size='60' text-anchor='middle' fill='white' font-family='Inter' %3E%E2%8E%8A%3C/text%3E%3C/svg%3E" />
+    <style>
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Inter', system-ui, sans-serif; padding-bottom: 80px; background-color: #F8FAFC; }
+        .nav-link { transition: color .2s, border-bottom-color .2s; border-bottom: 2px solid transparent; cursor: pointer; }
+        .nav-link:hover, .nav-link.active { color: #3B82F6; border-bottom-color: #3B82F6; }
+        .page-content { display: none; }
+        .page-content.active { display: block; animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .tab-btn.active { background-color: #3B82F6; color: white; }
+        .path-line { position: absolute; background-color: #FBBF24; transform-origin: left center; transition: all 1s ease-in-out; }
+        .path-dot { position: absolute; width: 16px; height: 16px; background-color: #FBBF24; border-radius: 50%; transition: all 1s ease-in-out; box-shadow: 0 0 10px #FBBF24; }
+        .quiz-option { transition: all 0.2s ease; }
+        .quiz-option:disabled { cursor: not-allowed; }
+        .quiz-option.correct { background-color: #D1FAE5 !important; border-color: #10B981 !important; color: #065F46 !important; }
+        .quiz-option.incorrect { background-color: #FEE2E2 !important; border-color: #EF4444 !important; color: #991B1B !important; }
+        .chart-container { position: relative; width: 100%; max-width: 900px; margin: auto; height: 300px; max-height: 40vh; }
+        @media (min-width: 768px) { .chart-container { height: 500px; } }
+        .hierarchy-item { position: relative; cursor: pointer; transition: transform 0.2s ease-out; }
+        .hierarchy-item:hover { transform: scale(1.03); }
+        .hierarchy-item::after { content: attr(data-tooltip); position: absolute; left: 105%; top: 50%; transform: translateY(-50%) translateX(-10px); background-color: #2D3748; color: #FFFFFF; padding: 8px 12px; border-radius: 6px; font-size: 0.875rem; line-height: 1.4; text-align: left; white-space: normal; width: max-content; max-width: 250px; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25); opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out; z-index: 100; }
+        .hierarchy-item:hover::after { opacity: 1; visibility: visible; transform: translateY(-50%) translateX(0); }
+    </style>
+</head>
+<body class="antialiased bg-zinc-50 text-slate-700">
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 bg-blue-600 text-white px-3 py-2 rounded-lg z-50">Skip to main content</a>
+
+    <header class="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-40">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold text-gray-800">Interactive Guide to Computer Memory</h1>
+            <nav class="hidden md:flex items-center space-x-1" aria-label="Primary">
+                <div class="flex items-center space-x-1 lg:space-x-4">
+                    <a data-target="home" class="nav-link font-medium px-3 py-2 rounded-md">Home</a>
+                    <a data-target="hierarchy" class="nav-link font-medium px-3 py-2 rounded-md">Hierarchy</a>
+                    <a data-target="types" class="nav-link font-medium px-3 py-2 rounded-md">Memory Types</a>
+                    <a data-target="performance" class="nav-link font-medium px-3 py-2 rounded-md">Performance</a>
+                    <a data-target="resources" class="nav-link font-medium px-3 py-2 rounded-md">Resources</a>
+                    <a data-target="quiz" class="nav-link font-medium px-3 py-2 rounded-md">Quiz</a>
+                </div>
+                <div class="ml-4 pl-4 border-l border-gray-300">
+                    <a href="index.html" class="inline-flex items-center bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-semibold hover:bg-blue-200 transition-colors">
+                        Back to Curriculum
+                    </a>
+                </div>
+            </nav>
+            <button type="button" id="mobile-menu-button" class="md:hidden focus:outline-none" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open navigation">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </div>
+        <div id="mobile-menu" class="hidden md:hidden">
+            <div class="px-4 pb-4 space-y-1">
+                <a data-target="home" class="nav-link mobile-link block py-2 px-3 rounded-lg">Home</a>
+                <a data-target="hierarchy" class="nav-link mobile-link block py-2 px-3 rounded-lg">Hierarchy</a>
+                <a data-target="types" class="nav-link mobile-link block py-2 px-3 rounded-lg">Memory Types</a>
+                <a data-target="performance" class="nav-link mobile-link block py-2 px-3 rounded-lg">Performance</a>
+                <a data-target="resources" class="nav-link mobile-link block py-2 px-3 rounded-lg">Resources</a>
+                <a data-target="quiz" class="nav-link mobile-link block py-2 px-3 rounded-lg">Quiz</a>
+                <div class="mt-2 pt-2 border-t border-zinc-200">
+                     <a href="index.html" class="block text-center py-2 px-3 rounded-lg bg-blue-100 text-blue-800 font-semibold">Back to Curriculum</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main id="main-content" class="container mx-auto px-6 py-10">
+        <!-- Content sections will be populated by JavaScript -->
+    </main>
+    
+    <footer class="fixed bottom-0 left-0 w-full bg-white/80 backdrop-blur-md py-2 border-t border-stone-200 text-center text-sm text-stone-500 z-30">
+        <div class="container mx-auto px-6 flex justify-center items-center space-x-4">
+            <a href="https://www.linkedin.com/in/emmayeboah360/" class="text-blue-600 hover:text-blue-800" target="_blank" rel="noopener">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.762s.784-1.762 1.75-1.762 1.75.79 1.75 1.762-.784 1.762-1.75 1.762zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+            </a>
+            <a href="mailto:yemmanuel308@gmail.com" class="text-rose-600 hover:text-rose-800">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12.713l-11.75 6.287 11.75 5.5zM23.75 18.995l-11.75-6.287v11.748zM12 11.287l-12-6.287v1.868l12 6.287l12-6.287v-1.868z"/></svg>
+            </a>
+            <p class="pl-4">&copy; 2025 Emmanuel Yeboah. All rights reserved.</p>
+        </div>
+    </footer>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // --- Data Store ---
+        const sections = {
+            home: {
+                title: "Home",
+                content: `<div class="text-center"><h2 class="text-4xl lg:text-5xl font-extrabold text-gray-900 tracking-tight">The Core of Performance</h2><p class="mt-4 max-w-3xl mx-auto text-lg text-slate-600">A computer's speed isn't just about its processor. It's about how efficiently that processor can access data. Explore the intricate, hierarchical system of memory that makes modern computing possible.</p></div><div class="mt-10 max-w-4xl mx-auto bg-white border border-zinc-200 p-6 rounded-lg shadow-sm text-left"><h3 class="text-xl font-bold text-gray-800 text-center mb-4">Syllabus Focus</h3><p class="font-semibold text-slate-700">This lesson covers the following IB Computer Science syllabus points. By exploring all the tabs, you will master:</p><ul class="mt-4 space-y-4 text-slate-600"><li><div class="p-4 bg-zinc-50 rounded-md border border-zinc-200"><strong class="font-semibold text-blue-800 block">A1.1.4: Explain the purposes of different types of primary memory.</strong><ul class="list-disc list-inside pl-4 mt-1 text-sm space-y-1"><li>The roles of Random-Access Memory (RAM), Read-Only Memory (ROM), Cache Memory (L1, L2, L3), and CPU Registers.</li><li>The interaction of the CPU with these memory types to optimize performance.</li><li>The relevance of the terms “cache miss” and “cache hit” in system performance.</li></ul></div></li></ul></div>`
+            },
+            hierarchy: {
+                title: "Hierarchy",
+                content: `<div class="max-w-5xl mx-auto"><div class="text-center"><h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900">A Balancing Act of Speed, Size, and Cost</h2><p class="mt-4 text-lg text-slate-600">The memory hierarchy is an engineering marvel, trading speed for capacity at each level. This structure is a necessary compromise driven by physics and economics to create a system that feels fast without being impossibly expensive.</p></div><div class="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center"><div class="relative flex flex-col items-center space-y-2 p-4"><div class="hierarchy-item w-24 h-12 bg-blue-500 hover:bg-blue-600 text-white flex items-center justify-center rounded-lg shadow-lg z-10" data-tooltip="Central Processing Unit: The brain of the computer that executes instructions.">CPU</div><div class="w-1 h-8 bg-gray-300"></div><div class="hierarchy-item w-32 h-12 bg-blue-400 hover:bg-blue-500 text-white flex items-center justify-center rounded-lg shadow-lg z-10" data-tooltip="The smallest, fastest memory, built directly into the CPU. Holds the single piece of data the CPU is manipulating right now.">Registers</div><div class="w-1 h-8 bg-gray-300"></div><div class="hierarchy-item w-40 h-12 bg-blue-400/80 hover:bg-blue-500/80 text-white flex items-center justify-center rounded-lg shadow-lg z-10" data-tooltip="The smallest and fastest cache level, located directly on each CPU core.">L1 Cache</div><div class="w-1 h-8 bg-gray-300"></div><div class="hierarchy-item w-48 h-12 bg-blue-400/70 hover:bg-blue-500/70 text-white flex items-center justify-center rounded-lg shadow-lg z-10" data-tooltip="Larger and slightly slower than L1 cache, often dedicated to a single CPU core.">L2 Cache</div><div class="w-1 h-8 bg-gray-300"></div><div class="hierarchy-item w-56 h-12 bg-blue-400/60 hover:bg-blue-500/60 text-white flex items-center justify-center rounded-lg shadow-lg z-10" data-tooltip="The largest and slowest cache level, shared among all CPU cores.">L3 Cache</div><div class="w-1 h-8 bg-gray-300"></div><div class="hierarchy-item w-64 h-12 bg-blue-300 hover:bg-blue-400 text-white flex items-center justify-center rounded-lg shadow-lg z-10" data-tooltip="Random-Access Memory: The computer's main volatile workspace for active programs.">RAM</div><div class="w-1 h-8 bg-gray-300"></div><div class="hierarchy-item w-72 h-12 bg-gray-500 hover:bg-gray-600 text-white flex items-center justify-center rounded-lg shadow-lg z-10" data-tooltip="The permanent, non-volatile archive for all files and programs.">Storage</div><div class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-xs sm:max-w-sm h-full border-l-2 border-r-2 border-gray-200 rounded-full -z-0"></div></div><div><h3 class="text-2xl font-bold text-gray-800">Why a Hierarchy is Necessary</h3><p class="mt-4 text-slate-600">In an ideal world, all computer memory would be as fast as the CPU. However, the technology for nanosecond access is incredibly expensive. The hierarchy solves this by using a small amount of expensive, fast memory for immediate tasks and large amounts of cheaper, slower memory for storage. The goal is to create the <strong>illusion of a large, fast memory</strong> by intelligently moving data where it's needed.</p><div class="mt-6 bg-blue-50 p-4 rounded-lg"><h4 class="font-semibold text-blue-800">A Library Analogy</h4><p class="mt-2 text-sm text-blue-700">Think of the CPU as a researcher. The <strong>registers</strong> are the thoughts in their head. The <strong>cache</strong> is the book on their desk. <strong>RAM</strong> is the shelf of books for the day's work. <strong>Storage</strong> is the entire library archive. It's fastest to use a thought and slowest to request a book from the archive.</p></div></div></div><div class="mt-16"><h3 class="text-2xl font-bold text-center text-gray-800">Visualizing Access Time</h3><p class="mt-2 text-center text-slate-600 max-w-3xl mx-auto">This chart uses a logarithmic scale to visualize the immense differences in access time. Each step down the hierarchy represents a massive jump in latency.</p><div class="mt-8"><div class="chart-container"><canvas id="latencyChart"></canvas></div></div></div></div>`
+            },
+            types: {
+                title: "Memory Types",
+                content: `<div class="max-w-5xl mx-auto"><div class="text-center"><h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900">A Deep Dive into Memory Types</h2><p class="mt-4 text-lg text-slate-600">Each type of memory serves a unique purpose. Select a tab below to learn about its specific role, characteristics, and importance in the system.</p></div><div class="mt-12"><div id="memory-tabs-container" class="mb-4 flex flex-wrap justify-center gap-2"><button class="tab-btn active px-4 py-2 text-sm font-medium rounded-md bg-gray-200 text-gray-700" data-tab="registers">Registers</button><button class="tab-btn px-4 py-2 text-sm font-medium rounded-md bg-gray-200 text-gray-700" data-tab="cache">Cache</button><button class="tab-btn px-4 py-2 text-sm font-medium rounded-md bg-gray-200 text-gray-700" data-tab="ram">RAM</button><button class="tab-btn px-4 py-2 text-sm font-medium rounded-md bg-gray-200 text-gray-700" data-tab="rom">ROM</button></div><div id="memory-content-container" class="bg-white p-6 sm:p-8 rounded-lg shadow-md"><div class="tab-content" id="content-registers"><h3 class="text-2xl font-bold text-gray-800">Registers: The CPU's Inner Sanctum</h3><p class="mt-2 text-slate-600">Registers are the smallest, fastest memory locations available, built directly into the CPU's silicon. They hold the immediate data, instructions, and memory addresses that the CPU is actively manipulating. Access is nearly instantaneous (sub-nanosecond).</p><ul class="mt-4 space-y-2 text-sm"><li><span class="font-semibold">Key Registers:</span> Program Counter (PC), Instruction Register (IR), Accumulator (ACC), Memory Address Register (MAR), Memory Data Register (MDR).</li><li><span class="font-semibold">Volatility:</span> Volatile (content is lost when power is off).</li></ul></div><div class="tab-content hidden" id="content-cache"><h3 class="text-2xl font-bold text-gray-800">Cache: The Great Accelerator</h3><p class="mt-2 text-slate-600">Cache is a small, extremely fast volatile memory that acts as a buffer between the CPU and slower RAM. It stores frequently used data and instructions, dramatically reducing the time the CPU spends waiting. It's organized in levels (L1, L2, L3), each a trade-off between speed and size.</p><div class="mt-4 border-t pt-4"><h4 class="font-semibold">L1 Cache:</h4><p class="text-sm text-slate-600">The smallest and fastest cache, located directly on each CPU core. Often split into an instruction cache (L1i) and a data cache (L1d).</p><h4 class="font-semibold mt-2">L2 Cache:</h4><p class="text-sm text-slate-600">Larger and slightly slower than L1. Often dedicated to a single CPU core.</p><h4 class="font-semibold mt-2">L3 Cache:</h4><p class="text-sm text-slate-600">The largest and slowest cache level, typically shared among all cores on a multi-core CPU.</p></div></div><div class="tab-content hidden" id="content-ram"><h3 class="text-2xl font-bold text-gray-800">RAM: The Active Workspace</h3><p class="mt-2 text-slate-600">Random-Access Memory (RAM) is the computer's primary volatile workspace. It temporarily stores the operating system, all currently running applications, and the active data they are using. Its capacity (measured in gigabytes) directly impacts multitasking performance.</p></div><div class="tab-content hidden" id="content-rom"><h3 class="text-2xl font-bold text-gray-800">ROM: The Startup Sentinel</h3><p class="mt-2 text-slate-600">Read-Only Memory (ROM) is non-volatile, meaning it retains data without power. Its critical role is to store the essential firmware (BIOS or UEFI) needed to start the computer. When you turn on your PC, the CPU reads instructions from ROM to perform a Power-On Self-Test (POST) and load the operating system from storage into RAM.</p></div></div></div></div>`
+            },
+            performance: {
+                title: "Performance",
+                content: `<div class="max-w-5xl mx-auto"><div class="text-center"><h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900">The Performance Engine</h2><p class="mt-4 text-lg text-slate-600">The efficiency of the cache system is the single biggest factor in bridging the speed gap between the CPU and RAM. Explore the concepts that define memory performance.</p></div><div class="mt-12"><h3 class="text-2xl font-bold text-center text-gray-800">Cache Hit vs. Miss Simulation</h3><div class="mt-8 max-w-6xl mx-auto p-6 bg-gray-50 rounded-lg shadow-inner relative"><div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-center text-center font-semibold"><div id="sim-cpu" class="p-4 bg-blue-500 text-white rounded-lg">CPU</div><div id="sim-l1" class="p-4 bg-blue-400 text-white rounded-lg">L1 Cache</div><div id="sim-l2" class="p-4 bg-blue-400/80 text-white rounded-lg">L2 Cache</div><div id="sim-l3" class="p-4 bg-blue-400/70 text-white rounded-lg">L3 Cache</div><div id="sim-ram" class="p-4 bg-blue-300 text-white rounded-lg">RAM</div></div><div id="sim-path-container" class="absolute top-0 left-0 w-full h-full pointer-events-none"></div><div class="mt-8 flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4"><button id="sim-hit-btn" class="w-full sm:w-auto px-6 py-2 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 transition">Simulate Cache Hit</button><button id="sim-miss-btn" class="w-full sm:w-auto px-6 py-2 bg-red-500 text-white font-semibold rounded-lg shadow-md hover:bg-red-600 transition">Simulate Cache Miss</button></div><p id="sim-explanation" class="mt-4 text-center text-gray-600 min-h-[4em]">Click a button to start the simulation. A <strong>Cache Hit</strong> is the ideal, fast path. A <strong>Cache Miss</strong> is the slow path that creates a performance bottleneck.</p></div></div><div class="mt-16"><h3 class="text-2xl font-bold text-center text-gray-800">Principles of Cache Optimization</h3><p class="mt-2 text-center text-slate-600 max-w-3xl mx-auto">Caches work because programs exhibit predictable behaviors, which can be exploited by two key principles.</p><div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8"><div class="bg-white p-6 rounded-lg shadow-md"><h4 class="text-xl font-bold text-gray-800">Temporal Locality</h4><p class="mt-2 text-slate-600">The principle that data accessed recently is likely to be accessed again soon. Caching keeps a copy of recent data, ensuring subsequent accesses are fast hits.</p></div><div class="bg-white p-6 rounded-lg shadow-md"><h4 class="text-xl font-bold text-gray-800">Spatial Locality</h4><p class="mt-2 text-slate-600">The principle that if one memory location is accessed, nearby locations are likely to be accessed soon. Caches fetch data in blocks (lines) to capitalize on this.</p></div></div></div></div>`
+            },
+            resources: {
+                title: "Resources",
+                content: `<div class="max-w-4xl mx-auto"><div class="text-center"><h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900">Further Learning Resources</h2><p class="mt-4 text-lg text-slate-600">Dive deeper into computer memory and architecture with these curated videos and articles.</p></div><div class="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3"><div class="bg-white p-6 rounded-lg shadow-md"><h4 class="font-bold text-lg text-blue-600">Memory Hierarchy Explained</h4><p class="mt-2 text-sm text-slate-600">A clear video that explains the levels of memory and their characteristics.</p><a href="https://www.youtube.com/watch?v=gNUDO5Hn160" target="_blank" class="mt-4 inline-block text-blue-500 hover:underline">Watch Video →</a></div><div class="bg-white p-6 rounded-lg shadow-md"><h4 class="font-bold text-lg text-blue-600">Crash Course: Memory & Storage</h4><p class="mt-2 text-sm text-slate-600">An engaging overview of the history and function of computer memory.</p><a href="https://www.youtube.com/watch?v=p3q5zWCw8J4" target="_blank" class="mt-4 inline-block text-blue-500 hover:underline">Watch Video →</a></div><div class="bg-white p-6 rounded-lg shadow-md"><h4 class="font-bold text-lg text-blue-600">How CPU Cache Works</h4><p class="mt-2 text-sm text-slate-600">A short, animated video breaking down the complex topic of CPU caching.</p><a href="https://www.youtube.com/watch?v=SAk-6gVkio0" target="_blank" class="mt-4 inline-block text-blue-500 hover:underline">Watch Video →</a></div></div></div>`
+            },
+            quiz: {
+                title: "Quiz",
+                content: `<div class="text-center mb-12"><h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900">Test Your Knowledge</h2><p class="mt-4 text-lg text-slate-600">You'll face 60 randomly selected questions with a 30-minute time limit. Good luck!</p></div><div id="quiz-container" class="max-w-3xl mx-auto bg-white border border-zinc-200 p-8 rounded-xl shadow-sm"></div>`
+            }
+        };
+
+        const questionBank = [
+             { question: "Which type of memory is non-volatile and stores the computer's boot-up instructions?", options: ["RAM", "L1 Cache", "ROM", "Register"], answer: "ROM" }, 
+             { question: "What is the primary characteristic of volatile memory?", options: ["It is extremely fast.", "It retains data without power.", "It loses data when power is turned off.", "It is read-only."], answer: "It loses data when power is turned off." }, 
+             { question: "Which of the following correctly orders memory types from fastest to slowest access time?", options: ["RAM, L3 Cache, L1 Cache, Registers", "Registers, L1 Cache, L2 Cache, RAM", "Registers, RAM, L2 Cache, L3 Cache", "L1 Cache, Registers, L2 Cache, RAM"], answer: "Registers, L1 Cache, L2 Cache, RAM" }, 
+             { question: "A 'cache hit' is best described as:", options: ["An error where data in the cache is corrupted.", "The event where the CPU finds the requested data in RAM instead of the cache.", "The event where the CPU requests data and finds it in one of the cache levels.", "A situation where the L1 cache and L3 cache contain different versions of the same data."], answer: "The event where the CPU requests data and finds it in one of the cache levels." }, 
+             { question: "The principle of spatial locality states that:", options: ["Data that was accessed recently is likely to be accessed again soon.", "Data should be stored in a physical location close to the CPU.", "If a memory location is accessed, memory locations nearby are likely to be accessed soon.", "The cache should be spatially organized to mirror the layout of RAM."], answer: "If a memory location is accessed, memory locations nearby are likely to be accessed soon." }, 
+             { question: "In a multi-core processor, which level of cache is most commonly shared among all cores?", options: ["L1 Cache", "L2 Cache", "L3 Cache", "Registers"], answer: "L3 Cache" }, 
+             { question: "What is the main purpose of the Program Counter (PC) register?", options: ["To store the result of arithmetic operations.", "To hold the address of the next instruction to be executed.", "To store the data being transferred from RAM.", "To decode the current instruction."], answer: "To hold the address of the next instruction to be executed." }, 
+             { question: "The term for the delay between a data request and its retrieval is:", options: ["Throughput", "Bandwidth", "Latency", "Clock Speed"], answer: "Latency" }, 
+             { question: "What is the unit of data transfer between the cache and main memory called?", options: ["A byte", "A word", "A cache line", "A sector"], answer: "A cache line" }, 
+             { question: "Why is the L1 cache typically split into L1i and L1d?", options: ["To save costs.", "To allow the CPU to fetch instructions and data simultaneously.", "To increase its total size.", "To make it non-volatile."], answer: "To allow the CPU to fetch instructions and data simultaneously." }, 
+             { question: "A cache miss that occurs because the data has never been requested before is known as a:", options: ["Conflict miss", "Capacity miss", "Coherence miss", "Compulsory miss"], answer: "Compulsory miss" }, 
+             { question: "What is the primary trade-off in the memory hierarchy?", options: ["Speed vs. Volatility", "Speed vs. Size and Cost", "Size vs. Durability", "Cost vs. Physical Location"], answer: "Speed vs. Size and Cost" }, 
+             { question: "Which register holds the instruction that is currently being decoded and executed?", options: ["Program Counter (PC)", "Accumulator (ACC)", "Memory Address Register (MAR)", "Instruction Register (IR)"], answer: "Instruction Register (IR)" }, 
+             { question: "What does a cache replacement policy like LRU (Least Recently Used) do?", options: ["It decides which data to prefetch into the cache.", "It decides which data to evict from the cache when it is full.", "It checks for data consistency between cores.", "It calculates the cache hit rate."], answer: "It decides which data to evict from the cache when it is full." }, 
+             { question: "The process of the CPU anticipating which data will be needed and loading it into the cache ahead of time is called:", options: ["Caching", "Prefetching", "Eviction", "Buffering"], answer: "Prefetching" }, 
+             { question: "RAM is an example of non-volatile memory.", options: ["True", "False"], answer: "False" }, 
+             { question: "The L1 cache is larger and slower than the L2 cache.", options: ["True", "False"], answer: "False" }, 
+             { question: "A cache hit occurs when the requested data is not found in the cache.", options: ["True", "False"], answer: "False" }, 
+             { question: "Registers are located directly inside the CPU.", options: ["True", "False"], answer: "True" }, 
+             { question: "The memory hierarchy is designed to balance speed, capacity, and cost.", options: ["True", "False"], answer: "True" }
+        ];
+
+        // --- Main App Initialization ---
+        const mainContent = document.getElementById('main-content');
+        Object.keys(sections).forEach(key => {
+            const section = document.createElement('section');
+            section.id = `${key}`;
+            section.className = 'page-content';
+            section.innerHTML = sections[key].content;
+            mainContent.appendChild(section);
+        });
+
+        // --- Feature Initializers ---
+        function initializeNavigation() {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const mobileLinks = document.querySelectorAll('.nav-link-mobile');
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+
+            function updateActiveState(targetId) {
+                document.querySelectorAll('.page-content').forEach(s => s.classList.remove('active'));
+                const targetPage = document.getElementById(targetId);
+                if (targetPage) targetPage.classList.add('active');
+
+                navLinks.forEach(l => l.classList.toggle('active', l.dataset.target === targetId));
+                mobileLinks.forEach(l => l.classList.toggle('active', l.dataset.target === targetId));
+                 if (targetId === 'hierarchy') { initializeLatencyChart(); }
+                 if (targetId === 'performance') { initializeCacheSimulation(); }
+            }
+            function handleNavClick(e) {
+                e.preventDefault();
+                const targetId = e.currentTarget.dataset.target;
+                updateActiveState(targetId);
+                if (!mobileMenu.classList.contains('hidden')) {
+                    mobileMenu.classList.add('hidden');
+                }
+            }
+
+            navLinks.forEach(link => link.addEventListener('click', handleNavClick));
+            mobileLinks.forEach(link => link.addEventListener('click', handleNavClick));
+            mobileMenuButton.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+            
+            updateActiveState('home');
+        }
+        function initializeLatencyChart() {
+            const canvas = document.getElementById('latencyChart'); if (!canvas || canvas.chart) return;
+            const latencyData = { labels: ['Registers', 'L1 Cache', 'L2 Cache', 'L3 Cache', 'RAM'], datasets: [{ label: 'Access Time (nanoseconds)', data: [0.5, 5, 8, 25, 60], backgroundColor: [ '#3B82F6', '#60A5FA', '#93C5FD', '#BFDBFE', '#F59E0B' ] }] };
+            canvas.chart = new Chart(canvas.getContext('2d'), { type: 'bar', data: latencyData, options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, scales: { x: { type: 'logarithmic', title: { display: true, text: 'Access Time (ns) - Logarithmic Scale' } } }, plugins: { legend: { display: false } } } });
+        }
+        function initializeMemoryTabs() {
+            const tabsContainer = document.getElementById('memory-tabs-container');
+            const contentContainer = document.getElementById('memory-content-container');
+            if (!tabsContainer) return;
+            tabsContainer.addEventListener('click', (e) => {
+                if (e.target.classList.contains('tab-btn')) {
+                    const tabId = e.target.dataset.tab;
+                    tabsContainer.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                    e.target.classList.add('active');
+                    contentContainer.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
+                    document.getElementById(`content-${tabId}`).classList.remove('hidden');
+                }
+            });
+        }
+        function initializeCacheSimulation() {
+            const container = document.getElementById('performance'); if (!container) return;
+            const simHitBtn = container.querySelector('#sim-hit-btn'); const simMissBtn = container.querySelector('#sim-miss-btn'); const simExplanation = container.querySelector('#sim-explanation'); const pathContainer = container.querySelector('#sim-path-container');
+            if(!simHitBtn) return;
+            async function runSimulation(isHit) {
+                simHitBtn.disabled = true; simMissBtn.disabled = true; pathContainer.innerHTML = '';
+                const cpu = container.querySelector('#sim-cpu'); const l1 = container.querySelector('#sim-l1'); const l2 = container.querySelector('#sim-l2'); const l3 = container.querySelector('#sim-l3'); const ram = container.querySelector('#sim-ram');
+                const createPath = (start, end, dur) => { /* Path creation logic */ 
+                    const startRect = start.getBoundingClientRect(); const endRect = end.getBoundingClientRect(); const contRect = pathContainer.getBoundingClientRect();
+                    const startX = startRect.left + startRect.width / 2 - contRect.left; const startY = startRect.top + startRect.height / 2 - contRect.top;
+                    const endX = endRect.left + endRect.width / 2 - contRect.left; const endY = endRect.top + endRect.height / 2 - contRect.top;
+                    const angle = Math.atan2(endY - startY, endX - startX) * 180 / Math.PI; const length = Math.hypot(endX - startX, endY - startY);
+                    const line = document.createElement('div'); line.className = 'path-line'; line.style.cssText = `width: 0px; height: 3px; left: ${startX}px; top: ${startY}px; transform: rotate(${angle}deg); transition-duration: ${dur}s;`;
+                    const dot = document.createElement('div'); dot.className = 'path-dot'; dot.style.cssText = `left: ${startX - 8}px; top: ${startY - 8}px; transition-duration: ${dur}s;`;
+                    pathContainer.append(line, dot);
+                    setTimeout(() => { line.style.width = `${length}px`; dot.style.left = `${endX - 8}px`; dot.style.top = `${endY - 8}px`; }, 100);
+                    return new Promise(res => setTimeout(res, dur * 1000 + 100));
+                };
+
+                simExplanation.innerHTML = '1. CPU requests data...'; await createPath(cpu, l1, 0.5);
+                simExplanation.innerHTML = '2. Checking L1 Cache... (Miss)'; await createPath(l1, l2, 0.5);
+                simExplanation.innerHTML = '3. Checking L2 Cache...';
+                if (isHit) {
+                    simExplanation.innerHTML += ' (Hit!) <br> 4. Data found! Returning to CPU...'; await createPath(l2, cpu, 0.5);
+                    simExplanation.innerHTML = '<strong>Result: Cache Hit.</strong> Fast retrieval complete.';
+                } else {
+                    simExplanation.innerHTML += ' (Miss) <br> 4. Checking L3 Cache... (Miss)'; await createPath(l2, l3, 0.5);
+                    simExplanation.innerHTML = '5. Data not in cache. Fetching from slow RAM...'; await createPath(l3, ram, 1.0);
+                    simExplanation.innerHTML = '6. Data found in RAM. Returning to CPU...'; await createPath(ram, cpu, 1.0);
+                    simExplanation.innerHTML = '<strong>Result: Cache Miss.</strong> Slow retrieval complete.';
+                }
+                simHitBtn.disabled = false; simMissBtn.disabled = false;
+            }
+            simHitBtn.addEventListener('click', () => runSimulation(true)); simMissBtn.addEventListener('click', () => runSimulation(false));
+        }
+        function initializeQuiz() {
+            let currentQuizQuestions = []; let currentQuestionIndex = 0; let score = 0; let timerInterval; let timeLeft = 1800; 
+            const quizContainer = document.getElementById('quiz-container');
+            if (!quizContainer) return;
+            function startQuiz() {
+                let expandedBank = [];
+                while(expandedBank.length < 60) { expandedBank.push(...questionBank); }
+                currentQuizQuestions = expandedBank.sort(() => 0.5 - Math.random()).slice(0, 60); 
+                currentQuestionIndex = 0; score = 0; timeLeft = 1800; 
+                clearInterval(timerInterval); timerInterval = setInterval(updateTimer, 1000);
+                showQuestion();
+            }
+            function updateTimer() {
+                const timerEl = document.getElementById('quiz-timer');
+                if (timerEl) {
+                    timeLeft--; const minutes = Math.floor(timeLeft / 60); const seconds = timeLeft % 60;
+                    timerEl.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                    if (timeLeft <= 0) { showResults("Time's up!"); }
+                }
+            }
+            function showQuestion() {
+                const questionData = currentQuizQuestions[currentQuestionIndex];
+                quizContainer.innerHTML = `<div class="mb-4"><div class="flex justify-between items-center mb-2 text-lg"><h3 class="font-semibold">Question ${currentQuestionIndex + 1} of ${currentQuizQuestions.length}</h3><div class="flex items-center space-x-4"><p class="font-bold text-blue-600">Score: ${score}</p><p id="quiz-timer" class="font-bold text-gray-700 bg-gray-200 px-3 py-1 rounded-md">30:00</p></div></div><div class="w-full bg-gray-200 rounded-full h-2.5"><div class="bg-blue-500 h-2.5 rounded-full" style="width: ${((currentQuestionIndex + 1) / currentQuizQuestions.length) * 100}%"></div></div></div><h4 class="text-xl font-bold mb-5 text-gray-800">${questionData.question}</h4><div id="options-container" class="space-y-3"></div><div id="feedback-container" class="mt-4 text-center font-semibold"></div><div class="mt-6 text-right"><button id="next-btn" class="bg-gray-400 text-white font-bold py-2 px-6 rounded-lg shadow-sm cursor-not-allowed" disabled>Next</button></div>`;
+                const optionsContainer = document.getElementById('options-container');
+                questionData.options.forEach(option => {
+                    const button = document.createElement('button');
+                    button.className = 'quiz-option block w-full text-left p-3 border-2 border-gray-200 rounded-lg hover:bg-gray-100';
+                    button.textContent = option;
+                    button.addEventListener('click', () => selectAnswer(button, option, questionData.answer));
+                    optionsContainer.appendChild(button);
+                });
+                document.getElementById('next-btn').addEventListener('click', nextQuestion);
+                updateTimer();
+            }
+            function selectAnswer(button, selectedOption, correctAnswer) {
+                document.querySelectorAll('.quiz-option').forEach(btn => btn.disabled = true);
+                const feedbackContainer = document.getElementById('feedback-container'); const nextBtn = document.getElementById('next-btn');
+                if (selectedOption === correctAnswer) {
+                    score++; button.classList.add('correct');
+                    feedbackContainer.innerHTML = `<p class="text-green-600">✅ Correct!</p>`;
+                } else {
+                    button.classList.add('incorrect'); feedbackContainer.innerHTML = `<p class="text-red-600">❌ Incorrect. The correct answer is "${correctAnswer}".</p>`;
+                    const correctButton = Array.from(document.querySelectorAll('.quiz-option')).find(btn => btn.textContent === correctAnswer);
+                    if (correctButton) correctButton.classList.add('correct');
+                }
+                nextBtn.disabled = false; nextBtn.classList.remove('bg-gray-400', 'cursor-not-allowed'); nextBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+                if (currentQuestionIndex === currentQuizQuestions.length - 1) { nextBtn.textContent = 'See Results'; }
+            }
+            function nextQuestion() {
+                currentQuestionIndex++;
+                if (currentQuestionIndex < currentQuizQuestions.length) { showQuestion(); } else { showResults(); }
+            }
+            function showResults(message = "Quiz Complete!") {
+                clearInterval(timerInterval);
+                quizContainer.innerHTML = `<div class="text-center"><h2 class="text-2xl font-bold mb-2">${message}</h2><p class="text-lg mb-4">You scored</p><p class="text-5xl font-extrabold text-blue-600 mb-6">${score} out of ${currentQuizQuestions.length}</p><button id="restart-quiz-btn" class="bg-blue-600 text-white font-bold py-3 px-8 rounded-lg shadow-md hover:bg-blue-700 transition-colors">Try Again</button></div>`;
+                document.getElementById('restart-quiz-btn').addEventListener('click', showStartScreen);
+            }
+            function showStartScreen() {
+                 clearInterval(timerInterval);
+                quizContainer.innerHTML = `<div class="text-center"><button id="start-quiz-btn" class="bg-blue-600 text-white font-bold py-3 px-8 rounded-lg shadow-md hover:bg-blue-700 transition-colors">Start 60-Question Test</button></div>`;
+                document.getElementById('start-quiz-btn').addEventListener('click', startQuiz);
+            }
+            showStartScreen();
+        }
+        
+        // --- Initial Load ---
+        initializeNavigation();
+        initializeLatencyChart();
+        initializeMemoryTabs();
+        initializeCacheSimulation();
+        initializeQuiz(); 
+    });
+    </script>
+</body>
+</html>
+

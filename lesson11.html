@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Binary Stores Data Guide</title>
+    <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">💾</text></svg>'>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+    };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #F8FAFC; color: #334155; padding-bottom: 60px; }
+        .nav-link { transition: color 0.3s, border-bottom-color 0.3s; border-bottom: 2px solid transparent; cursor: pointer; }
+        .nav-link.active, .nav-link:hover { color: #3B82F6; border-bottom-color: #3B82F6; }
+        .page-content { display: none; animation: fadeIn 0.8s ease-in-out forwards; }
+        .page-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .social-link svg { transition: transform 0.3s ease; }
+        .social-link:hover svg { transform: scale(1.2); }
+        .quiz-option-label { transition: all 0.2s ease-in-out; }
+        .quiz-option-label.selected { background-color: #BFDBFE; border-color: #3B82F6; }
+        .quiz-option-label.correct { background-color: #D1FAE5 !important; color: #065F46 !important; border-color: #10B981 !important; }
+        .quiz-option-label.incorrect { background-color: #FEE2E2 !important; color: #991B1B !important; border-color: #EF4444 !important; }
+        .code-block { background-color: #F1F5F9; border-left: 4px solid #3B82F6; padding: 1rem; font-family: 'Courier New', Courier, monospace; border-radius: 0 0.25rem 0.25rem 0; overflow-x: auto; font-size: 0.9rem; line-height: 1.5; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #CBD5E1; padding: 8px; text-align: center; }
+        th { background-color: #E2E8F0; }
+        /* Simulation Styles */
+        #pixel-grid { display: grid; grid-template-columns: repeat(16, 1fr); border: 2px solid #94A3B8; image-rendering: pixelated; }
+        .pixel { width: 100%; padding-bottom: 100%; background-color: #FFFFFF; cursor: pointer; border: 1px solid #E2E8F0;}
+        .color-swatch { width: 40px; height: 40px; cursor: pointer; border: 2px solid #CBD5E1; border-radius: 0.25rem; transition: all 0.2s; }
+        .color-swatch:hover { transform: scale(1.1); }
+        .color-swatch.selected { border-color: #3B82F6; transform: scale(1.1); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5); }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex-shrink-0">
+                    <h1 class="text-xl font-bold text-gray-800">How Binary Stores Data</h1>
+                </div>
+                <div class="hidden md:flex items-center">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a data-target="home" class="nav-link active px-3 py-2 rounded-md text-sm font-medium">Home</a>
+                        <a data-target="fundamentals" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Fundamentals</a>
+                        <a data-target="text-numbers" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Text & Numbers</a>
+                        <a data-target="media" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Media & Simulation</a>
+                        <a data-target="quiz" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Quiz</a>
+                        <a data-target="resources" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Resources</a>
+                    </div>
+                     <div class="ml-4 pl-4 border-l border-gray-300">
+                        <a href="index.html" class="inline-flex items-center bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-semibold hover:bg-blue-200 transition-colors">
+                            Back to Curriculum
+                        </a>
+                    </div>
+                </div>
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
+                        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                    </button>
+                </div>
+            </div>
+            <div id="mobile-menu" class="md:hidden hidden">
+                <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                    <a data-target="home" class="nav-link mobile-link active block px-3 py-2 rounded-md text-base font-medium">Home</a>
+                    <a data-target="fundamentals" class="nav-link mobile-link block px-3 py-2 rounded-md text-base font-medium">Fundamentals</a>
+                    <a data-target="text-numbers" class="nav-link mobile-link block px-3 py-2 rounded-md text-base font-medium">Text & Numbers</a>
+                    <a data-target="media" class="nav-link mobile-link block px-3 py-2 rounded-md text-base font-medium">Media & Simulation</a>
+                    <a data-target="quiz" class="nav-link mobile-link block px-3 py-2 rounded-md text-base font-medium">Quiz</a>
+                    <a data-target="resources" class="nav-link mobile-link block px-3 py-2 rounded-md text-base font-medium">Resources</a>
+                     <div class="mt-2 pt-2 border-t border-zinc-200">
+                        <a href="index.html" class="block text-center py-2 px-3 rounded-lg bg-blue-100 text-blue-800 font-semibold">Back to Curriculum</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section id="home" class="page-content active py-12 sm:py-16 lg:py-24">
+             <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h2 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 tracking-tight">Encoding Our World in Binary</h2>
+                <p class="mt-4 max-w-3xl mx-auto text-base sm:text-lg text-slate-600">Every piece of data a computer handles—from a single letter to a full-length movie—must be translated into binary. This guide explains the fundamental concepts of binary encoding and the specific mechanisms used to store all types of modern data.</p>
+                
+                <div class="mt-10 max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-sm border border-slate-200 text-left">
+                    <h3 class="text-xl font-bold text-gray-800 text-center mb-4">Syllabus Focus: A1.2.2</h3>
+                    <p class="font-semibold text-slate-700">This guide comprehensively covers the syllabus requirement to "Explain how binary is used to store data." By exploring all the tabs, you will master:</p>
+                    <ul class="list-disc list-inside mt-4 space-y-2 text-slate-600">
+                        <li>The fundamentals of <strong>binary encoding</strong> and its impact on data storage and retrieval.</li>
+                        <li>The mechanisms by which data such as <strong>integers</strong>, <strong>strings</strong>, <strong>characters</strong>, <strong>images</strong>, <strong>audio</strong>, and <strong>video</strong> are stored in binary form.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="fundamentals" class="page-content hidden py-12 sm:py-16 lg:py-24 bg-white">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
+                <div class="text-center">
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900">The Fundamentals of Binary Encoding</h2>
+                    <p class="mt-4 max-w-3xl mx-auto text-base sm:text-lg text-slate-600">Before storing complex data, we must understand the basic building blocks and the concept of encoding.</p>
+                </div>
+                <div class="mt-12 space-y-8">
+                    <div>
+                        <h3 class="text-2xl font-bold text-gray-800">Bits and Bytes: The Building Blocks</h3>
+                        <p class="mt-2 text-slate-600">All data in a computer is made of <strong>bits</strong>. A bit (short for binary digit) is the smallest unit of data and can only have one of two values: <strong>0</strong> or <strong>1</strong>. Think of it as a light switch that can be either off (0) or on (1). While a single bit isn't very useful, grouping them together allows us to represent complex information.</p>
+                        <p class="mt-4 text-slate-600">Bits are typically grouped into sets of eight, called a <strong>byte</strong>. A byte is the standard unit of digital storage. With 8 bits, we can create $2^8 = 256$ unique combinations of 0s and 1s. This allows us to represent 256 different things, like every character on the keyboard, a range of numbers, or the color of a single pixel.</p>
+                    </div>
+                     <div>
+                        <h3 class="text-2xl font-bold text-gray-800">Binary Encoding: Giving Bits Meaning</h3>
+                        <p class="mt-2 text-slate-600"><strong>Encoding</strong> is the process of creating a "codebook" that maps a unique binary pattern to each piece of information we want to store. For this to work, everyone (or at least, every computer program that handles the data) must agree on the same codebook.</p>
+                        <p class="mt-4 text-slate-600">For example, we could agree that the binary pattern `01000001` represents the letter 'A'. When you press the 'A' key, the keyboard sends this pattern to the computer. When the computer needs to display 'A', it retrieves this pattern from memory and sends it to the screen, which knows how to draw an 'A' based on that code. This agreement is called a <strong>character set</strong> or <strong>encoding standard</strong> (like ASCII or Unicode).</p>
+                        <p class="mt-4 text-slate-600">The impact of this is profound: the choice of encoding determines how much storage data requires and how efficiently it can be retrieved. A more efficient encoding scheme can significantly reduce file sizes, which is crucial for storage and network transmission.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="text-numbers" class="page-content hidden py-12 sm:py-16 lg:py-24 bg-white">
+             <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
+                <div class="text-center">
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900">Storing Text and Numbers</h2>
+                    <p class="mt-4 max-w-3xl mx-auto text-base sm:text-lg text-slate-600">Text and numbers are the most common forms of data. Here's how they are encoded in binary.</p>
+                </div>
+                <div class="mt-12 space-y-12">
+                    <div>
+                        <h3 class="text-2xl font-bold text-gray-800">Characters and Strings</h3>
+                        <p class="mt-2 text-slate-600">To store text, computers use character encoding standards. Each character (letter, number, symbol) is assigned a unique binary number.</p>
+                        <ul class="mt-4 space-y-4">
+                            <li><strong>ASCII (American Standard Code for Information Interchange):</strong> An early 7-bit standard, representing 128 characters (English alphabet, numbers, basic punctuation). The letter 'A' is decimal 65, which is `01000001` in 8-bit binary.</li>
+                            <li><strong>Unicode (UTF-8):</strong> The modern standard that can represent over 149,000 characters from virtually every language. It is backward-compatible with ASCII. The first 128 characters are identical. UTF-8 is a variable-width encoding, meaning it uses one byte for common English characters but up to four bytes for more complex characters, making it very efficient.</li>
+                        </ul>
+                        <p class="mt-4 text-slate-600">A <strong>string</strong>, like the word "Hello", is stored as a sequence of these binary codes, one for each character. For example, "CAT" would be stored as the sequence of bytes for 'C', 'A', and 'T':</p>
+                        <div class="code-block mt-2">C (67) &nbsp;&nbsp;&nbsp;A (65) &nbsp;&nbsp;&nbsp;T (84)<br>01000011 01000001 01010100</div>
+                    </div>
+                     <div>
+                        <h3 class="text-2xl font-bold text-gray-800">Integers (Unsigned and Signed)</h3>
+                        <p class="mt-2 text-slate-600">Integers are stored in two primary ways:</p>
+                         <ul class="mt-4 space-y-4">
+                            <li><strong>Unsigned Integers:</strong> These are positive whole numbers (including zero). They are stored using their direct binary representation. An 8-bit unsigned integer can represent numbers from 0 ($00000000_2$) to 255 ($11111111_2$).</li>
+                            <li><strong>Signed Integers (Two's Complement):</strong> To represent both positive and negative numbers, computers use a method called <strong>Two's Complement</strong>. In an 8-bit signed integer, the leftmost bit (the Most Significant Bit or MSB) indicates the sign: 0 for positive, 1 for negative. This allows for a range of -128 to +127.</li>
+                        </ul>
+                        <p class="mt-4 text-slate-600">To find the binary for a negative number (e.g., -5) using 8-bit two's complement:</p>
+                        <div class="code-block mt-2">
+                           1. <strong>Start with the positive binary:</strong> +5 is `00000101`<br>
+                           2. <strong>Invert all the bits (One's Complement):</strong> `11111010`<br>
+                           3. <strong>Add one:</strong> `11111010 + 1 = 11111011`<br><br>
+                           Therefore, -5 is represented as `11111011`.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="media" class="page-content hidden py-12 sm:py-16 lg:py-24 bg-white">
+             <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">
+                <div class="text-center">
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900">Storing Images, Audio, and Video</h2>
+                    <p class="mt-4 max-w-3xl mx-auto text-base sm:text-lg text-slate-600">Multimedia files are also just vast collections of binary numbers, encoded using specific techniques.</p>
+                </div>
+                <div class="mt-12 space-y-12">
+                    <div>
+                        <h3 class="text-2xl font-bold text-gray-800">Images (Bitmaps)</h3>
+                        <p class="mt-2 text-slate-600">The most common type of image, a bitmap (like BMP, JPEG, PNG), is a grid of tiny dots called <strong>pixels</strong>. The computer stores a binary number for each pixel representing its color.</p>
+                         <ul class="mt-4 space-y-4">
+                            <li><strong>Resolution:</strong> The size of the grid (e.g., 1920x1080 pixels).</li>
+                            <li><strong>Color Depth:</strong> The number of bits used to store each pixel's color. Higher color depth allows for more colors but increases file size.
+                                <ul class="list-disc list-inside ml-6 mt-2">
+                                    <li><strong>1-bit:</strong> $2^1 = 2$ colors (e.g., black and white)</li>
+                                    <li><strong>8-bit:</strong> $2^8 = 256$ colors (e.g., grayscale)</li>
+                                    <li><strong>24-bit (True Color):</strong> $2^{24} \approx 16.7$ million colors. This is typically 8 bits for Red, 8 for Green, and 8 for Blue (RGB).</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="bg-slate-50 p-6 md:p-8 rounded-xl shadow-md">
+                        <h3 class="text-2xl font-bold text-gray-800 text-center">Interactive Image Simulation</h3>
+                        <p class="mt-2 text-slate-600 text-center">This simulation demonstrates how resolution and color depth affect the binary representation and size of a bitmap image.</p>
+                        
+                        <div class="mt-4 flex justify-center items-center gap-4">
+                            <label class="font-semibold">Mode:</label>
+                            <input type="radio" id="mode-1bit" name="sim-mode" value="1-bit" checked>
+                            <label for="mode-1bit">1-Bit (B&W)</label>
+                            <input type="radio" id="mode-24bit" name="sim-mode" value="24-bit">
+                            <label for="mode-24bit">24-Bit (Color)</label>
+                        </div>
+
+                        <div id="sim-explanation" class="mt-4 text-center text-sm bg-blue-100 text-blue-800 p-3 rounded-lg"></div>
+
+                        <div class="mt-6 flex flex-col md:flex-row gap-6 items-start">
+                            <div class="w-full md:w-1/2">
+                                <div id="pixel-grid" class="shadow-lg"></div>
+                                <div class="mt-4 flex justify-between items-start">
+                                    <div class="flex flex-col">
+                                        <div id="pixel-palette" class="flex flex-wrap gap-2"></div>
+                                        <div id="selected-color-info" class="mt-2 text-xs font-mono bg-white p-2 rounded shadow-inner min-h-[60px]"></div>
+                                    </div>
+                                    <button id="clear-grid-btn" class="px-4 py-2 bg-red-500 text-white text-sm font-semibold rounded-lg shadow-md hover:bg-red-600 transition">Clear Grid</button>
+                                </div>
+                            </div>
+                            <div class="w-full md:w-1/2">
+                                <div id="pixel-info" class="text-sm space-y-2 mb-4 bg-white p-4 rounded-lg shadow-inner"></div>
+                                <label id="binary-output-label" for="binary-output" class="font-semibold text-slate-700">Live Binary Representation:</label>
+                                <textarea id="binary-output" readonly class="w-full h-48 mt-1 p-2 font-mono text-xs bg-gray-900 text-green-400 rounded-lg border-2 border-slate-300"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold text-gray-800">Audio</h3>
+                        <p class="mt-2 text-slate-600">To store sound, the continuous analog sound wave is converted into digital data through a process called <strong>sampling</strong>. Imagine plotting the sound wave on a graph; sampling is taking measurements of the wave's amplitude at thousands of regular intervals every second.</p>
+                        <ul class="mt-4 space-y-4">
+                           <li><strong>Sample Rate:</strong> How many samples (measurements) are taken per second, measured in Hertz (Hz). A common rate for music is 44,100 Hz (44.1 kHz).</li>
+                           <li><strong>Bit Depth:</strong> The number of bits used to store the value of each sample. A higher bit depth provides a more accurate representation of the sound's amplitude, resulting in higher quality. CD quality audio uses a 16-bit depth.</li>
+                        </ul>
+                         <p class="mt-4">The final audio file is a long sequence of these binary numbers, one for each sample taken.</p>
+                    </div>
+                     <div>
+                        <h3 class="text-2xl font-bold text-gray-800">Video</h3>
+                        <p class="mt-2 text-slate-600">Video is the most complex, as it combines two other forms of media. A video file is fundamentally:</p>
+                        <ul class="mt-4 space-y-4">
+                           <li>A sequence of still images (called <strong>frames</strong>) displayed rapidly to create the illusion of motion. The speed at which they are shown is the <strong>frame rate</strong> (e.g., 30 frames per second).</li>
+                           <li>A synchronized <strong>audio track</strong>, which is stored using the same sampling method described above.</li>
+                        </ul>
+                        <p class="mt-4">Because uncompressed video data is enormous (a single minute of 1080p video at 30fps can be over 1 GB), it almost always uses advanced <strong>compression</strong> techniques to reduce the file size.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="quiz" class="page-content hidden py-12 sm:py-16 lg:py-24 bg-white">
+             <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900">Knowledge Check</h2>
+                    <p class="mt-4 max-w-3xl mx-auto text-base sm:text-lg text-slate-600">Test your understanding of how binary is used to store different types of data.</p>
+                </div>
+                <div id="quiz-wrapper" class="mt-12 max-w-4xl mx-auto">
+                    <div id="quiz-start-screen" class="text-center bg-slate-50 p-8 rounded-lg shadow-md">
+                        <h3 class="text-2xl font-bold text-gray-800">Ready to Test Your Knowledge?</h3>
+                        <p class="mt-2 text-slate-600">You will have <strong>40 minutes</strong> to answer <strong>60 questions</strong> selected from a large question bank.</p>
+                        <button id="start-quiz-btn" class="mt-6 px-8 py-3 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 transition">Start Quiz</button>
+                    </div>
+                    <div id="quiz-container" class="hidden">
+                        <div class="flex justify-between items-center mb-4 p-4 bg-slate-100 rounded-lg">
+                            <h3 class="text-xl font-bold text-gray-800">Binary Storage Quiz</h3>
+                            <div id="timer" class="text-lg font-bold text-red-500">40:00</div>
+                        </div>
+                        <div id="quiz-questions" class="space-y-6 bg-slate-50 p-6 rounded-lg"></div>
+                        <button id="submit-quiz-btn" class="mt-8 w-full px-8 py-3 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 transition">Submit Answers</button>
+                    </div>
+                    <div id="quiz-results-screen" class="hidden text-center bg-slate-50 p-8 rounded-lg shadow-md">
+                        <h3 class="text-2xl font-bold text-gray-800">Quiz Complete!</h3>
+                        <p class="mt-2 text-slate-600">Here are your results.</p>
+                        <div id="quiz-score-display" class="my-4 text-4xl font-extrabold text-blue-600"></div>
+                        <div id="quiz-time-taken" class="text-slate-600"></div>
+                        <button id="review-answers-btn" class="mt-6 px-8 py-3 bg-gray-500 text-white font-semibold rounded-lg shadow-md hover:bg-gray-600 transition">Review Your Answers</button>
+                        <div id="quiz-review" class="hidden mt-8 text-left space-y-6"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="resources" class="page-content hidden py-12 sm:py-16 lg:py-24 bg-white">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900">Further Learning Resources</h2>
+                    <p class="mt-4 max-w-3xl mx-auto text-base sm:text-lg text-slate-600">Deepen your understanding with these curated external resources.</p>
+                </div>
+                <div class="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+                    <div class="bg-slate-50 p-6 rounded-lg shadow-md">
+                        <h4 class="font-bold text-lg text-blue-600">How Computers Calculate</h4>
+                        <p class="mt-2 text-sm text-slate-600">A fantastic video explaining binary, bits, bytes, and how computers represent numbers, including Two's Complement.</p>
+                        <a href="https://youtu.be/KQwvC3CU7Ms?si=8LaC91hOvJsrtsGu" target="_blank" class="mt-4 inline-block text-blue-500 hover:underline font-semibold">Watch on YouTube →</a>
+                    </div>
+                    <div class="bg-slate-50 p-6 rounded-lg shadow-md">
+                        <h4 class="font-bold text-lg text-blue-600">Character Encoding Explained</h4>
+                        <p class="mt-2 text-sm text-slate-600">A clear explanation of ASCII and Unicode (UTF-8) and why modern standards are so important for global communication.</p>
+                        <a href="https://www.youtube.com/watch?v=MijmeoH9LT4" target="_blank" class="mt-4 inline-block text-blue-500 hover:underline font-semibold">Watch on YouTube →</a>
+                    </div>
+                    <div class="bg-slate-50 p-6 rounded-lg shadow-md">
+                        <h4 class="font-bold text-lg text-blue-600">Digital Images and Audio</h4>
+                        <p class="mt-2 text-sm text-slate-600">An easy-to-understand article explaining pixels, color depth, audio sampling, and bit depth.</p>
+                        <a href="https://www.bbc.co.uk/bitesize/search?q=Binary&d=BITESIZE&edgeauth=eyJhbGciOiAiSFMyNTYiLCAidHlwIjogIkpXVCJ9.eyJrZXkiOiAiZmFzdGx5LXVyaS10b2tlbi0xIiwiZXhwIjogMTc1Nzg4MjU2NCwibmJmIjogMTc1Nzg4MjIwNCwicmVxdWVzdHVyaSI6ICIlMkZiaXRlc2l6ZSUyRnNlYXJjaCUzRnElM0RCaW5hcnklMjZkJTNEQklURVNJWkUifQ.AlU7xcoMs5jl-ZraqtwBMfDTKz9UiIE4QgAl67BhWhw" target="_blank" class="mt-4 inline-block text-blue-500 hover:underline font-semibold">Read on BBC Bitesize →</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <footer class="fixed bottom-0 left-0 w-full bg-white py-2 border-t border-slate-200 text-center text-sm text-slate-500">
+        <div class="container mx-auto px-6 flex flex-col sm:flex-row justify-center items-center space-y-2 sm:space-y-0 sm:space-x-4">
+            <div class="flex items-center space-x-4">
+                <a href="https://www.linkedin.com/in/emmayeboah360/" class="text-blue-600 hover:text-blue-800 social-link" target="_blank">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.762s.784-1.762 1.75-1.762 1.75.79 1.75 1.762-.784 1.762-1.75 1.762zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                </a>
+                <a href="mailto:yemmanuel308@gmail.com" class="text-rose-600 hover:text-rose-800 social-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12.713l-11.75 6.287 11.75 5.5zM23.75 18.995l-11.75-6.287v11.748zM12 11.287l-12-6.287v1.868l12 6.287l12-6.287v-1.868z"/></svg>
+                </a>
+            </div>
+            <p class="pl-4">&copy; 2025 Emmanuel Yeboah. All rights reserved.</p>
+        </div>
+    </footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // --- Navigation ---
+    const navLinks = document.querySelectorAll('.nav-link');
+    const pages = document.querySelectorAll('.page-content');
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+
+    mobileMenuButton.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+
+    function switchTab(targetId) {
+        pages.forEach(page => page.classList.remove('active'));
+        const targetPage = document.getElementById(targetId);
+        if (targetPage) targetPage.classList.add('active');
+        navLinks.forEach(link => link.classList.toggle('active', link.dataset.target === targetId));
+        mobileMenu.classList.add('hidden');
+        
+        if (targetId === 'media') {
+            if (!document.getElementById('pixel-grid').hasChildNodes()) {
+                initPixelSimulator();
+            }
+        }
+    }
+
+    navLinks.forEach(link => link.addEventListener('click', (e) => {
+        e.preventDefault();
+        switchTab(e.currentTarget.dataset.target);
+    }));
+
+    // --- Pixel Simulator ---
+    function initPixelSimulator() {
+        // Simulation elements
+        const grid = document.getElementById('pixel-grid');
+        const paletteContainer = document.getElementById('pixel-palette');
+        const binaryOutput = document.getElementById('binary-output');
+        const binaryOutputLabel = document.getElementById('binary-output-label');
+        const infoDisplay = document.getElementById('pixel-info');
+        const clearBtn = document.getElementById('clear-grid-btn');
+        const modeRadios = document.querySelectorAll('input[name="sim-mode"]');
+        const selectedColorInfo = document.getElementById('selected-color-info');
+        const simExplanation = document.getElementById('sim-explanation');
+
+        const GRID_SIZE = 16;
+        let currentMode = '1-bit'; // '1-bit' or '24-bit'
+        let selectedColor;
+        
+        const palettes = {
+            '1-bit': [
+                { name: 'Black', hex: '#000000', binary: '0' },
+                { name: 'White', hex: '#FFFFFF', binary: '1' }
+            ],
+            '24-bit': [
+                { name: 'White', hex: '#FFFFFF', rgb: '255,255,255', binary: '111111111111111111111111' },
+                { name: 'Black', hex: '#000000', rgb: '0,0,0', binary: '000000000000000000000000' },
+                { name: 'Red', hex: '#FF0000', rgb: '255,0,0', binary: '111111110000000000000000' },
+                { name: 'Green', hex: '#00FF00', rgb: '0,255,0', binary: '000000001111111100000000' },
+                { name: 'Blue', hex: '#0000FF', rgb: '0,0,255', binary: '000000000000000011111111' },
+                { name: 'Yellow', hex: '#FFFF00', rgb: '255,255,0', binary: '111111111111111100000000' }
+            ]
+        };
+
+        function setupMode(mode) {
+            currentMode = mode;
+            paletteContainer.innerHTML = '';
+            
+            palettes[mode].forEach(color => {
+                const swatch = document.createElement('div');
+                swatch.className = 'color-swatch';
+                swatch.style.backgroundColor = color.hex;
+                swatch.dataset.colorData = JSON.stringify(color);
+                swatch.setAttribute('title', color.name);
+                paletteContainer.appendChild(swatch);
+                swatch.addEventListener('click', () => {
+                    selectedColor = color;
+                    document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
+                    swatch.classList.add('selected');
+                    updateSelectedColorInfo();
+                });
+            });
+            
+            selectedColor = palettes[mode][0];
+            paletteContainer.firstChild.classList.add('selected');
+            updateSelectedColorInfo();
+            clearGrid();
+            
+            if (mode === '1-bit') {
+                simExplanation.textContent = 'In 1-bit mode, each pixel needs only one bit. 0 is black, and 1 is white. Notice how small the total binary data is.';
+                binaryOutputLabel.textContent = 'Live Binary Representation (1 bit per pixel):';
+            } else {
+                simExplanation.textContent = 'In 24-bit mode, each pixel needs 24 bits (3 bytes) to represent its color—8 bits for Red, 8 for Green, and 8 for Blue. See how much larger the binary data becomes!';
+                 binaryOutputLabel.textContent = 'Live Binary Representation (24 bits per pixel):';
+            }
+        }
+        
+        function updateSelectedColorInfo() {
+            if (currentMode === '1-bit') {
+                selectedColorInfo.innerHTML = `<p><strong>${selectedColor.name}</strong></p><p>Binary: ${selectedColor.binary}</p>`;
+            } else {
+                selectedColorInfo.innerHTML = `
+                    <p><strong>${selectedColor.name}</strong></p>
+                    <p>Hex: ${selectedColor.hex}</p>
+                    <p>RGB: ${selectedColor.rgb}</p>
+                    <p class="break-all">Bin: ${selectedColor.binary.substring(0,8)} ${selectedColor.binary.substring(8,16)} ${selectedColor.binary.substring(16,24)}</p>
+                `;
+            }
+        }
+
+        modeRadios.forEach(radio => radio.addEventListener('change', (e) => setupMode(e.target.value)));
+
+        if (grid.childElementCount === 0) {
+            for (let i = 0; i < GRID_SIZE * GRID_SIZE; i++) {
+                const pixel = document.createElement('div');
+                pixel.className = 'pixel';
+                grid.appendChild(pixel);
+                
+                pixel.addEventListener('click', () => {
+                    pixel.style.backgroundColor = selectedColor.hex;
+                    pixel.dataset.binary = selectedColor.binary;
+                    updateBinaryOutput();
+                });
+            }
+        }
+        
+        function updateBinaryOutput() {
+            let binaryString = '';
+            const pixels = grid.childNodes;
+            pixels.forEach((pixel) => {
+                const pixelBinary = pixel.dataset.binary || (currentMode === '1-bit' ? '1' : palettes['24-bit'][0].binary);
+                if (currentMode === '24-bit') {
+                    binaryString += `${pixelBinary.substring(0,8)} ${pixelBinary.substring(8,16)} ${pixelBinary.substring(16,24)}\n`;
+                } else {
+                    binaryString += pixelBinary;
+                }
+            });
+            binaryOutput.value = binaryString.trim();
+            updateInfo();
+        }
+
+        function updateInfo() {
+            const resolution = GRID_SIZE * GRID_SIZE;
+            const colorDepth = (currentMode === '1-bit') ? 1 : 24;
+            const totalBytes = (resolution * colorDepth) / 8;
+            infoDisplay.innerHTML = `
+                <p><strong>Resolution:</strong> ${GRID_SIZE} x ${GRID_SIZE} = ${resolution} pixels</p>
+                <p><strong>Color Depth:</strong> ${colorDepth}-bit</p>
+                <p><strong>Uncompressed Size:</strong> ${totalBytes.toLocaleString()} bytes</p>
+            `;
+        }
+
+        function clearGrid() {
+            const defaultColor = palettes[currentMode][0]; // white
+            grid.childNodes.forEach(pixel => {
+                pixel.style.backgroundColor = defaultColor.hex;
+                pixel.dataset.binary = defaultColor.binary;
+            });
+            updateBinaryOutput();
+        }
+
+        clearBtn.addEventListener('click', clearGrid);
+        
+        // Initial setup
+        setupMode('1-bit');
+    }
+
+    // --- Quiz Logic ---
+    const startQuizBtn = document.getElementById('start-quiz-btn');
+    const quizStartScreen = document.getElementById('quiz-start-screen');
+    const quizContainer = document.getElementById('quiz-container');
+    const quizQuestionsContainer = document.getElementById('quiz-questions');
+    const submitQuizBtn = document.getElementById('submit-quiz-btn');
+    const quizResultsScreen = document.getElementById('quiz-results-screen');
+    const quizScoreDisplay = document.getElementById('quiz-score-display');
+    const quizTimeTakenEl = document.getElementById('quiz-time-taken');
+    const reviewAnswersBtn = document.getElementById('review-answers-btn');
+    const quizReviewEl = document.getElementById('quiz-review');
+    const timerEl = document.getElementById('timer');
+
+    let timerInterval;
+    let timeRemaining;
+    let activeQuizQuestions = [];
+    let userAnswers = [];
+
+    const questionBank = [
+        // Fundamentals (1-20)
+        { q: "What is the smallest unit of data in a computer?", options: ["Byte", "Bit", "Nibble", "Word"], answer: "Bit" },
+        { q: "How many bits are in a standard byte?", options: ["4", "8", "16", "1"], answer: "8" },
+        { q: "The process of assigning a unique binary pattern to a piece of information is called:", options: ["Decoding", "Encoding", "Compiling", "Executing"], answer: "Encoding" },
+        { q: "With 8 bits, how many unique combinations can be made?", options: ["8", "16", "128", "256"], answer: "256" },
+        { q: "A single bit can represent how many different values?", options: ["1", "2", "4", "8"], answer: "2" },
+        { q: "The term 'bit' is an abbreviation for:", options: ["Binary Item", "Byte Integer", "Binary Digit", "Bilateral Table"], answer: "Binary Digit" },
+        { q: "Why is the concept of an encoding 'standard' important?", options: ["It makes files larger.", "It allows different programs and computers to interpret binary data consistently.", "It is a form of data encryption.", "It increases the speed of the CPU."], answer: "It allows different programs and computers to interpret binary data consistently." },
+        { q: "If you have 4 bits, how many unique values can you represent?", options: ["4", "8", "16", "32"], answer: "16" },
+        { q: "The on/off state of a transistor in a CPU is a physical representation of a:", options: ["Byte", "Program", "Bit", "Pixel"], answer: "Bit" },
+        { q: "Which of the following is an example of binary encoding?", options: ["Assigning '01000001' to the letter 'A'.", "Converting a file to a ZIP archive.", "Running a program.", "Saving a file to a hard drive."], answer: "Assigning '01000001' to the letter 'A'." },
+        { q: "What is the primary impact of using a more efficient encoding scheme?", options: ["It makes the data less accurate.", "It increases the number of bits required.", "It reduces the storage space needed for the data.", "It requires a faster computer to read."], answer: "It reduces the storage space needed for the data." },
+        { q: "A 'nibble' is a group of how many bits?", options: ["2", "4", "6", "8"], answer: "4" },
+        { q: "If a new character is added to a language, what must be updated?", options: ["The computer's hardware.", "The character encoding standard.", "The speed of the internet.", "The size of a byte."], answer: "The character encoding standard." },
+        { q: "The fundamental reason computers use binary is that:", options: ["It's easier for humans to read.", "It's required by international law.", "Electronic components naturally have two states (on/off).", "It was invented by Alan Turing."], answer: "Electronic components naturally have two states (on/off)." },
+        { q: "The number of unique patterns possible with 'n' bits is calculated by:", options: ["$2 \\times n$", "$n^2$", "$2^n$", "$n/2$"], answer: "$2^n$" },
+        { q: "Which of these is NOT a direct result of binary encoding?", options: ["Storing text in a file.", "Representing a pixel's color.", "The physical speed of the processor (GHz).", "Storing a negative number."], answer: "The physical speed of the processor (GHz)." },
+        { q: "To represent 300 different symbols, what is the minimum number of bits you would need?", options: ["7 (128 values)", "8 (256 values)", "9 (512 values)", "10 (1024 values)"], answer: "9 (512 values)" },
+        { q: "A kilobyte (KB) is approximately how many bytes?", options: ["100", "1,000", "1,000,000", "1,000,000,000"], answer: "1,000" },
+        { q: "Data retrieval relies on the computer knowing the correct _______ to apply to the binary data.", options: ["file size", "encoding scheme", "hard drive speed", "user password"], answer: "encoding scheme" },
+        { q: "True or False: A byte always represents a character.", options: ["True", "False"], answer: "False" },
+
+        // Text & Numbers (21-45)
+        { q: "What is the primary difference between ASCII and Unicode (UTF-8)?", options: ["ASCII uses more bits for English characters.", "Unicode can represent characters from virtually all languages.", "ASCII is a newer standard.", "Unicode is only for numbers."], answer: "Unicode can represent characters from virtually all languages." },
+        { q: "In the ASCII standard, what does the binary pattern 01000001 represent?", options: ["The number 1", "The letter A", "A space character", "The symbol @"], answer: "The letter A" },
+        { q: "A string is stored in a computer as:", options: ["A single, very large binary number.", "A sequence of binary codes, one for each character.", "An analog signal.", "A mathematical formula."], answer: "A sequence of binary codes, one for each character." },
+        { q: "What method is most commonly used to store signed (positive and negative) integers in computers?", options: ["One's Complement", "Binary Coded Decimal", "Sign and Magnitude", "Two's Complement"], answer: "Two's Complement" },
+        { q: "In an 8-bit two's complement system, what does the most significant bit (MSB) indicate?", options: ["The number is even or odd.", "The number's total value.", "The number's sign (0=positive, 1=negative).", "If the number is a fraction."], answer: "The number's sign (0=positive, 1=negative)." },
+        { q: "Using 8-bit two's complement, what is the binary representation of -1?", options: ["10000001", "11111110", "11111111", "00000001"], answer: "11111111" },
+        { q: "An unsigned 8-bit integer can represent values in which range?", options: ["-128 to 127", "0 to 255", "-127 to 128", "0 to 256"], answer: "0 to 255" },
+        { q: "UTF-8 is a 'variable-width' encoding. What does this mean?", options: ["It can only be used on certain screen sizes.", "It uses a different number of bytes depending on the character.", "The font size changes automatically.", "It cannot represent all characters."], answer: "It uses a different number of bytes depending on the character." },
+        { q: "Using the two's complement method, what is the first step to find the binary for -10?", options: ["Invert the bits of +10.", "Find the binary for +10.", "Add 1 to the binary of +10.", "Find the binary for -9."], answer: "Find the binary for +10." },
+        { q: "Why is Unicode preferred over ASCII in modern applications?", options: ["It uses fewer bits per character.", "It is simpler to implement.", "It supports a global range of languages and symbols.", "It is faster for the CPU to process."], answer: "It supports a global range of languages and symbols." },
+        { q: "The string 'HI' is stored in ASCII as `01001000 01001001`. How many bytes does this require?", options: ["1", "2", "8", "16"], answer: "2" },
+        { q: "What is the decimal value of the two's complement binary number `10000000`?", options: ["-0", "+128", "-128", "0"], answer: "-128" },
+        { q: "What is the decimal value of the two's complement binary number `01111111`?", options: ["-1", "128", "-127", "127"], answer: "127" },
+        { q: "A simple unsigned integer is stored using:", options: ["Two's complement", "Its direct binary representation", "ASCII", "Unicode"], answer: "Its direct binary representation" },
+        { q: "The binary number `11111100` in two's complement represents which decimal number?", options: ["-2", "-3", "-4", "252"], answer: "-4" },
+        { q: "Is Unicode's UTF-8 encoding backward-compatible with ASCII?", options: ["Yes, the first 128 characters are identical.", "No, they are completely different systems.", "Only for numbers, not letters.", "Only on certain operating systems."], answer: "Yes, the first 128 characters are identical." },
+        { q: "An unsigned integer can represent negative numbers.", options: ["True", "False"], answer: "False" },
+        { q: "What is the 8-bit binary representation for the unsigned integer 130?", options: ["10000010", "01111110", "10000001", "It cannot be represented in 8 bits."], answer: "10000010" },
+        { q: "How is the end of a string often marked in memory?", options: ["With a special 'null' character.", "By inverting the last bit.", "With a large number.", "The computer just knows."], answer: "With a special 'null' character." },
+        { q: "The two's complement representation of 0 is:", options: ["10000000", "11111111", "00000000", "There are two representations for 0."], answer: "00000000" },
+        { q: "What would the binary for the ASCII string 'IT' be?", options: ["01001001 01010100", "01001000 01010100", "01001001 01010010", "10010010 10101001"], answer: "01001001 01010100" },
+        { q: "The range of an 8-bit signed integer is:", options: ["0 to 255", "-127 to 127", "0 to 256", "-128 to 127"], answer: "-128 to 127" },
+        { q: "What is the two's complement of `00001101` (13)?", options: ["11110011", "11110010", "10001101", "00001110"], answer: "11110011" },
+        { q: "Which of these data types would NOT be stored using a character encoding standard?", options: ["A person's name", "A paragraph in a text file", "A password", "A person's age stored as an integer"], answer: "A person's age stored as an integer" },
+        { q: "The number of bits used to store an integer determines its:", options: ["Sign", "Value range", "Character set", "Encoding standard"], answer: "Value range" },
+
+        // Media (46-80)
+        { q: "In a bitmap image, what is a 'pixel'?", options: ["A measurement of image quality.", "The smallest individual dot of color in the image grid.", "A type of image file.", "A unit of image size (megapixels)."], answer: "The smallest individual dot of color in the image grid." },
+        { q: "What does 'color depth' refer to in the context of an image?", options: ["The physical thickness of the screen.", "The number of bits used to represent the color of a single pixel.", "The variety of colors in the image palette.", "The resolution of the image."], answer: "The number of bits used to represent the color of a single pixel." },
+        { q: "How many different colors can be represented by a 24-bit color depth?", options: ["256", "1,024", "65,536", "About 16.7 million"], answer: "About 16.7 million" },
+        { q: "In the RGB color model, the color white is typically represented by:", options: ["R=0, G=0, B=0", "R=255, G=255, B=255", "R=255, G=0, B=0", "R=0, G=0, B=255"], answer: "R=255, G=255, B=255" },
+        { q: "How is digital audio created from an analog sound wave?", options: ["By taking many rapid measurements of the wave's amplitude (sampling).", "By compressing the wave into a smaller size.", "By converting the wave to text.", "By taking a single picture of the wave."], answer: "By taking many rapid measurements of the wave's amplitude (sampling)." },
+        { q: "What is the 'sample rate' in audio recording?", options: ["The number of bits used for each sample.", "The quality of the microphone.", "The number of samples (measurements) taken per second.", "The volume of the audio."], answer: "The number of samples (measurements) taken per second." },
+        { q: "A higher audio bit depth results in:", options: ["A smaller file size.", "A lower sample rate.", "A more accurate representation of the sound's amplitude.", "Faster playback speed."], answer: "A more accurate representation of the sound's amplitude." },
+        { q: "How is video primarily stored in a digital format?", options: ["As a single, complex image.", "As a continuous stream of bits representing motion.", "As a sequence of still images (frames) combined with an audio track.", "As a mathematical description of the objects in the scene."], answer: "As a sequence of still images (frames) combined with an audio track." },
+        { q: "What does 'frame rate' (fps) in a video refer to?", options: ["The quality of each image.", "The number of frames displayed per second.", "The total number of frames in the video.", "The size of each frame in pixels."], answer: "The number of frames displayed per second." },
+        { q: "A 1-bit color depth would be suitable for what kind of image?", options: ["A full-color photograph.", "A simple black and white image.", "A grayscale image.", "A high-definition video frame."], answer: "A simple black and white image." },
+        { q: "If an image has a resolution of 10x10 pixels and a color depth of 8 bits, what is its uncompressed size in bytes?", options: ["10 bytes", "80 bytes", "100 bytes", "800 bytes"], answer: "100 bytes" },
+        { q: "What is a common sample rate for CD-quality audio?", options: ["8,000 Hz", "22,050 Hz", "44,100 Hz", "96,000 Hz"], answer: "44,100 Hz" },
+        { q: "Increasing the sample rate of an audio file will generally:", options: ["Decrease the file size.", "Increase the accuracy of the frequency representation.", "Lower the audio quality.", "Not change the file at all."], answer: "Increase the accuracy of the frequency representation." },
+        { q: "In 24-bit RGB color, how many bits are used for each color channel (Red, Green, Blue)?", options: ["1", "3", "8", "24"], answer: "8" },
+        { q: "A video file contains:", options: ["Only image data.", "Only audio data.", "Both image and audio data.", "Text data describing the scene."], answer: "Both image and audio data." },
+        { q: "Why is compression almost always used for video files?", options: ["To improve the video quality.", "Uncompressed video files are extremely large.", "To add special effects.", "To make the video play faster."], answer: "Uncompressed video files are extremely large." },
+        { q: "The term 'pixel' is short for:", options: ["Picture Element", "Picture Extension", "Image Cell", "Picture Exhibit"], answer: "Picture Element" },
+        { q: "To represent a grayscale image, you typically need at least:", options: ["1 bit per pixel", "8 bits per pixel", "16 bits per pixel", "24 bits per pixel"], answer: "8 bits per pixel" },
+        { q: "The process of converting analog audio to digital binary is done by a device called an:", options: ["Analog-to-Digital Converter (ADC)", "Digital Audio Player (DAP)", "Central Processing Unit (CPU)", "Graphics Processing Unit (GPU)"], answer: "Analog-to-Digital Converter (ADC)" },
+        { q: "A higher frame rate in a video leads to:", options: ["Smaller file size.", "Smoother motion.", "Better color accuracy.", "Higher audio quality."], answer: "Smoother motion." },
+        { q: "If an image is 100 pixels wide and 50 pixels high, how many pixels does it contain in total?", options: ["150", "500", "1000", "5000"], answer: "5000" },
+        { q: "The binary data `11111111 00000000 00000000` represents which color for a 24-bit pixel?", options: ["Blue", "Green", "Red", "White"], answer: "Red" },
+        { q: "What does a higher bit depth in an image allow for?", options: ["A larger image resolution.", "More shades and nuances of color.", "Faster loading times.", "A smaller file size."], answer: "More shades and nuances of color." },
+        { q: "The amount of data in a digital audio file is determined by its duration, sample rate, and ____.", options: ["volume", "bit depth", "file name", "artist"], answer: "bit depth" },
+        { q: "True or False: A video is essentially a series of bitmap images.", options: ["True", "False"], answer: "True" }
+    ];
+
+    function startTimer() {
+        timerInterval = setInterval(() => {
+            timeRemaining--;
+            const minutes = Math.floor(timeRemaining / 60);
+            const seconds = timeRemaining % 60;
+            timerEl.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+            if (timeRemaining <= 0) {
+                clearInterval(timerInterval);
+                submitQuiz();
+            }
+        }, 1000);
+    }
+
+    function displayQuestions() {
+        quizQuestionsContainer.innerHTML = '';
+        activeQuizQuestions.forEach((item, index) => {
+            const questionEl = document.createElement('div');
+            questionEl.className = 'bg-white p-5 rounded-lg shadow-sm';
+            let optionsHtml = item.options.map(option => `<div><label class="quiz-option-label block w-full text-left p-3 my-2 border-2 border-slate-200 rounded-md cursor-pointer hover:bg-slate-100"><input type="radio" name="question${index}" value="${option}" class="hidden"> ${option}</label></div>`).join('');
+            questionEl.innerHTML = `<p class="font-semibold text-gray-800">${index + 1}. ${item.q.replace(/\$(\^|\_\{[^\}]+\}|[a-zA-Z0-9]+)\$/g, (match, p1) => `<code>${p1.replace(/[\$\_\{\}]/g, '')}</code>`)}</p><div class="mt-2">${optionsHtml}</div>`;
+            quizQuestionsContainer.appendChild(questionEl);
+            MathJax.typesetPromise([questionEl]);
+        });
+
+        document.querySelectorAll('.quiz-option-label').forEach(label => {
+            label.addEventListener('click', (e) => {
+                const input = e.currentTarget.querySelector('input');
+                const questionName = input.name;
+                document.querySelectorAll(`input[name="${questionName}"]`).forEach(radio => {
+                    radio.parentElement.classList.remove('selected');
+                });
+                e.currentTarget.classList.add('selected');
+                input.checked = true;
+            });
+        });
+    }
+
+    function submitQuiz() {
+        clearInterval(timerInterval);
+        const totalTime = 40 * 60;
+        const timeTaken = totalTime - timeRemaining;
+        const minutes = Math.floor(timeTaken / 60);
+        const seconds = timeTaken % 60;
+
+        let score = 0;
+        userAnswers = [];
+        activeQuizQuestions.forEach((item, index) => {
+            const selectedOption = document.querySelector(`input[name="question${index}"]:checked`);
+            const userAnswer = selectedOption ? selectedOption.value : null;
+            userAnswers.push(userAnswer);
+            if (userAnswer === item.answer) {
+                score++;
+            }
+        });
+
+        quizContainer.classList.add('hidden');
+        quizResultsScreen.classList.remove('hidden');
+        quizScoreDisplay.textContent = `You scored ${score} out of ${activeQuizQuestions.length}`;
+        quizTimeTakenEl.textContent = `Time taken: ${minutes} minutes and ${seconds} seconds.`;
+    }
+
+    function displayReview() {
+        quizReviewEl.innerHTML = '';
+        activeQuizQuestions.forEach((item, index) => {
+            const userAnswer = userAnswers[index];
+            const isCorrect = userAnswer === item.answer;
+            const questionEl = document.createElement('div');
+            questionEl.className = 'bg-slate-100 p-4 rounded-lg';
+            let optionsHtml = item.options.map(option => {
+                let labelClass = 'quiz-option-label block w-full text-left p-3 my-2 border-2 rounded-md';
+                if (option === item.answer) {
+                    labelClass += ' correct';
+                } else if (option === userAnswer && !isCorrect) {
+                    labelClass += ' incorrect';
+                }
+                return `<div><label class="${labelClass}">${option}</label></div>`;
+            }).join('');
+            questionEl.innerHTML = `<p class="font-semibold text-gray-800">${index + 1}. ${item.q.replace(/\$(\^|\_\{[^\}]+\}|[a-zA-Z0-9]+)\$/g, (match, p1) => `<code>${p1.replace(/[\$\_\{\}]/g, '')}</code>`)}</p><p class="text-sm mt-2">Your answer: <strong class="${isCorrect ? 'text-green-600' : 'text-red-600'}">${userAnswer || "Not answered"}</strong></p>${!isCorrect ? `<p class="text-sm mt-1">Correct answer: <strong class="text-green-700">${item.answer}</strong></p>` : ''}<div class="mt-2">${optionsHtml}</div>`;
+            quizReviewEl.appendChild(questionEl);
+            MathJax.typesetPromise([questionEl]);
+        });
+    }
+
+    startQuizBtn.addEventListener('click', () => {
+        const shuffled = [...questionBank].sort(() => 0.5 - Math.random());
+        activeQuizQuestions = shuffled.slice(0, 60);
+        quizStartScreen.classList.add('hidden');
+        quizContainer.classList.remove('hidden');
+        quizResultsScreen.classList.add('hidden');
+        quizReviewEl.classList.add('hidden');
+        reviewAnswersBtn.textContent = 'Review Your Answers';
+        timeRemaining = 40 * 60;
+        timerEl.textContent = "40:00";
+        startTimer();
+        displayQuestions();
+    });
+
+    submitQuizBtn.addEventListener('click', submitQuiz);
+    reviewAnswersBtn.addEventListener('click', () => {
+        quizReviewEl.classList.toggle('hidden');
+        reviewAnswersBtn.textContent = quizReviewEl.classList.contains('hidden') ? 'Review Your Answers' : 'Hide Answers';
+        if (!quizReviewEl.classList.contains('hidden')) {
+            displayReview();
+        }
+    });
+
+    // Initial setup
+    switchTab('home');
+});
+</script>
+
+</body>
+</html>

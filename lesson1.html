@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Central Processing Unit (CPU)</title>
+    <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M75,25 a2,2 0 0,0 -2,-2 h-46 a2,2 0 0,0 -2,2 v46 a2,2 0 0,0 2,2 h46 a2,2 0 0,0 2,-2 z M50,32 a2,2 0 0,1 2,2 v8 a2,2 0 0,1 -2,2 h-10 a2,2 0 0,1 -2,-2 v-8 a2,2 0 0,1 2,-2 z M50,50 a2,2 0 0,1 2,2 v8 a2,2 0 0,1 -2,2 h-10 a2,2 0 0,1 -2,-2 v-8 a2,2 0 0,1 2,-2 z M65,50 a2,2 0 0,1 2,2 v8 a2,2 0 0,1 -2,2 h-10 a2,2 0 0,1 -2,-2 v-8 a2,2 0 0,1 2,-2 z M35,50 a2,2 0 0,1 2,2 v8 a2,2 0 0,1 -2,2 h-10 a2,2 0 0,1 -2,-2 v-8 a2,2 0 0,1 2,-2 z" fill="%233B82F6" /></svg>'>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FDFBF8; color: #383838; padding-bottom: 100px; }
+        .nav-link { transition: color 0.3s, border-bottom-color 0.3s; border-bottom: 2px solid transparent; cursor: pointer; }
+        .nav-link.active, .nav-link:hover { color: #3B82F6; border-bottom-color: #3B82F6; }
+        .page-content { display: none; animation: fadeIn 0.8s ease-in-out forwards; }
+        .page-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .social-link svg { transition: transform 0.3s ease; }
+        .social-link:hover svg { transform: scale(1.2); }
+        .fde-component.highlight {
+            background-color: #BFDBFE; /* light blue */
+            color: #1E3A8A; /* dark blue */
+            border-color: #3B82F6;
+            transform: scale(1.03);
+            box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.3);
+            transition: all 0.7s ease-in-out;
+        }
+        .quiz-option { transition: all 0.2s ease; }
+        .quiz-option:disabled { cursor: not-allowed; }
+        .quiz-option.correct { background-color: #D1FAE5; border-color: #10B981; color: #065F46; }
+        .quiz-option.incorrect { background-color: #FEE2E2; border-color: #EF4444; color: #991B1B; }
+        .video-embed { position: relative; width: 100%; padding-bottom: 56.25%; height: 0; }
+        .video-embed iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 0.75rem; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex-shrink-0">
+                    <h1 class="text-xl font-bold text-gray-800">Understanding the CPU</h1>
+                </div>
+                <div class="hidden md:flex md:items-center">
+                    <div class="ml-10 flex items-center space-x-1 lg:space-x-4">
+                        <a data-target="home" class="nav-link active px-3 py-2 rounded-md text-sm font-medium">Home</a>
+                        <a data-target="components" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Components</a>
+                        <a data-target="cycle" class="nav-link px-3 py-2 rounded-md text-sm font-medium">FDE Cycle</a>
+                        <a data-target="processors" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Processors</a>
+                        <a data-target="diagram" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Diagram</a>
+                        <a data-target="videos" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Videos</a>
+                        <a data-target="quiz" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Quiz</a>
+                    </div>
+                    <div class="ml-4 pl-4 border-l border-gray-300">
+                        <a href="index.html" class="inline-flex items-center bg-blue-50 text-blue-700 px-4 py-2 rounded-full text-sm font-semibold hover:bg-blue-100 transition-colors">
+                            Back to Curriculum
+                        </a>
+                    </div>
+                </div>
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
+                        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                    </button>
+                </div>
+            </div>
+            <div id="mobile-menu" class="md:hidden hidden">
+                <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                    <a data-target="home" class="nav-link mobile-link active block px-3 py-2 rounded-md text-base font-medium">Home</a>
+                    <a data-target="components" class="nav-link mobile-link block px-3 py-2 rounded-md text-base font-medium">Components</a>
+                    <a data-target="cycle" class="nav-link mobile-link block px-3 py-2 rounded-md text-base font-medium">FDE Cycle</a>
+                    <a data-target="processors" class="nav-link mobile-link block px-3 py-2 rounded-md text-base font-medium">Processors</a>
+                    <a data-target="diagram" class="nav-link mobile-link block px-3 py-2 rounded-md text-base font-medium">Diagram</a>
+                    <a data-target="videos" class="nav-link mobile-link block px-3 py-2 rounded-md text-base font-medium">Videos</a>
+                    <a data-target="quiz" class="nav-link mobile-link block px-3 py-2 rounded-md text-base font-medium">Quiz</a>
+                    <div class="border-t border-gray-200 pt-3 mt-2">
+                        <a href="lesson2_3.html" class="block text-center bg-blue-100 text-blue-800 px-3 py-2 rounded-md text-base font-medium">
+                            Back to Curriculum
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section id="home" class="page-content active py-12 sm:py-16 lg:py-24">
+              <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h2 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 tracking-tight">The Brain of the Computer</h2>
+                <p class="mt-4 max-w-3xl mx-auto text-base sm:text-lg text-gray-600">The <strong>Central Processing Unit (CPU)</strong>, or processor, is the primary component of a computer that acts as its "brain." It is responsible for interpreting and executing most of the commands from the computer's hardware and software. This lesson will break down the CPU into its fundamental parts to understand how it operates.</p>
+                
+                <div class="mt-10 max-w-4xl mx-auto bg-gray-50 p-6 rounded-lg shadow-inner border border-gray-200 text-left">
+                    <h3 class="text-xl font-bold text-gray-800 text-center mb-4">Syllabus Focus: A1.1.1</h3>
+                    <p class="font-semibold text-gray-700">This guide covers the syllabus requirement to "Describe the functions and interactions of the main CPU components." By exploring all the tabs, you will master:</p>
+                    <ul class="list-disc list-inside mt-4 space-y-2 text-gray-600">
+                        <li><strong>Core Units:</strong> The Arithmetic Logic Unit (ALU) and Control Unit (CU).</li>
+                        <li><strong>Registers:</strong> PC, MAR, MDR, IR, and Accumulator.</li>
+                        <li><strong>Buses:</strong> Address, Data, and Control buses.</li>
+                        <li><strong>Processor Types:</strong> Single-core, multi-core, and co-processors.</li>
+                        <li>The <strong>interaction</strong> between these components during the machine cycle.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="components" class="page-content hidden py-12 sm:py-16 lg:py-24 bg-white">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900">The Core Components of a CPU</h2>
+                    <p class="mt-4 max-w-3xl mx-auto text-base sm:text-lg text-gray-600">A CPU is comprised of several key parts working together. These include units that perform calculations, registers that hold data temporarily, and buses that transport data.</p>
+                </div>
+                <div class="mt-12 max-w-7xl mx-auto">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">Processing Units</h3>
+                    <div class="grid md:grid-cols-2 gap-8 mb-12">
+                        <div class="bg-gray-50 p-8 rounded-xl shadow-md">
+                            <h4 class="text-xl font-bold text-blue-800">🧠 Arithmetic Logic Unit (ALU)</h4>
+                            <p class="mt-2 text-gray-600">The digital calculator of the CPU. The ALU performs all arithmetic operations (like addition and subtraction) and logical operations (like AND, OR, and NOT). All calculations in a computer are handled here.</p>
+                        </div>
+                        <div class="bg-gray-50 p-8 rounded-xl shadow-md">
+                            <h4 class="text-xl font-bold text-blue-800">🚦 Control Unit (CU)</h4>
+                            <p class="mt-2 text-gray-600">The traffic controller of the CPU. The CU directs and coordinates most of the operations in the computer. It fetches instructions from memory, decodes them, and directs the other components on what to do.</p>
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">Registers (High-Speed Memory)</h3>
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+                        <div class="bg-gray-50 p-6 rounded-xl shadow-md"><strong>Program Counter (PC):</strong> Holds the memory address of the next instruction to be executed.</div>
+                        <div class="bg-gray-50 p-6 rounded-xl shadow-md"><strong>Memory Address Register (MAR):</strong> Holds the memory address of data or an instruction that needs to be fetched from or sent to memory.</div>
+                        <div class="bg-gray-50 p-6 rounded-xl shadow-md"><strong>Memory Data Register (MDR):</strong> A two-way register that holds data fetched from memory or data waiting to be stored in memory.</div>
+                        <div class="bg-gray-50 p-6 rounded-xl shadow-md"><strong>Instruction Register (IR):</strong> Holds the current instruction being decoded and executed by the Control Unit.</div>
+                        <div class="bg-gray-50 p-6 rounded-xl shadow-md col-span-1 md:col-span-2 lg:col-span-1"><strong>Accumulator (AC):</strong> A general-purpose register that holds intermediate results from the ALU.</div>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">Buses (The Data Highways)</h3>
+                    <div class="grid md:grid-cols-3 gap-8">
+                        <div class="bg-gray-50 p-8 rounded-xl shadow-md">
+                            <h4 class="text-xl font-bold text-blue-800">📍 Address Bus</h4>
+                            <p class="mt-2 text-gray-600"><strong>Unidirectional.</strong> Carries memory addresses from the CPU to main memory (RAM). The CPU uses it to specify which memory location it wants to read from or write to.</p>
+                        </div>
+                        <div class="bg-gray-50 p-8 rounded-xl shadow-md">
+                            <h4 class="text-xl font-bold text-blue-800">↔️ Data Bus</h4>
+                            <p class="mt-2 text-gray-600"><strong>Bidirectional.</strong> Carries the actual data or instruction between the CPU and main memory. It can move data from the CPU to memory (write) or from memory to the CPU (read).</p>
+                        </div>
+                        <div class="bg-gray-50 p-8 rounded-xl shadow-md">
+                            <h4 class="text-xl font-bold text-blue-800">🚦 Control Bus</h4>
+                            <p class="mt-2 text-gray-600"><strong>Bidirectional.</strong> Carries control and timing signals from the Control Unit to manage and synchronize all computer activities. Signals include memory read/write commands.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="cycle" class="page-content hidden py-12 sm:py-16 lg:py-24 bg-white">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900">How They Interact: The FDE Cycle</h2>
+                    <p class="mt-4 max-w-3xl mx-auto text-base sm:text-lg text-gray-600">Every second, your CPU performs billions of these <strong>Fetch-Decode-Execute</strong> cycles. This is how it processes every single instruction. Let's watch one in action!</p>
+                </div>
+                <div class="mt-12 max-w-5xl mx-auto bg-gray-50 p-6 rounded-xl shadow-lg">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="space-y-4">
+                            <h3 class="text-xl font-bold text-center">CPU Components</h3>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div id="fde-pc" class="fde-component border-2 p-3 rounded-lg text-center"><strong>PC:</strong> <span id="pc-val">0</span></div>
+                                <div id="fde-mar" class="fde-component border-2 p-3 rounded-lg text-center"><strong>MAR:</strong> <span id="mar-val">...</span></div>
+                                <div id="fde-ir" class="fde-component border-2 p-3 rounded-lg text-center"><strong>IR:</strong> <span id="ir-val">...</span></div>
+                                <div id="fde-mdr" class="fde-component border-2 p-3 rounded-lg text-center"><strong>MDR:</strong> <span id="mdr-val">...</span></div>
+                                <div id="fde-cu" class="fde-component border-2 p-3 rounded-lg text-center col-span-2"><strong>Control Unit</strong></div>
+                                <div id="fde-ac" class="fde-component border-2 p-3 rounded-lg text-center col-span-2"><strong>Accumulator:</strong> <span id="ac-val">...</span></div>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <h3 class="text-xl font-bold text-center">RAM (Memory)</h3>
+                            <div id="fde-ram" class="space-y-2 bg-gray-200 p-4 rounded-lg"></div>
+                        </div>
+                    </div>
+                    <div class="mt-6 pt-6 border-t border-gray-200">
+                        <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                            <div class="flex-1">
+                                <h4 id="fde-stage" class="text-2xl font-bold text-blue-600">Stage: Idle</h4>
+                                <p id="fde-explanation" class="text-gray-600 mt-1">Click "Start Cycle" to begin the simulation.</p>
+                            </div>
+                            <button id="fde-btn" class="bg-blue-600 text-white font-bold py-3 px-6 rounded-lg shadow-md hover:bg-blue-700 transition-colors">Start Cycle</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="processors" class="page-content hidden py-12 sm:py-16 lg:py-24 bg-white">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900">Types of Processors</h2>
+                    <p class="mt-4 max-w-3xl mx-auto text-base sm:text-lg text-gray-600">Processors can be categorized by the number of processing units they contain and their specific purpose.</p>
+                </div>
+                <div class="mt-12 max-w-5xl mx-auto space-y-8">
+                    <div class="bg-gray-50 p-6 rounded-lg shadow-md border-l-4 border-blue-500">
+                        <h3 class="text-xl font-bold text-gray-800">Single-Core Processor</h3>
+                        <p class="mt-2 text-gray-600">A CPU with only one processing unit (core). It can only execute one task at a time. While it can switch between tasks very quickly (multitasking), it is not performing them simultaneously. This was the standard for early computers.</p>
+                    </div>
+                    <div class="bg-gray-50 p-6 rounded-lg shadow-md border-l-4 border-blue-500">
+                        <h3 class="text-xl font-bold text-gray-800">Multi-Core Processor</h3>
+                        <p class="mt-2 text-gray-600">A single CPU chip that contains two or more independent processing units (cores). This allows the processor to execute multiple instructions simultaneously (true parallelism), significantly improving performance for demanding applications. Think of it as having multiple brains working on different problems at once.</p>
+                    </div>
+                    <div class="bg-gray-50 p-6 rounded-lg shadow-md border-l-4 border-blue-500">
+                        <h3 class="text-xl font-bold text-gray-800">Co-processor (e.g., GPU)</h3>
+                        <p class="mt-2 text-gray-600">A specialized processor that assists the main CPU with complex, specific tasks. This offloads work from the CPU, allowing it to focus on general-purpose tasks. The most common example is the <strong>Graphics Processing Unit (GPU)</strong>, which handles complex graphics and parallel computations, making it ideal for gaming, video editing, and AI.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-lg border">
+                        <h3 class="text-2xl font-bold mb-4 text-center">CPU vs. GPU: A Quick Comparison</h3>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full text-left">
+                                <thead>
+                                    <tr class="bg-gray-100">
+                                        <th class="p-3 font-semibold">Feature</th>
+                                        <th class="p-3 font-semibold">CPU</th>
+                                        <th class="p-3 font-semibold">GPU</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200">
+                                    <tr><td class="p-3 font-medium">Core Count</td><td class="p-3">A few powerful cores</td><td class="p-3">Hundreds to thousands of simpler cores</td></tr>
+                                    <tr><td class="p-3 font-medium">Task Specialization</td><td class="p-3">General purpose; handles varied tasks sequentially</td><td class="p-3">Specialized for massively parallel, repetitive tasks</td></tr>
+                                    <tr><td class="p-3 font-medium">Best For...</td><td class="p-3">Operating systems, complex decision-making</td><td class="p-3">Graphics rendering, machine learning, simulations</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="diagram" class="page-content hidden py-12 sm:py-16 lg:py-24 bg-white">
+               <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900">CPU Architecture Diagram</h2>
+                    <p class="mt-4 max-w-3xl mx-auto text-base sm:text-lg text-gray-600">This diagram shows the relationship between the main CPU components and their connection to Main Memory (RAM) via the system buses.</p>
+                </div>
+                <div class="mt-12 max-w-5xl mx-auto bg-gray-50 p-8 rounded-lg shadow-md">
+                    <div class="flex flex-col md:flex-row justify-between items-stretch space-y-8 md:space-y-0 md:space-x-8 relative">
+                        <div class="w-full md:w-2/3 border-4 border-blue-500 p-4 rounded-lg bg-white relative flex flex-col">
+                            <h3 class="text-center font-bold text-xl text-blue-600">Central Processing Unit (CPU)</h3>
+                            <div class="flex flex-col sm:flex-row mt-4 gap-4 flex-grow">
+                                <div class="w-full sm:w-1/2 p-2 bg-blue-100 rounded flex items-center justify-center"><h4 class="font-semibold text-center">Control Unit (CU)</h4></div>
+                                <div class="w-full sm:w-1/2 p-2 bg-blue-100 rounded flex items-center justify-center"><h4 class="font-semibold text-center">Arithmetic Logic Unit (ALU)</h4></div>
+                            </div>
+                            <div class="mt-4 p-2 bg-gray-100 rounded">
+                                <h4 class="font-semibold text-center mb-2">Registers</h4>
+                                <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-center text-sm">
+                                    <span class="bg-white p-1 rounded-sm shadow-sm">PC</span> <span class="bg-white p-1 rounded-sm shadow-sm">MAR</span> <span class="bg-white p-1 rounded-sm shadow-sm">MDR</span> <span class="bg-white p-1 rounded-sm shadow-sm">IR</span> <span class="bg-white p-1 rounded-sm shadow-sm">AC</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="w-full md:w-auto flex flex-col justify-center items-center font-semibold text-center">
+                            <div>Address Bus <span class="text-blue-500 font-mono">&rarr;</span></div>
+                            <div class="my-4"><span class="text-blue-500 font-mono">&larr;</span> Data Bus <span class="text-blue-500 font-mono">&rarr;</span></div>
+                            <div><span class="text-blue-500 font-mono">&larr;</span> Control Bus <span class="text-blue-500 font-mono">&rarr;</span></div>
+                        </div>
+                        <div class="w-full md:w-1/3 border-4 border-gray-400 p-4 rounded-lg bg-white flex flex-col items-center justify-center">
+                            <h3 class="text-center font-bold text-xl text-gray-600">Main Memory (RAM)</h3>
+                            <div class="text-gray-500 text-sm mt-4 text-center"><p>Stores instructions and data currently in use.</p></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="videos" class="page-content hidden py-12 sm:py-16 lg:py-24 bg-white">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900">Video Resources</h2>
+                    <p class="mt-4 max-w-3xl mx-auto text-base sm:text-lg text-gray-600">Watch these curated videos to deepen your understanding of CPU components and the Fetch-Decode-Execute cycle.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+                    <div class="bg-gray-50 p-4 rounded-xl shadow-lg"><div class="video-embed"><iframe src="https://www.youtube.com/embed/pOD9UTlO33A" title="IBCS Lesson 3 - A 1-1-1 CPU Components" frameborder="0" allowfullscreen></iframe></div></div>
+                    <div class="bg-gray-50 p-4 rounded-xl shadow-lg"><div class="video-embed"><iframe src="https://www.youtube.com/embed/ByllwN8q2ss" title="Fetch-Decode-Execute Cycle Explained" frameborder="0" allowfullscreen></iframe></div></div>
+                    <div class="bg-gray-50 p-4 rounded-xl shadow-lg"><div class="video-embed"><iframe src="https://www.youtube.com/embed/Z5JC9Ve1sfI" title="Understanding CPU Registers" frameborder="0" allowfullscreen></iframe></div></div>
+                    <div class="bg-gray-50 p-4 rounded-xl shadow-lg"><div class="video-embed"><iframe src="https://www.youtube.com/embed/vgPFzblBh7w" title="CPU Architecture - IB Computer Science" frameborder="0" allowfullscreen></iframe></div></div>
+                </div>
+            </div>
+        </section>
+        <section id="quiz" class="page-content hidden py-12 sm:py-16 lg:py-24 bg-white">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900">Test Your Knowledge!</h2>
+                    <p class="mt-4 max-w-3xl mx-auto text-base sm:text-lg text-gray-600">You'll face 60 randomly selected questions with a 30-minute time limit. Good luck!</p>
+                </div>
+                <div id="quiz-container" class="max-w-3xl mx-auto bg-gray-50 p-8 rounded-xl shadow-lg">
+                    </div>
+            </div>
+        </section>
+
+    </main>
+    
+    <footer class="fixed bottom-0 left-0 w-full bg-white py-2 border-t border-gray-200 text-center text-sm text-gray-500">
+        <div class="container mx-auto px-6 flex flex-col sm:flex-row justify-center items-center space-y-2 sm:space-y-0 sm:space-x-4">
+            <div class="flex items-center space-x-4">
+                <a href="https://www.linkedin.com/in/emmayeboah360/" class="text-blue-600 hover:text-blue-800 social-link" target="_blank">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.762s.784-1.762 1.75-1.762 1.75.79 1.75 1.762-.784 1.762-1.75 1.762zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                </a>
+                <a href="mailto:yemmanuel308@gmail.com" class="text-rose-600 hover:text-rose-800 social-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12.713l-11.75 6.287 11.75 5.5zM23.75 18.995l-11.75-6.287v11.748zM12 11.287l-12-6.287v1.868l12 6.287l12-6.287v-1.868z"/></svg>
+                </a>
+            </div>
+            <p class="pl-4">&copy; 2025 Emmanuel Yeboah. All rights reserved.</p>
+        </div>
+    </footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // --- Navigation Logic ---
+    const navLinks = document.querySelectorAll('.nav-link');
+    const pages = document.querySelectorAll('.page-content');
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+
+    if (mobileMenuButton && mobileMenu) {
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+    }
+
+    window.addEventListener('resize', () => {
+        if (window.innerWidth >= 768 && !mobileMenu.classList.contains('hidden')) {
+            mobileMenu.classList.add('hidden');
+        }
+    });
+
+    function switchTab(targetId) {
+        pages.forEach(page => page.classList.remove('active'));
+        const targetPage = document.getElementById(targetId);
+        if (targetPage) {
+            targetPage.classList.add('active');
+        }
+        navLinks.forEach(navLink => {
+            navLink.classList.toggle('active', navLink.dataset.target === targetId);
+        });
+        if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+            mobileMenu.classList.add('hidden');
+        }
+        if (targetId === 'quiz' && typeof initializeQuiz === 'function') {
+            initializeQuiz();
+        }
+    }
+
+    navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetId = e.currentTarget.dataset.target;
+            switchTab(targetId);
+            window.scrollTo(0, 0); 
+        });
+    });
+
+    // --- FDE Cycle Logic ---
+    const fdeBtn = document.getElementById('fde-btn');
+    if (fdeBtn) {
+        const getInitialRamData = () => [ { address: 0, instruction: 'LOAD 4', data: null }, { address: 1, instruction: 'ADD 5', data: null }, { address: 2, instruction: 'STORE 6', data: null }, { address: 3, instruction: 'HALT', data: null }, { address: 4, instruction: null, data: 10 }, { address: 5, instruction: null, data: 5 }, { address: 6, instruction: null, data: 0 } ];
+        let ramData = getInitialRamData();
+        const fdeRamContainer = document.getElementById('fde-ram');
+        const fdeStage = document.getElementById('fde-stage');
+        const fdeExplanation = document.getElementById('fde-explanation');
+        const fdeValues = { pc: document.getElementById('pc-val'), mar: document.getElementById('mar-val'), mdr: document.getElementById('mdr-val'), ir: document.getElementById('ir-val'), ac: document.getElementById('ac-val') };
+        const fdeComponents = { pc: document.getElementById('fde-pc'), mar: document.getElementById('fde-mar'), mdr: document.getElementById('fde-mdr'), ir: document.getElementById('fde-ir'), cu: document.getElementById('fde-cu'), ac: document.getElementById('fde-ac') };
+        let fdeState = 'idle';
+
+        function initializeRamUI() { if (!fdeRamContainer) return; fdeRamContainer.innerHTML = ''; ramData.forEach(mem => { const memDiv = document.createElement('div'); memDiv.id = `ram-${mem.address}`; memDiv.className = 'fde-component border-2 p-2 rounded-md text-sm flex justify-between bg-white'; memDiv.innerHTML = `<span><strong>${mem.address}:</strong> ${mem.instruction || 'DATA'}</span><span class="font-mono">${mem.data !== null ? mem.data : '...'}</span>`; fdeRamContainer.appendChild(memDiv); }); }
+        
+        function resetFDE() { fdeState = 'idle'; fdeBtn.textContent = 'Start Cycle'; fdeBtn.disabled = false; fdeStage.textContent = 'Stage: Idle'; fdeExplanation.textContent = 'Click "Start Cycle" to begin the simulation.'; document.querySelectorAll('.fde-component').forEach(c => c.classList.remove('highlight')); fdeValues.pc.textContent = '0'; ['mar', 'mdr', 'ir', 'ac'].forEach(k => { if(fdeValues[k]) fdeValues[k].textContent = '...'}); ramData = getInitialRamData(); initializeRamUI(); }
+        
+        async function runFdeCycle() {
+            fdeState = 'running';
+            fdeBtn.disabled = true;
+            const pcAddress = parseInt(fdeValues.pc.textContent);
+            const instructionData = ramData[pcAddress];
+
+            if (!instructionData || instructionData.instruction === 'HALT') {
+                fdeStage.textContent = 'Stage: Halt';
+                fdeExplanation.textContent = 'The HALT instruction was found. The cycle is complete.';
+                fdeBtn.textContent = 'Reset';
+                fdeBtn.disabled = false;
+                fdeState = 'halted';
+                return;
+            }
+
+            const highlight = (el) => {
+                document.querySelectorAll('.fde-component').forEach(c => c.classList.remove('highlight'));
+                if (el) el.classList.add('highlight');
+            };
+            
+            const step = async (stage, explanation, component, action = () => {}, delay = 1500) => {
+                highlight(component);
+                fdeStage.textContent = `Stage: ${stage}`;
+                fdeExplanation.textContent = explanation;
+                action();
+                await new Promise(resolve => setTimeout(resolve, delay));
+            };
+
+            await step('Fetch', 'FETCH: The Program Counter (PC) holds the memory address of the next instruction. This address is copied to the Memory Address Register (MAR).', fdeComponents.pc, () => { fdeValues.mar.textContent = pcAddress; });
+            await step('Fetch', 'FETCH: The PC is immediately incremented to point to the *next* instruction in memory, getting it ready for the next cycle.', fdeComponents.pc, () => { fdeValues.pc.textContent = pcAddress + 1; });
+            await step('Fetch', 'FETCH: The CPU places the address from the MAR onto the Address Bus. The instruction at that RAM location is sent back along the Data Bus to the Memory Data Register (MDR).', document.getElementById(`ram-${pcAddress}`), () => { fdeValues.mdr.textContent = instructionData.instruction; });
+            await step('Fetch', 'FETCH: The fetched instruction is copied from the MDR to the Instruction Register (IR), where the CPU can begin to process it.', fdeComponents.mdr, () => { fdeValues.ir.textContent = instructionData.instruction; });
+            await step('Decode', 'DECODE: The Control Unit (CU) analyzes the instruction in the IR to determine what operation to perform (e.g., LOAD, ADD, STORE).', fdeComponents.cu);
+
+            const [opcode, operand] = fdeValues.ir.textContent.split(' ');
+            const operandAddr = parseInt(operand);
+
+            switch(opcode) {
+                case 'LOAD':
+                    await step('Execute', `EXECUTE (LOAD): The address part of the instruction (${operandAddr}) is sent to the MAR, as we now need to fetch data.`, fdeComponents.ir, () => { fdeValues.mar.textContent = operandAddr; });
+                    await step('Execute', `EXECUTE (LOAD): The data value from the specified RAM location is fetched across the Data Bus into the MDR.`, document.getElementById(`ram-${operandAddr}`), () => { fdeValues.mdr.textContent = ramData[operandAddr].data; });
+                    await step('Execute', 'EXECUTE (LOAD): The data is finally copied from the MDR into the Accumulator, completing the load operation.', fdeComponents.mdr, () => { fdeValues.ac.textContent = fdeValues.mdr.textContent; });
+                    break;
+                case 'ADD':
+                    await step('Execute', `EXECUTE (ADD): The address of the second number (${operandAddr}) is sent to the MAR to be fetched.`, fdeComponents.ir, () => { fdeValues.mar.textContent = operandAddr; });
+                    await step('Execute', `EXECUTE (ADD): The second number is fetched from RAM into the MDR.`, document.getElementById(`ram-${operandAddr}`), () => { fdeValues.mdr.textContent = ramData[operandAddr].data; });
+                    await step('Execute', 'EXECUTE (ADD): The CU directs the ALU to add the value in the MDR to the value in the Accumulator. The result is stored back in the Accumulator.', fdeComponents.cu, () => { fdeValues.ac.textContent = parseInt(fdeValues.ac.textContent) + parseInt(fdeValues.mdr.textContent); });
+                    break;
+                case 'STORE':
+                    await step('Execute', `EXECUTE (STORE): The destination address in RAM (${operandAddr}) is sent to the MAR.`, fdeComponents.ir, () => { fdeValues.mar.textContent = operandAddr; });
+                    await step('Execute', 'EXECUTE (STORE): The result from the Accumulator is copied to the MDR, ready to be sent to memory.', fdeComponents.ac, () => { fdeValues.mdr.textContent = fdeValues.ac.textContent; });
+                    await step('Execute', `EXECUTE (STORE): The value in the MDR is sent across the Data Bus and stored at the specified address in RAM, completing the store operation.`, document.getElementById(`ram-${operandAddr}`), () => { ramData[operandAddr].data = parseInt(fdeValues.mdr.textContent); document.querySelector(`#ram-${operandAddr} span.font-mono`).textContent = fdeValues.mdr.textContent; });
+                    break;
+            }
+
+            highlight(null);
+            fdeBtn.disabled = false;
+            fdeBtn.textContent = 'Next Instruction';
+            fdeState = 'idle';
+        }
+        fdeBtn.addEventListener('click', () => { if (fdeState === 'halted') { resetFDE(); } else if (fdeState === 'idle') { runFdeCycle(); } });
+        initializeRamUI();
+        resetFDE();
+    }
+    
+    // --- Quiz Logic ---
+    const quizContainer = document.getElementById('quiz-container');
+    const questionBank = [
+        { question: "What is the primary function of the Arithmetic Logic Unit (ALU)?", options: ["Store data", "Perform calculations and logical operations", "Fetch instructions", "Control I/O devices"], answer: "Perform calculations and logical operations" }, { question: "Which register holds the address of the next instruction to be fetched?", options: ["MAR", "MDR", "PC", "IR"], answer: "PC" }, { question: "The Control Unit (CU) operates by sending out what kind of signals?", options: ["Data signals", "Address signals", "Timing and control signals", "Interrupt signals"], answer: "Timing and control signals" }, { question: "Which bus is unidirectional?", options: ["Data Bus", "Address Bus", "Control Bus", "All are bidirectional"], answer: "Address Bus" }, { question: "During the Fetch stage, the contents of the Program Counter are copied to which register?", options: ["MDR", "IR", "Accumulator", "MAR"], answer: "MAR" }, { question: "A processor with four cores is called a:", options: ["Single-core processor", "Dual-core processor", "Quad-core processor", "Co-processor"], answer: "Quad-core processor" }, { question: "What is the main advantage of a multi-core processor?", options: ["Lower power consumption", "Smaller physical size", "Ability to perform multiple tasks in parallel", "Higher clock speed per core"], answer: "Ability to perform multiple tasks in parallel" }, { question: "A Graphics Processing Unit (GPU) is an example of a:", options: ["General-purpose processor", "Co-processor", "Register", "System bus"], answer: "Co-processor" }, { question: "The Memory Data Register (MDR) is connected to which bus?", options: ["Address Bus", "Control Bus", "Data Bus", "Front-side Bus"], answer: "Data Bus" }, { question: "What happens during the 'Decode' stage of the FDE cycle?", options: ["The instruction is executed by the ALU.", "The CU interprets the instruction in the IR.", "The next instruction is fetched from RAM.", "The result is written back to memory."], answer: "The CU interprets the instruction in the IR." }, { question: "Which component holds the result of calculations performed by the ALU?", options: ["Program Counter", "Instruction Register", "Accumulator", "Memory Address Register"], answer: "Accumulator" }, { question: "The width of the Address Bus determines the...", options: ["Speed of data transfer", "Maximum amount of memory the CPU can address", "Number of cores", "Clock speed"], answer: "Maximum amount of memory the CPU can address" }, { question: "Which signal is NOT carried by the Control Bus?", options: ["Memory Read/Write", "Interrupt Request", "The actual data being transferred", "Bus Request"], answer: "The actual data being transferred" }, { question: "What is the final stage of the Fetch-Decode-Execute cycle?", options: ["Store", "Fetch", "Execute", "Decode"], answer: "Execute" }, { question: "The job of the Control Unit can be compared to a...", options: ["Calculator", "Library", "Traffic police officer", "Filing cabinet"], answer: "Traffic police officer" }, { question: "The Instruction Register (IR) holds the...", options: ["Address of the next instruction", "Data fetched from memory", "Current instruction being executed", "Result of the last calculation"], answer: "Current instruction being executed" }, { question: "What does 'bidirectional' mean in the context of a bus?", options: ["It carries addresses", "It carries control signals", "Data can travel in both directions", "It is twice as fast"], answer: "Data can travel in both directions" }, { question: "CPUs that can execute multiple instructions at the same time are said to have...", options: ["A fast clock speed", "A large cache", "Parallel processing capabilities", "A single core"], answer: "Parallel processing capabilities" }, { question: "Which of these is a logical operation performed by the ALU?", options: ["Addition", "Multiplication", "AND", "Square Root"], answer: "AND" }, { question: "Where are the instructions and data a program is currently using stored?", options: ["Hard Drive", "CPU Registers", "Main Memory (RAM)", "Control Unit"], answer: "Main Memory (RAM)" }, { question: "After fetching an instruction, the Program Counter is typically...", options: ["Reset to zero", "Incremented", "Decremented", "Copied to the MDR"], answer: "Incremented" }, { question: "A GPU is highly specialized for tasks involving...", options: ["Database management", "Sequential processing", "Massively parallel computations", "Network routing"], answer: "Massively parallel computations" }, { question: "The width of the Data Bus determines the...", options: ["Maximum memory capacity", "Amount of data that can be transferred at one time", "Speed of the ALU", "Number of registers"], answer: "Amount of data that can be transferred at one time" }, { question: "What is the role of the MAR?", options: ["To hold data being transferred to/from memory", "To hold the address of the memory location being accessed", "To hold the instruction being decoded", "To count program steps"], answer: "To hold the address of the memory location being accessed" }, { question: "The process of the CPU repeatedly performing the FDE cycle is also known as the...", options: ["Machine Instruction Cycle", "System Clock", "Bus Cycle", "I/O Cycle"], answer: "Machine Instruction Cycle" }, { question: "The ALU and CU are the two main parts of the...", options: ["RAM", "System Bus", "CPU", "Hard Drive"], answer: "CPU" }, { question: "Which register acts as a buffer between the CPU and main memory for data?", options: ["PC", "IR", "MAR", "MDR"], answer: "MDR" }, { question: "A 'memory write' operation sends data from where to where?", options: ["RAM to CPU", "CPU to RAM", "ALU to CU", "Register to Register"], answer: "CPU to RAM" }, { question: "What is the primary limitation of a single-core processor?", options: ["It cannot multitask", "It cannot perform true parallel processing", "It has no registers", "It is too large"], answer: "It cannot perform true parallel processing" }, { question: "What triggers the start of the Fetch-Decode-Execute cycle?", options: ["A user click", "A clock pulse", "A power-on signal", "An interrupt"], answer: "A clock pulse" }, { question: "Which bus carries signals to synchronize the activities of all computer components?", options: ["Address Bus", "Data Bus", "Control Bus", "Internal Bus"], answer: "Control Bus" }, { question: "The contents of the MDR are copied to which register during the fetch stage?", options: ["PC", "MAR", "IR", "Accumulator"], answer: "IR" }, { question: "Which type of processor is best suited for rendering complex 3D graphics in a video game?", options: ["CPU", "GPU", "ALU", "CU"], answer: "GPU" }, { question: "A CPU's speed is often measured in...", options: ["Gigabytes (GB)", "Megabits per second (Mbps)", "Gigahertz (GHz)", "Dots per inch (DPI)"], answer: "Gigahertz (GHz)" }, { question: "What does the term 'register' refer to within the CPU?", options: ["A large memory area for storing files", "A component that performs calculations", "A small, very fast storage location", "A pathway for data"], answer: "A small, very fast storage location" }, { question: "The 'Execute' stage might involve which two components working together?", options: ["PC and MAR", "CU and ALU", "MDR and RAM", "Address Bus and Data Bus"], answer: "CU and ALU" }, { question: "If a CPU has a 32-bit address bus, what is the maximum amount of memory it can access?", options: ["32 MB", "1 GB", "4 GB", "32 GB"], answer: "4 GB" }, { question: "Which of these is NOT a register inside the CPU?", options: ["Program Counter", "Accumulator", "RAM Controller", "Instruction Register"], answer: "RAM Controller" }, { question: "True or False: The Data Bus is unidirectional.", options: ["True", "False"], answer: "False" }, { question: "Offloading specific, intensive tasks from the CPU to a specialized processor is a key role of a...", options: ["Multi-core CPU", "System Clock", "Co-processor", "Register file"], answer: "Co-processor" }, { question: "What is the function of the Accumulator (AC)?", options: ["Store the next memory address", "Hold intermediate results from the ALU", "Decode instructions", "Control the system clock"], answer: "Hold intermediate results from the ALU" }, { question: "The three types of buses connecting the CPU and RAM are collectively known as the...", options: ["System Bus", "Internal Bus", "Expansion Bus", "Serial Bus"], answer: "System Bus" }, { question: "Which CPU component is responsible for interpreting a 'LOAD' command?", options: ["ALU", "PC", "CU", "Accumulator"], answer: "CU" }, { question: "A 'memory read' signal would be sent along which bus?", options: ["Address Bus", "Data Bus", "Control Bus", "All of the above"], answer: "Control Bus" }, { question: "Which component is NOT part of the CPU?", options: ["Control Unit", "ALU", "Registers", "Main Memory (RAM)"], answer: "Main Memory (RAM)" }, { question: "In modern computing, are single-core processors common for desktop computers?", options: ["Yes", "No"], answer: "No" }, { question: "The interaction between the MAR, MDR, and the buses is essential for...", options: ["Performing arithmetic", "Decoding instructions", "Communicating with memory", "Incrementing the PC"], answer: "Communicating with memory" }, { question: "What is the very first step in the Fetch-Decode-Execute cycle?", options: ["Increment the PC", "Copy the address from the PC to the MAR", "Fetch data into the MDR", "Decode the instruction"], answer: "Copy the address from the PC to the MAR" }, { question: "Having more cores in a CPU generally leads to better...", options: ["Single-threaded performance", "Multitasking performance", "Graphics quality", "Memory capacity"], answer: "Multitasking performance" }, { question: "Which register's content directly specifies a location in RAM?", options: ["PC", "IR", "MDR", "MAR"], answer: "MAR" }, { question: "The set of all operations that a CPU can execute is known as its...", options: ["Register set", "Instruction set", "Bus architecture", "Core count"], answer: "Instruction set" }, { question: "Which bus is used by the CPU to select a specific memory location?", options: ["Data Bus", "Control Bus", "Address Bus", "PCI Bus"], answer: "Address Bus" }, { question: "The result of `10 + 5` would be calculated by the ___ and stored in the ___.", options: ["CU, PC", "ALU, Accumulator", "PC, MAR", "MDR, IR"], answer: "ALU, Accumulator" }, { question: "What is the purpose of the system clock?", options: ["To keep the current time and date", "To synchronize the operations of CPU components", "To measure program execution time", "To power the CPU"], answer: "To synchronize the operations of CPU components" }, { question: "What does CPU stand for?", options: ["Computer Processing Unit", "Central Processing Unit", "Core Programming Unit", "Central Program Utility"], answer: "Central Processing Unit" }, { question: "A co-processor like a GPU excels at 'Single Instruction, Multiple Data' (SIMD) tasks. This means it performs...", options: ["One complex operation on one piece of data", "Many different operations on one piece of data", "The same operation on many pieces of data simultaneously", "Many different operations on many pieces of data"], answer: "The same operation on many pieces of data simultaneously" }, { question: "When the CU decodes an instruction, it determines...", options: ["The address of the next instruction", "What operation needs to be performed", "If there is enough RAM available", "The speed of the system bus"], answer: "What operation needs to be performed" }, { question: "Which of the following is an arithmetic operation?", options: ["OR", "NOT", "SHIFT", "SUBTRACT"], answer: "SUBTRACT" }, { question: "True or False: All registers in the CPU are general-purpose.", options: ["True", "False"], answer: "False" }, { question: "The 'brain' of the computer is a common analogy for the...", options: ["RAM", "Hard Drive", "Motherboard", "CPU"], answer: "CPU" }
+    ];
+    let currentQuizQuestions = [];
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let timerInterval;
+    let timeLeft = 1800; 
+
+    function initializeQuiz() {
+        if (!quizContainer) return;
+        clearInterval(timerInterval);
+        quizContainer.innerHTML = `
+            <div class="text-center">
+                <button id="start-quiz-btn" class="bg-blue-600 text-white font-bold py-3 px-8 rounded-lg shadow-md hover:bg-blue-700 transition-colors">Start 60-Question Test</button>
+            </div>
+        `;
+        document.getElementById('start-quiz-btn').addEventListener('click', startQuiz);
+    }
+
+    function startQuiz() {
+        currentQuizQuestions = questionBank.sort(() => 0.5 - Math.random()).slice(0, 60);
+        currentQuestionIndex = 0;
+        score = 0;
+        timeLeft = 1800; 
+        
+        clearInterval(timerInterval);
+        timerInterval = setInterval(updateTimer, 1000);
+
+        showQuestion();
+    }
+
+    function updateTimer() {
+        const timerEl = document.getElementById('quiz-timer');
+        if (timerEl) {
+            timeLeft--;
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerEl.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            if (timeLeft <= 0) {
+                showResults("Time's up!");
+            }
+        }
+    }
+
+    function showQuestion() {
+        const questionData = currentQuizQuestions[currentQuestionIndex];
+        quizContainer.innerHTML = `
+            <div class="mb-4">
+                <div class="flex justify-between items-center mb-2 text-lg">
+                    <h3 class="font-semibold">Question ${currentQuestionIndex + 1} of ${currentQuizQuestions.length}</h3>
+                    <div class="flex items-center space-x-4">
+                        <p class="font-bold text-blue-600">Score: ${score}</p>
+                        <p id="quiz-timer" class="font-bold text-gray-700 bg-gray-200 px-3 py-1 rounded-md">30:00</p>
+                    </div>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                    <div class="bg-blue-500 h-2.5 rounded-full" style="width: ${((currentQuestionIndex + 1) / currentQuizQuestions.length) * 100}%"></div>
+                </div>
+            </div>
+            <h4 class="text-xl font-bold mb-5 text-gray-800">${questionData.question}</h4>
+            <div id="options-container" class="space-y-3"></div>
+            <div id="feedback-container" class="mt-4 text-center font-semibold"></div>
+            <div class="mt-6 text-right">
+                <button id="next-btn" class="bg-gray-400 text-white font-bold py-2 px-6 rounded-lg shadow-sm cursor-not-allowed" disabled>Next</button>
+            </div>
+        `;
+        
+        const optionsContainer = document.getElementById('options-container');
+        questionData.options.forEach(option => {
+            const button = document.createElement('button');
+            button.className = 'quiz-option block w-full text-left p-3 border-2 border-gray-200 rounded-lg hover:bg-gray-100';
+            button.textContent = option;
+            button.addEventListener('click', () => selectAnswer(button, option, questionData.answer));
+            optionsContainer.appendChild(button);
+        });
+
+        document.getElementById('next-btn').addEventListener('click', nextQuestion);
+        updateTimer();
+    }
+
+    function selectAnswer(button, selectedOption, correctAnswer) {
+        document.querySelectorAll('.quiz-option').forEach(btn => btn.disabled = true);
+        const feedbackContainer = document.getElementById('feedback-container');
+        const nextBtn = document.getElementById('next-btn');
+
+        if (selectedOption === correctAnswer) {
+            score++;
+            button.classList.add('correct');
+            feedbackContainer.innerHTML = `<p class="text-green-600">✅ Correct!</p>`;
+        } else {
+            button.classList.add('incorrect');
+            feedbackContainer.innerHTML = `<p class="text-red-600">❌ Incorrect. The correct answer is "${correctAnswer}".</p>`;
+            const correctButton = Array.from(document.querySelectorAll('.quiz-option')).find(btn => btn.textContent === correctAnswer);
+            if (correctButton) correctButton.classList.add('correct');
+        }
+
+        nextBtn.disabled = false;
+        nextBtn.classList.remove('bg-gray-400', 'cursor-not-allowed');
+        nextBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+        if (currentQuestionIndex === currentQuizQuestions.length - 1) {
+            nextBtn.textContent = 'See Results';
+        }
+    }
+    
+    function nextQuestion() {
+        currentQuestionIndex++;
+        if (currentQuestionIndex < currentQuizQuestions.length) {
+            showQuestion();
+        } else {
+            showResults();
+        }
+    }
+
+    function showResults(message = "Quiz Complete!") {
+        clearInterval(timerInterval);
+        quizContainer.innerHTML = `
+            <div class="text-center">
+                <h2 class="text-2xl font-bold mb-2">${message}</h2>
+                <p class="text-lg mb-4">You scored</p>
+                <p class="text-5xl font-extrabold text-blue-600 mb-6">${score} out of ${currentQuizQuestions.length}</p>
+                <button id="restart-quiz-btn" class="bg-blue-600 text-white font-bold py-3 px-8 rounded-lg shadow-md hover:bg-blue-700 transition-colors">Try Again</button>
+            </div>
+        `;
+        document.getElementById('restart-quiz-btn').addEventListener('click', initializeQuiz);
+    }
+    
+    // --- Initial Setup ---
+    switchTab('home');
+    if (quizContainer) {
+        initializeQuiz(); 
+    }
+});
+</script>
+</body>
+</html>
